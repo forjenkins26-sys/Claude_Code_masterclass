@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "baseUrl": ".",
+    "paths": {
+      "@config": ["src/01_config/config"],
+      "@types/*": ["src/02_types/*"],
+      "@clients/*": ["src/03_clients/*"],
+      "@services/*": ["src/04_services/*"],
+      "@utils/*": ["src/05_utils/*"],
+      "@fixtures": ["src/fixtures/api-fixtures"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*", "playwright.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

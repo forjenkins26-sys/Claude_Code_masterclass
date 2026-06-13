@@ -1,0 +1,18 @@
+{
+  "name": "restapi-framework-task",
+  "version": "1.0.0",
+  "description": "Playwright API Testing Framework — Restful Booker",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:auth": "npx playwright test tests/auth.spec.ts",
+    "test:booking": "npx playwright test tests/booking.spec.ts",
+    "test:filter": "npx playwright test tests/filter.spec.ts",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@faker-js/faker": "^8.4.1",
+    "typescript": "^5.4.5",
+    "@types/node": "^20.12.12"
+  }
+}
