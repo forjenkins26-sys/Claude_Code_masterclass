@@ -1,0 +1,322 @@
+
+> facebook-playwright-automation@1.0.0 test
+> playwright test tests/ui/registration.spec.ts --grep REG-001 --project=chromium --reporter=json
+
+{
+  "config": {
+    "configFile": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\playwright.config.ts",
+    "rootDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "setup\\auth.setup.ts",
+      "file": "setup/auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 439,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Auth setup skipped - requires valid credentials\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-06-11T07:52:45.641Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e717b06d8d484d1cd946-ece6ea03d0ba8d9d0fd4",
+          "file": "setup/auth.setup.ts",
+          "line": 13,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "ui\\registration.spec.ts",
+      "file": "ui/registration.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Facebook Registration Tests",
+          "file": "ui/registration.spec.ts",
+          "line": 21,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "DOM Verification Tests (No Behavioral Assumptions) @smoke",
+              "file": "ui/registration.spec.ts",
+              "line": 29,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "REG-001: Verify registration form DOM elements exist",
+                  "ok": false,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 9890,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[name=\"firstname\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[name=\"firstname\"]')\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[name=\"firstname\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[name=\"firstname\"]')\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:33:53",
+                            "location": {
+                              "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                              "column": 53,
+                              "line": 33
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 31 |\u001b[39m     test(\u001b[32m'REG-001: Verify registration form DOM elements exist'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ registrationPage }) \u001b[33m=>\u001b[39m {\n \u001b[90m 32 |\u001b[39m       \u001b[90m// VERIFIED: Only checks DOM existence, no behavior assumptions\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 33 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mfirstNameInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mlastNameInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailOrPhoneInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mnewPasswordInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                                "column": 53,
+                                "line": 33
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[name=\"firstname\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[name=\"firstname\"]')\u001b[22m\n\n\n  31 |     test('REG-001: Verify registration form DOM elements exist', async ({ registrationPage }) => {\n  32 |       // VERIFIED: Only checks DOM existence, no behavior assumptions\n> 33 |       await expect(registrationPage.firstNameInput).toBeVisible();\n     |                                                     ^\n  34 |       await expect(registrationPage.lastNameInput).toBeVisible();\n  35 |       await expect(registrationPage.emailOrPhoneInput).toBeVisible();\n  36 |       await expect(registrationPage.newPasswordInput).toBeVisible();\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:33:53"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T07:52:47.132Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium\\video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium\\error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 53,
+                            "line": 33
+                          }
+                        },
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 7524,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[name=\"firstname\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[name=\"firstname\"]')\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[name=\"firstname\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[name=\"firstname\"]')\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:33:53",
+                            "location": {
+                              "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                              "column": 53,
+                              "line": 33
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 31 |\u001b[39m     test(\u001b[32m'REG-001: Verify registration form DOM elements exist'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ registrationPage }) \u001b[33m=>\u001b[39m {\n \u001b[90m 32 |\u001b[39m       \u001b[90m// VERIFIED: Only checks DOM existence, no behavior assumptions\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 33 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mfirstNameInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mlastNameInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailOrPhoneInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mnewPasswordInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                                "column": 53,
+                                "line": 33
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[name=\"firstname\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[name=\"firstname\"]')\u001b[22m\n\n\n  31 |     test('REG-001: Verify registration form DOM elements exist', async ({ registrationPage }) => {\n  32 |       // VERIFIED: Only checks DOM existence, no behavior assumptions\n> 33 |       await expect(registrationPage.firstNameInput).toBeVisible();\n     |                                                     ^\n  34 |       await expect(registrationPage.lastNameInput).toBeVisible();\n  35 |       await expect(registrationPage.emailOrPhoneInput).toBeVisible();\n  36 |       await expect(registrationPage.newPasswordInput).toBeVisible();\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:33:53"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 1,
+                          "startTime": "2026-06-11T07:52:58.034Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium-retry1\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium-retry1\\video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium-retry1\\error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Facebook-R-a2d89-ion-form-DOM-elements-exist-chromium-retry1\\trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 53,
+                            "line": 33
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "d0536cdd17d6e3b61b4a-e56d48870c3e1b07bf37",
+                  "file": "ui/registration.spec.ts",
+                  "line": 31,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-11T07:52:44.771Z",
+    "duration": 21302.095,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

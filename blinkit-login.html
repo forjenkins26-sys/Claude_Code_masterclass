@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blinkit – Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wrapper {
+      display: flex;
+      width: 860px;
+      min-height: 520px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      background: #fff;
+    }
+
+    /* Left panel */
+    .left-panel {
+      background: #f8e71c;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg { fill: #f8e71c; }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      font-size: 15px;
+      color: #333;
+      text-align: center;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .delivery-badge {
+      margin-top: 24px;
+      background: #1a1a1a;
+      color: #f8e71c;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    /* Right panel */
+    .right-panel {
+      flex: 1;
+      padding: 48px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input {
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 14px;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fafafa;
+    }
+
+    input:focus {
+      border-color: #f8e71c;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(248,231,28,0.18);
+    }
+
+    .mobile-wrap {
+      position: relative;
+    }
+
+    .mobile-prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #555;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    .mobile-wrap input {
+      padding-left: 38px;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: #f8e71c;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-login:hover { background: #f0dc00; }
+    .btn-login:active { transform: scale(0.98); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      color: #bbb;
+      font-size: 12px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e8e8e8;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 12px;
+      background: #fff;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: #bbb;
+      background: #fafafa;
+    }
+
+    /* INTENTIONAL BUG: signup button looks normal but does nothing */
+    .btn-signup {
+      width: 100%;
+      padding: 12px;
+      background: #1a1a1a;
+      color: #f8e71c;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      /* pointer-events: none; -- NOT disabled, just handler is broken */
+    }
+
+    .btn-signup:hover { background: #2d2d2d; }
+
+    .forgot {
+      text-align: right;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .forgot a {
+      font-size: 12px;
+      color: #1a1a1a;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .forgot a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .error-msg {
+      font-size: 12px;
+      color: #e53935;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .input-error { border-color: #e53935 !important; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Left branding panel -->
+  <div class="left-panel">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="logo-text">blinkit</span>
+    </div>
+    <p class="tagline">Groceries delivered<br>in 10 minutes</p>
+    <div class="delivery-badge">⚡ Instant Delivery</div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="right-panel">
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to your Blinkit account</p>
+
+    <form id="loginForm" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" placeholder="Rahul" autocomplete="given-name" />
+          <span class="error-msg" id="firstNameErr">Enter your first name</span>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" placeholder="Sharma" autocomplete="family-name" />
+          <span class="error-msg" id="lastNameErr">Enter your last name</span>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:4px">
+        <label for="mobile">Mobile Number</label>
+        <div class="mobile-wrap">
+          <span class="mobile-prefix">+91</span>
+          <input type="tel" id="mobile" placeholder="9876543210" maxlength="10" autocomplete="tel" />
+        </div>
+        <span class="error-msg" id="mobileErr">Enter valid 10-digit mobile number</span>
+      </div>
+
+      <div class="forgot">
+        <a href="#" id="forgotBtn">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">Login</button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <!-- INTENTIONAL BUG: signup button does nothing on click -->
+    <button class="btn-signup" id="signupBtn">Create New Account</button>
+
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+  function showToast(msg, duration = 3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  // Login form validation
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const firstName = document.getElementById('firstName');
+    const lastName  = document.getElementById('lastName');
+    const mobile    = document.getElementById('mobile');
+    let valid = true;
+
+    // Reset errors
+    ['firstName','lastName','mobile'].forEach(id => {
+      document.getElementById(id).classList.remove('input-error');
+      document.getElementById(id + 'Err').style.display = 'none';
+    });
+
+    if (!firstName.value.trim()) {
+      firstName.classList.add('input-error');
+      document.getElementById('firstNameErr').style.display = 'block';
+      valid = false;
+    }
+
+    if (!lastName.value.trim()) {
+      lastName.classList.add('input-error');
+      document.getElementById('lastNameErr').style.display = 'block';
+      valid = false;
+    }
+
+    if (!/^\d{10}$/.test(mobile.value.trim())) {
+      mobile.classList.add('input-error');
+      document.getElementById('mobileErr').style.display = 'block';
+      valid = false;
+    }
+
+    if (valid) {
+      showToast('✅ OTP sent to +91 ' + mobile.value.trim());
+    }
+  });
+
+  // Mobile: numbers only
+  document.getElementById('mobile').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '');
+  });
+
+  // Forgot password
+  document.getElementById('forgotBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    showToast('📱 Password reset link sent to your mobile');
+  });
+
+  // ⚠️ INTENTIONAL BUG: signup button has no event listener — click does nothing
+  // The button looks active (hover effect works) but has no handler attached.
+  // This is a known defect for test automation practice.
+</script>
+
+</body>
+</html>

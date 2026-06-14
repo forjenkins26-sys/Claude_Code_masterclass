@@ -1,0 +1,275 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ui\registration.spec.ts >> Registration Page Tests (SCRUM-142) >> REG-010: Verify email with no TLD is rejected [WILL FAIL — BUG-A]
+- Location: tests\ui\registration.spec.ts:100:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator:  locator('#emailError')
+Expected: visible
+Received: hidden
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('#emailError')
+    13 × locator resolved to <div id="emailError" class="error-msg">Enter a valid email address (e.g. name@domain.com)</div>
+       - unexpected value "hidden"
+
+```
+
+```yaml
+- heading "DemoApp" [level=1]
+- paragraph: Create your account
+- text: First Name *
+- textbox "First Name *":
+  - /placeholder: Rahul
+- text: Last Name *
+- textbox "Last Name *":
+  - /placeholder: Sharma
+- text: Email Address *
+- textbox "Email Address *":
+  - /placeholder: rahul.sharma@example.com
+- text: Mobile Number *
+- textbox "Mobile Number *":
+  - /placeholder: "9876543210"
+- text: Date of Birth *
+- textbox "Date of Birth *"
+- text: Password *
+- textbox "Password *":
+  - /placeholder: Create a strong password
+- button "Toggle password visibility": 👁
+- paragraph: "Password must contain:"
+- text: At least 8 characters One uppercase letter (A-Z) One lowercase letter (a-z) One number (0-9) One special character (!@#$%^&*) Confirm Password *
+- textbox "Confirm Password *":
+  - /placeholder: Re-enter your password
+- button "Toggle confirm password visibility": 👁
+- checkbox "I agree to the Terms of Service and Privacy Policy"
+- text: I agree to the
+- link "Terms of Service":
+  - /url: "#"
+- text: and
+- link "Privacy Policy":
+  - /url: "#"
+- button "Create Account"
+- text: or Already have an account?
+- link "Sign in":
+  - /url: "#"
+- text: ✅ Account created successfully! Welcome aboard.
+```
+
+# Test source
+
+```ts
+  6   | // Known intentional bugs: BUG-A (email), BUG-B (password) — tests WILL FAIL until fixed
+  7   | 
+  8   | test.describe('Registration Page Tests (SCRUM-142)', () => {
+  9   | 
+  10  |   test.beforeEach(async ({ registrationPage }) => {
+  11  |     await registrationPage.goto();
+  12  |     await registrationPage.submitButton.waitFor({ state: 'visible' });
+  13  |   });
+  14  | 
+  15  |   // ── Valid Scenarios ──────────────────────────────────────────────────────────
+  16  | 
+  17  |   test('REG-001: Verify successful registration with all valid inputs', async ({ registrationPage }) => {
+  18  |     // Source: SCRUM-142 — "All fields valid + terms checked → Toast: ✅ Account created successfully! Welcome aboard."
+  19  |     // AFP-15: validate actual outcome — toast visible + exact text + has .show class
+  20  |     await registrationPage.fillValidForm();
+  21  |     await registrationPage.submit();
+  22  |     await expect(registrationPage.toast).toHaveClass(/show/);
+  23  |     await expect(registrationPage.toast).toHaveText('✅ Account created successfully! Welcome aboard.');
+  24  |   });
+  25  | 
+  26  |   // ── Name Field Validation ────────────────────────────────────────────────────
+  27  | 
+  28  |   test('REG-002: Verify empty first name shows error', async ({ registrationPage }) => {
+  29  |     // Source: SCRUM-142 — empty → FAIL: "Enter your first name (letters only, min 2 chars)"
+  30  |     await registrationPage.fillValidForm();
+  31  |     await registrationPage.firstNameInput.fill('');
+  32  |     await registrationPage.submit();
+  33  |     await expect(registrationPage.firstNameError).toBeVisible();
+  34  |     await expect(registrationPage.firstNameError).toHaveText('Enter your first name (letters only, min 2 chars)');
+  35  |   });
+  36  | 
+  37  |   test('REG-003: Verify single-char first name shows error', async ({ registrationPage }) => {
+  38  |     // Source: SCRUM-142 — "R" (1 char) → FAIL: same error message
+  39  |     await registrationPage.fillValidForm();
+  40  |     await registrationPage.firstNameInput.fill('R');
+  41  |     await registrationPage.submit();
+  42  |     await expect(registrationPage.firstNameError).toBeVisible();
+  43  |     await expect(registrationPage.firstNameError).toHaveText('Enter your first name (letters only, min 2 chars)');
+  44  |   });
+  45  | 
+  46  |   test('REG-004: Verify digits-only first name shows error', async ({ registrationPage }) => {
+  47  |     // Source: SCRUM-142 — "123" (digits) → FAIL
+  48  |     await registrationPage.fillValidForm();
+  49  |     await registrationPage.firstNameInput.fill('123');
+  50  |     await registrationPage.submit();
+  51  |     await expect(registrationPage.firstNameError).toBeVisible();
+  52  |     await expect(registrationPage.firstNameError).toHaveText('Enter your first name (letters only, min 2 chars)');
+  53  |   });
+  54  | 
+  55  |   test('REG-005: Verify empty last name shows error', async ({ registrationPage }) => {
+  56  |     // Source: SCRUM-142 — empty last name → FAIL: "Enter your last name (letters only, min 2 chars)"
+  57  |     await registrationPage.fillValidForm();
+  58  |     await registrationPage.lastNameInput.fill('');
+  59  |     await registrationPage.submit();
+  60  |     await expect(registrationPage.lastNameError).toBeVisible();
+  61  |     await expect(registrationPage.lastNameError).toHaveText('Enter your last name (letters only, min 2 chars)');
+  62  |   });
+  63  | 
+  64  |   test('REG-006: Verify single-char last name shows error', async ({ registrationPage }) => {
+  65  |     // Source: SCRUM-142 — "S" (1 char) → FAIL
+  66  |     await registrationPage.fillValidForm();
+  67  |     await registrationPage.lastNameInput.fill('S');
+  68  |     await registrationPage.submit();
+  69  |     await expect(registrationPage.lastNameError).toBeVisible();
+  70  |     await expect(registrationPage.lastNameError).toHaveText('Enter your last name (letters only, min 2 chars)');
+  71  |   });
+  72  | 
+  73  |   test('REG-007: Verify valid name format passes validation', async ({ registrationPage }) => {
+  74  |     // Source: SCRUM-142 — "Rahul" → PASS
+  75  |     await registrationPage.fillValidForm();
+  76  |     await registrationPage.submit();
+  77  |     await expect(registrationPage.firstNameError).not.toBeVisible();
+  78  |     await expect(registrationPage.lastNameError).not.toBeVisible();
+  79  |   });
+  80  | 
+  81  |   // ── Email Validation ─────────────────────────────────────────────────────────
+  82  | 
+  83  |   test('REG-008: Verify valid email format passes validation', async ({ registrationPage }) => {
+  84  |     // Source: SCRUM-142 — "rahul@example.com" → PASS
+  85  |     await registrationPage.fillValidForm();
+  86  |     await registrationPage.submit();
+  87  |     await expect(registrationPage.emailError).not.toBeVisible();
+  88  |   });
+  89  | 
+  90  |   test('REG-009: Verify email with no domain is rejected [WILL FAIL — BUG-A]', async ({ registrationPage }) => {
+  91  |     // Source: SCRUM-142 — "rahul@" → FAIL: "Enter a valid email address (e.g. name@domain.com)"
+  92  |     // BUG-A: validateEmail() only checks '@' presence — accepts "rahul@" as valid
+  93  |     await registrationPage.fillValidForm();
+  94  |     await registrationPage.emailInput.fill('rahul@');
+  95  |     await registrationPage.submit();
+  96  |     await expect(registrationPage.emailError).toBeVisible();
+  97  |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');
+  98  |   });
+  99  | 
+  100 |   test('REG-010: Verify email with no TLD is rejected [WILL FAIL — BUG-A]', async ({ registrationPage }) => {
+  101 |     // Source: SCRUM-142 — "rahul@nodot" → FAIL
+  102 |     // BUG-A: accepts "rahul@nodot" because @ is present
+  103 |     await registrationPage.fillValidForm();
+  104 |     await registrationPage.emailInput.fill('rahul@nodot');
+  105 |     await registrationPage.submit();
+> 106 |     await expect(registrationPage.emailError).toBeVisible();
+      |                                               ^ Error: expect(locator).toBeVisible() failed
+  107 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');
+  108 |   });
+  109 | 
+  110 |   test('REG-011: Verify @ symbol only is rejected [WILL FAIL — BUG-A]', async ({ registrationPage }) => {
+  111 |     // Source: SCRUM-142 — "@only" → FAIL
+  112 |     // BUG-A: "@only" contains @ so passes validateEmail()
+  113 |     await registrationPage.fillValidForm();
+  114 |     await registrationPage.emailInput.fill('@only');
+  115 |     await registrationPage.submit();
+  116 |     await expect(registrationPage.emailError).toBeVisible();
+  117 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');
+  118 |   });
+  119 | 
+  120 |   test('REG-012: Verify email with no @ symbol is rejected', async ({ registrationPage }) => {
+  121 |     // Source: SCRUM-142 — "notanemail" (no @) → FAIL
+  122 |     await registrationPage.fillValidForm();
+  123 |     await registrationPage.emailInput.fill('notanemail');
+  124 |     await registrationPage.submit();
+  125 |     await expect(registrationPage.emailError).toBeVisible();
+  126 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');
+  127 |   });
+  128 | 
+  129 |   // ── Phone Validation ─────────────────────────────────────────────────────────
+  130 | 
+  131 |   test('REG-013: Verify valid 10-digit mobile passes validation', async ({ registrationPage }) => {
+  132 |     // Source: SCRUM-142 — "9876543210" (10 digits) → PASS
+  133 |     await registrationPage.fillValidForm();
+  134 |     await registrationPage.submit();
+  135 |     await expect(registrationPage.phoneError).not.toBeVisible();
+  136 |   });
+  137 | 
+  138 |   test('REG-014: Verify phone under 10 digits is rejected', async ({ registrationPage }) => {
+  139 |     // Source: SCRUM-142 — "98765" (5 digits) → FAIL: "Enter a valid 10-digit mobile number"
+  140 |     await registrationPage.fillValidForm();
+  141 |     await registrationPage.phoneInput.fill('');
+  142 |     await registrationPage.phoneInput.pressSequentially('98765');
+  143 |     await registrationPage.submit();
+  144 |     await expect(registrationPage.phoneError).toBeVisible();
+  145 |     await expect(registrationPage.phoneError).toHaveText('Enter a valid 10-digit mobile number');
+  146 |   });
+  147 | 
+  148 |   test('REG-015: Verify letters in phone field are rejected', async ({ registrationPage }) => {
+  149 |     // Source: SCRUM-142 — "abcdefghij" → FAIL
+  150 |     await registrationPage.fillValidForm();
+  151 |     await registrationPage.phoneInput.fill('');
+  152 |     await registrationPage.phoneInput.pressSequentially('abcdefghij');
+  153 |     await registrationPage.submit();
+  154 |     await expect(registrationPage.phoneError).toBeVisible();
+  155 |     await expect(registrationPage.phoneError).toHaveText('Enter a valid 10-digit mobile number');
+  156 |   });
+  157 | 
+  158 |   test('REG-016: Verify phone maxlength=10 enforced by browser via pressSequentially', async ({ registrationPage }) => {
+  159 |     // Source: SCRUM-142 — DOM maxlength=10 must be enforced
+  160 |     // AH-18: pressSequentially() respects maxlength; fill() bypasses it
+  161 |     await registrationPage.phoneInput.pressSequentially('12345678901234');
+  162 |     const value = await registrationPage.phoneInput.inputValue();
+  163 |     expect(value.length).toBeLessThanOrEqual(10);
+  164 |   });
+  165 | 
+  166 |   // ── Date of Birth (Age Gate) ─────────────────────────────────────────────────
+  167 | 
+  168 |   test('REG-017: Verify DOB making user exactly 18 passes age gate', async ({ registrationPage }) => {
+  169 |     // Source: SCRUM-142 — exactly 18 years old → PASS
+  170 |     // Date: user born 2008-06-12 is exactly 18 on 2026-06-12
+  171 |     await registrationPage.fillValidForm();
+  172 |     await registrationPage.dobInput.fill('2008-06-12');
+  173 |     await registrationPage.submit();
+  174 |     await expect(registrationPage.dobError).not.toBeVisible();
+  175 |   });
+  176 | 
+  177 |   test('REG-018: Verify DOB making user under 18 is rejected', async ({ registrationPage }) => {
+  178 |     // Source: SCRUM-142 — 17 yrs 11 months → FAIL: "You must be at least 18 years old to register"
+  179 |     // Date: 2008-07-12 = 17 years 11 months on 2026-06-12
+  180 |     await registrationPage.fillValidForm();
+  181 |     await registrationPage.dobInput.fill('2008-07-12');
+  182 |     await registrationPage.submit();
+  183 |     await expect(registrationPage.dobError).toBeVisible();
+  184 |     await expect(registrationPage.dobError).toHaveText('You must be at least 18 years old to register');
+  185 |   });
+  186 | 
+  187 |   // ── Password Strength Validation ─────────────────────────────────────────────
+  188 | 
+  189 |   test('REG-019: Verify strong password with all requirements passes', async ({ registrationPage }) => {
+  190 |     // Source: SCRUM-142 — "Password1!" → PASS (upper, lower, digit, special, length ≥ 8)
+  191 |     await registrationPage.fillValidForm();
+  192 |     await registrationPage.submit();
+  193 |     await expect(registrationPage.passwordError).not.toBeVisible();
+  194 |   });
+  195 | 
+  196 |   test('REG-020: Verify all-lowercase password is rejected [WILL FAIL — BUG-B]', async ({ registrationPage }) => {
+  197 |     // Source: SCRUM-142 — "password" → FAIL (missing uppercase, digit, special char)
+  198 |     // BUG-B: validatePassword() only checks length >= 8 — "password" passes
+  199 |     await registrationPage.fillValidForm();
+  200 |     await registrationPage.passwordInput.fill('password');
+  201 |     await registrationPage.confirmPasswordInput.fill('password');
+  202 |     await registrationPage.submit();
+  203 |     await expect(registrationPage.passwordError).toBeVisible();
+  204 |     await expect(registrationPage.passwordError).toHaveText('Password does not meet all requirements');
+  205 |   });
+  206 | 
+```

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account - Demo Registration</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      color: #1a1a2e;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: #0f3460;
+    }
+
+    .logo p {
+      font-size: 14px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .form-group label .required {
+      color: #e74c3c;
+      margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+      background: #fafafa;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #0f3460;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(15,52,96,0.1);
+    }
+
+    .form-group input.error-field {
+      border-color: #e74c3c;
+      background: #fff8f8;
+    }
+
+    .form-group input.success-field {
+      border-color: #27ae60;
+    }
+
+    .error-msg {
+      font-size: 12px;
+      color: #e74c3c;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 40px;
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #888;
+      font-size: 16px;
+      padding: 0;
+    }
+
+    .pw-requirements {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .pw-requirements p {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .req-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #888;
+      margin-bottom: 3px;
+      transition: color 0.2s;
+    }
+
+    .req-item.met {
+      color: #27ae60;
+    }
+
+    .req-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .req-item.met .dot {
+      background: #27ae60;
+    }
+
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .terms-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: #0f3460;
+      flex-shrink: 0;
+    }
+
+    .terms-row label {
+      font-size: 13px;
+      color: #555;
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .terms-row label a {
+      color: #0f3460;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    #submitBtn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    #submitBtn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    #submitBtn:active {
+      transform: translateY(0);
+    }
+
+    #submitBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 1000;
+      max-width: 340px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .toast.success { background: #27ae60; }
+    .toast.error   { background: #e74c3c; }
+
+    .divider {
+      text-align: center;
+      margin: 20px 0 16px;
+      font-size: 13px;
+      color: #aaa;
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background: #e8e8e8;
+    }
+
+    .divider::before { left: 0; }
+    .divider::after  { right: 0; }
+
+    .login-link {
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .login-link a {
+      color: #0f3460;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <h1>Demo<span>App</span></h1>
+    <p>Create your account</p>
+  </div>
+
+  <form id="registrationForm" novalidate>
+
+    <!-- Full Name Row -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">First Name <span class="required">*</span></label>
+        <input type="text" id="firstName" placeholder="Rahul" autocomplete="given-name" />
+        <div class="error-msg" id="firstNameError">Enter your first name (letters only, min 2 chars)</div>
+      </div>
+      <div class="form-group">
+        <label for="lastName">Last Name <span class="required">*</span></label>
+        <input type="text" id="lastName" placeholder="Sharma" autocomplete="family-name" />
+        <div class="error-msg" id="lastNameError">Enter your last name (letters only, min 2 chars)</div>
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email">Email Address <span class="required">*</span></label>
+      <input type="email" id="email" placeholder="rahul.sharma@example.com" autocomplete="email" />
+      <div class="error-msg" id="emailError">Enter a valid email address (e.g. name@domain.com)</div>
+    </div>
+
+    <!-- Phone -->
+    <div class="form-group">
+      <label for="phone">Mobile Number <span class="required">*</span></label>
+      <input type="tel" id="phone" placeholder="9876543210" maxlength="10" autocomplete="tel" />
+      <div class="error-msg" id="phoneError">Enter a valid 10-digit mobile number</div>
+    </div>
+
+    <!-- Date of Birth -->
+    <div class="form-group">
+      <label for="dob">Date of Birth <span class="required">*</span></label>
+      <input type="date" id="dob" autocomplete="bday" />
+      <div class="error-msg" id="dobError">You must be at least 18 years old to register</div>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password <span class="required">*</span></label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password" />
+        <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password visibility">👁</button>
+      </div>
+      <div class="pw-requirements" id="pwRequirements">
+        <p>Password must contain:</p>
+        <div class="req-item" id="req-length"><span class="dot"></span>At least 8 characters</div>
+        <div class="req-item" id="req-upper"><span class="dot"></span>One uppercase letter (A-Z)</div>
+        <div class="req-item" id="req-lower"><span class="dot"></span>One lowercase letter (a-z)</div>
+        <div class="req-item" id="req-digit"><span class="dot"></span>One number (0-9)</div>
+        <div class="req-item" id="req-special"><span class="dot"></span>One special character (!@#$%^&amp;*)</div>
+      </div>
+      <div class="error-msg" id="passwordError">Password does not meet all requirements</div>
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" />
+        <button type="button" class="toggle-pw" id="toggleConfirmPw" aria-label="Toggle confirm password visibility">👁</button>
+      </div>
+      <div class="error-msg" id="confirmPasswordError">Passwords do not match</div>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms-row">
+      <input type="checkbox" id="terms" />
+      <label for="terms">
+        I agree to the <a href="#" id="termsLink">Terms of Service</a> and
+        <a href="#" id="privacyLink">Privacy Policy</a>
+      </label>
+    </div>
+    <div class="error-msg" id="termsError" style="margin-top:-12px; margin-bottom:14px;">You must accept the Terms of Service to continue</div>
+
+    <button type="submit" id="submitBtn">Create Account</button>
+  </form>
+
+  <div class="divider">or</div>
+  <div class="login-link">
+    Already have an account? <a href="#" id="loginLink">Sign in</a>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  function showError(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const error = document.getElementById(errorId);
+    field.classList.add('error-field');
+    field.classList.remove('success-field');
+    error.style.display = 'block';
+  }
+
+  function clearError(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const error = document.getElementById(errorId);
+    field.classList.remove('error-field');
+    field.classList.add('success-field');
+    error.style.display = 'none';
+  }
+
+  function showToast(message, type) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast ' + type;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // ─── Password visibility toggles ──────────────────────────────────────────
+
+  document.getElementById('togglePw').addEventListener('click', function () {
+    const pw = document.getElementById('password');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  });
+
+  document.getElementById('toggleConfirmPw').addEventListener('click', function () {
+    const pw = document.getElementById('confirmPassword');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  });
+
+  // ─── Live password requirement indicators ─────────────────────────────────
+
+  document.getElementById('password').addEventListener('input', function () {
+    const val = this.value;
+    toggle('req-length',  val.length >= 8);
+    toggle('req-upper',   /[A-Z]/.test(val));
+    toggle('req-lower',   /[a-z]/.test(val));
+    toggle('req-digit',   /[0-9]/.test(val));
+    toggle('req-special', /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val));
+  });
+
+  function toggle(id, condition) {
+    document.getElementById(id).classList.toggle('met', condition);
+  }
+
+  // ─── Validation functions ──────────────────────────────────────────────────
+
+  function validateName(value) {
+    return /^[A-Za-z]{2,}$/.test(value.trim());
+  }
+
+  // ╔══════════════════════════════════════════════════════════════════════╗
+  // ║  INTENTIONAL BUG #1 — Email validation                             ║
+  // ║  Requirement: full RFC-like check — local@domain.tld               ║
+  // ║  Bug: only checks that @ symbol exists anywhere in string           ║
+  // ║  Accepts: "user@" (no domain), "user@nodot" (no TLD), "@only"      ║
+  // ╚══════════════════════════════════════════════════════════════════════╝
+  function validateEmail(value) {
+    return value.includes('@');   // BUG: incomplete check — domain + TLD not validated
+  }
+
+  function validatePhone(value) {
+    return /^[0-9]{10}$/.test(value.trim());
+  }
+
+  function validateDOB(value) {
+    if (!value) return false;
+    const today = new Date();
+    const dob   = new Date(value);
+    const age   = today.getFullYear() - dob.getFullYear();
+    const m     = today.getMonth() - dob.getMonth();
+    return age > 18 || (age === 18 && m >= 0);
+  }
+
+  // ╔══════════════════════════════════════════════════════════════════════╗
+  // ║  INTENTIONAL BUG #2 — Password strength validation                 ║
+  // ║  Requirement: length ≥ 8 AND uppercase AND lowercase               ║
+  // ║               AND digit AND special char                            ║
+  // ║  Bug: only checks length ≥ 8 — strength rules silently ignored     ║
+  // ║  Accepts: "password" (all lowercase, no digit, no special char)    ║
+  // ╚══════════════════════════════════════════════════════════════════════╝
+  function validatePassword(value) {
+    return value.length >= 8;   // BUG: strength requirements not checked
+  }
+
+  function validateConfirmPassword(pw, confirm) {
+    return pw === confirm && confirm.length > 0;
+  }
+
+  // ─── Form submit handler ───────────────────────────────────────────────────
+
+  document.getElementById('registrationForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const firstName       = document.getElementById('firstName').value;
+    const lastName        = document.getElementById('lastName').value;
+    const email           = document.getElementById('email').value;
+    const phone           = document.getElementById('phone').value;
+    const dob             = document.getElementById('dob').value;
+    const password        = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const termsChecked    = document.getElementById('terms').checked;
+
+    let valid = true;
+
+    // First Name
+    if (!validateName(firstName)) {
+      showError('firstName', 'firstNameError');
+      valid = false;
+    } else {
+      clearError('firstName', 'firstNameError');
+    }
+
+    // Last Name
+    if (!validateName(lastName)) {
+      showError('lastName', 'lastNameError');
+      valid = false;
+    } else {
+      clearError('lastName', 'lastNameError');
+    }
+
+    // Email — BUG #1: validateEmail() only checks '@' presence
+    if (!email || !validateEmail(email)) {
+      showError('email', 'emailError');
+      valid = false;
+    } else {
+      clearError('email', 'emailError');
+    }
+
+    // Phone
+    if (!validatePhone(phone)) {
+      showError('phone', 'phoneError');
+      valid = false;
+    } else {
+      clearError('phone', 'phoneError');
+    }
+
+    // DOB
+    if (!validateDOB(dob)) {
+      showError('dob', 'dobError');
+      valid = false;
+    } else {
+      clearError('dob', 'dobError');
+    }
+
+    // Password — BUG #2: validatePassword() only checks length
+    if (!validatePassword(password)) {
+      showError('password', 'passwordError');
+      valid = false;
+    } else {
+      clearError('password', 'passwordError');
+    }
+
+    // Confirm Password
+    if (!validateConfirmPassword(password, confirmPassword)) {
+      showError('confirmPassword', 'confirmPasswordError');
+      valid = false;
+    } else {
+      clearError('confirmPassword', 'confirmPasswordError');
+    }
+
+    // Terms
+    const termsErrorEl = document.getElementById('termsError');
+    if (!termsChecked) {
+      termsErrorEl.style.display = 'block';
+      valid = false;
+    } else {
+      termsErrorEl.style.display = 'none';
+    }
+
+    if (valid) {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account…';
+      setTimeout(() => {
+        showToast('✅ Account created successfully! Welcome aboard.', 'success');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        document.getElementById('registrationForm').reset();
+        document.querySelectorAll('.req-item').forEach(el => el.classList.remove('met'));
+        document.querySelectorAll('.success-field').forEach(el => el.classList.remove('success-field'));
+      }, 1200);
+    } else {
+      showToast('⚠️ Please fix the errors above and try again.', 'error');
+    }
+  });
+
+  // Inline validation on blur
+  document.getElementById('firstName').addEventListener('blur', function () {
+    validateName(this.value) ? clearError('firstName','firstNameError') : showError('firstName','firstNameError');
+  });
+  document.getElementById('lastName').addEventListener('blur', function () {
+    validateName(this.value) ? clearError('lastName','lastNameError') : showError('lastName','lastNameError');
+  });
+  document.getElementById('email').addEventListener('blur', function () {
+    validateEmail(this.value) ? clearError('email','emailError') : showError('email','emailError');
+  });
+  document.getElementById('phone').addEventListener('blur', function () {
+    validatePhone(this.value) ? clearError('phone','phoneError') : showError('phone','phoneError');
+  });
+  document.getElementById('dob').addEventListener('blur', function () {
+    validateDOB(this.value) ? clearError('dob','dobError') : showError('dob','dobError');
+  });
+  document.getElementById('confirmPassword').addEventListener('blur', function () {
+    const pw = document.getElementById('password').value;
+    validateConfirmPassword(pw, this.value)
+      ? clearError('confirmPassword','confirmPasswordError')
+      : showError('confirmPassword','confirmPasswordError');
+  });
+
+  // Prevent non-digit input on phone field
+  document.getElementById('phone').addEventListener('keypress', function (e) {
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+  });
+</script>
+</body>
+</html>

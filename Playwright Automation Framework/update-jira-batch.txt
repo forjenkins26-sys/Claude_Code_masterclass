@@ -1,0 +1,18 @@
+Remaining tests to update to Done with pass comments:
+
+SCRUM-71: TC-003, 3.6s
+SCRUM-72: TC-004, 4.6s
+SCRUM-73: TC-005, 5.5s
+SCRUM-74: TC-006, 4.9s
+SCRUM-75: TC-008, 5.2s
+SCRUM-76: TC-009, 4.7s
+SCRUM-77: TC-010, 10.6s
+SCRUM-78: TC-011, 5.9s
+SCRUM-79: TC-012, 5.0s
+SCRUM-80: TC-013, 4.8s
+SCRUM-81: TC-014, 4.3s
+SCRUM-82: TC-015, 4.3s
+SCRUM-83: TC-016, 4.7s
+SCRUM-84: TC-017, 2.1s
+
+All clean pass (retry: 0)

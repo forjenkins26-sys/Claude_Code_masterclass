@@ -1,0 +1,36 @@
+{
+  "name": "facebook-playwright-automation",
+  "version": "1.0.0",
+  "description": "Production-ready Playwright framework for Facebook automation",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test tests/ui/",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:ui:headed": "playwright test tests/ui/ --headed",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://www.facebook.com",
+    "install:browsers": "playwright install",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "testing",
+    "facebook",
+    "pom"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^22.5.0",
+    "allure-playwright": "^3.10.0",
+    "typescript": "^5.5.4"
+  }
+}

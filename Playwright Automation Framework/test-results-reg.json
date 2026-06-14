@@ -1,0 +1,2075 @@
+﻿{
+  "config": {
+    "configFile": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\playwright.config.ts",
+    "rootDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\src\\global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "blinkit",
+        "name": "blinkit",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/blinkit.*\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [
+          "/blinkit.*\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [
+          "/blinkit.*\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [
+          "/blinkit.*\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "setup\\auth.setup.ts",
+      "file": "setup/auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 723,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Auth setup skipped - requires valid credentials\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-06-12T07:15:55.213Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\setup-auth.setup.ts-authenticate-setup\\test-finished-1.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e717b06d8d484d1cd946-ece6ea03d0ba8d9d0fd4",
+          "file": "setup/auth.setup.ts",
+          "line": 13,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "ui\\registration.spec.ts",
+      "file": "ui/registration.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Registration Page Tests (SCRUM-142)",
+          "file": "ui/registration.spec.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "REG-001: Verify successful registration with all valid inputs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4250,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:15:57.559Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-57e97-ation-with-all-valid-inputs-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-264cf7bdd3109d708528",
+              "file": "ui/registration.spec.ts",
+              "line": 17,
+              "column": 7
+            },
+            {
+              "title": "REG-002: Verify empty first name shows error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4536,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:15:57.588Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-1cbea-mpty-first-name-shows-error-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-a036276409e8620ff340",
+              "file": "ui/registration.spec.ts",
+              "line": 28,
+              "column": 7
+            },
+            {
+              "title": "REG-003: Verify single-char first name shows error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3184,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:15:57.572Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-1e88d-char-first-name-shows-error-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-b2c751f786714e766726",
+              "file": "ui/registration.spec.ts",
+              "line": 37,
+              "column": 7
+            },
+            {
+              "title": "REG-004: Verify digits-only first name shows error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2671,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:15:57.573Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-ed32a-only-first-name-shows-error-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-c8767b1ea137f8d92a04",
+              "file": "ui/registration.spec.ts",
+              "line": 46,
+              "column": 7
+            },
+            {
+              "title": "REG-005: Verify empty last name shows error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2478,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:01.272Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-fa109-empty-last-name-shows-error-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-26d8d6517d10fd0a52f5",
+              "file": "ui/registration.spec.ts",
+              "line": 55,
+              "column": 7
+            },
+            {
+              "title": "REG-006: Verify single-char last name shows error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2590,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:01.321Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-5d132--char-last-name-shows-error-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-07f4cc3d0ad177fc8675",
+              "file": "ui/registration.spec.ts",
+              "line": 64,
+              "column": 7
+            },
+            {
+              "title": "REG-007: Verify valid name format passes validation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2567,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:02.494Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-3d571-me-format-passes-validation-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-69fee1557d9ca6771211",
+              "file": "ui/registration.spec.ts",
+              "line": 73,
+              "column": 7
+            },
+            {
+              "title": "REG-008: Verify valid email format passes validation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2592,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:03.153Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-b9a10-il-format-passes-validation-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-cded30f1de4c8cfb58ca",
+              "file": "ui/registration.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "REG-009: Verify email with no domain is rejected [WILL FAIL — BUG-A]",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 7671,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:96:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 96
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 94 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39memailInput\u001b[33m.\u001b[39mfill(\u001b[32m'rahul@'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 95 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 96 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 97 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Enter a valid email address (e.g. name@domain.com)'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 98 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 99 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 96
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  94 |     await registrationPage.emailInput.fill('rahul@');\n  95 |     await registrationPage.submit();\n> 96 |     await expect(registrationPage.emailError).toBeVisible();\n     |                                               ^\n  97 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');\n  98 |   });\n  99 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:96:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:03.780Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 96
+                      }
+                    },
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 7329,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:96:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 96
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 94 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39memailInput\u001b[33m.\u001b[39mfill(\u001b[32m'rahul@'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 95 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 96 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 97 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Enter a valid email address (e.g. name@domain.com)'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 98 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 99 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 96
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  94 |     await registrationPage.emailInput.fill('rahul@');\n  95 |     await registrationPage.submit();\n> 96 |     await expect(registrationPage.emailError).toBeVisible();\n     |                                               ^\n  97 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');\n  98 |   });\n  99 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:96:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-12T07:16:13.482Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-324f7-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 96
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-b79fb56a8f75dd06ac02",
+              "file": "ui/registration.spec.ts",
+              "line": 90,
+              "column": 7
+            },
+            {
+              "title": "REG-010: Verify email with no TLD is rejected [WILL FAIL — BUG-A]",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 7589,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:106:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 106
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39memailInput\u001b[33m.\u001b[39mfill(\u001b[32m'rahul@nodot'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 105 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Enter a valid email address (e.g. name@domain.com)'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 108 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 109 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 106
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  104 |     await registrationPage.emailInput.fill('rahul@nodot');\n  105 |     await registrationPage.submit();\n> 106 |     await expect(registrationPage.emailError).toBeVisible();\n      |                                               ^\n  107 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');\n  108 |   });\n  109 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:106:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:03.946Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 106
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 7838,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:106:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 106
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39memailInput\u001b[33m.\u001b[39mfill(\u001b[32m'rahul@nodot'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 105 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Enter a valid email address (e.g. name@domain.com)'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 108 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 109 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 106
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  104 |     await registrationPage.emailInput.fill('rahul@nodot');\n  105 |     await registrationPage.submit();\n> 106 |     await expect(registrationPage.emailError).toBeVisible();\n      |                                               ^\n  107 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');\n  108 |   });\n  109 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:106:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-12T07:16:13.405Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-00955-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 106
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-dc459e01505216e598bd",
+              "file": "ui/registration.spec.ts",
+              "line": 100,
+              "column": 7
+            },
+            {
+              "title": "REG-011: Verify @ symbol only is rejected [WILL FAIL — BUG-A]",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6972,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:116:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 116
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 114 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39memailInput\u001b[33m.\u001b[39mfill(\u001b[32m'@only'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 115 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 116 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 117 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Enter a valid email address (e.g. name@domain.com)'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 118 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 119 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 116
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  114 |     await registrationPage.emailInput.fill('@only');\n  115 |     await registrationPage.submit();\n> 116 |     await expect(registrationPage.emailError).toBeVisible();\n      |                                               ^\n  117 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');\n  118 |   });\n  119 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:116:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:05.138Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 116
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8087,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:116:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 116
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 114 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39memailInput\u001b[33m.\u001b[39mfill(\u001b[32m'@only'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 115 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 116 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 117 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Enter a valid email address (e.g. name@domain.com)'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 118 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 119 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 116
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  114 |     await registrationPage.emailInput.fill('@only');\n  115 |     await registrationPage.submit();\n> 116 |     await expect(registrationPage.emailError).toBeVisible();\n      |                                               ^\n  117 |     await expect(registrationPage.emailError).toHaveText('Enter a valid email address (e.g. name@domain.com)');\n  118 |   });\n  119 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:116:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-12T07:16:14.222Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7070b-rejected-WILL-FAIL-—-BUG-A--chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 116
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-740b8f69d6445a27df0e",
+              "file": "ui/registration.spec.ts",
+              "line": 110,
+              "column": 7
+            },
+            {
+              "title": "REG-012: Verify email with no @ symbol is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1816,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:05.787Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-2d9ff--with-no-symbol-is-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-82bb54da4a977578e0ef",
+              "file": "ui/registration.spec.ts",
+              "line": 120,
+              "column": 7
+            },
+            {
+              "title": "REG-013: Verify valid 10-digit mobile passes validation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1677,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:07.635Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-76628-it-mobile-passes-validation-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-d1438eeead593a588bd2",
+              "file": "ui/registration.spec.ts",
+              "line": 131,
+              "column": 7
+            },
+            {
+              "title": "REG-014: Verify phone under 10 digits is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1012,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:09.338Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-dba70-under-10-digits-is-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-1fdaf2169512a388c4a5",
+              "file": "ui/registration.spec.ts",
+              "line": 138,
+              "column": 7
+            },
+            {
+              "title": "REG-015: Verify letters in phone field are rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1497,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:10.372Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-6ee9b-in-phone-field-are-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-c9322c3fb3e63e003fd8",
+              "file": "ui/registration.spec.ts",
+              "line": 148,
+              "column": 7
+            },
+            {
+              "title": "REG-016: Verify phone maxlength=10 enforced by browser via pressSequentially",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1067,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:11.892Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-e1c32-owser-via-pressSequentially-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-bcd31287e76ebb14615a",
+              "file": "ui/registration.spec.ts",
+              "line": 158,
+              "column": 7
+            },
+            {
+              "title": "REG-017: Verify DOB making user exactly 18 passes age gate",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1506,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:12.979Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-74e30--exactly-18-passes-age-gate-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-19ec4f21c6f33db81601",
+              "file": "ui/registration.spec.ts",
+              "line": 168,
+              "column": 7
+            },
+            {
+              "title": "REG-018: Verify DOB making user under 18 is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2513,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:14.504Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-7ea81-g-user-under-18-is-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-c1d48be1275b42c4e833",
+              "file": "ui/registration.spec.ts",
+              "line": 177,
+              "column": 7
+            },
+            {
+              "title": "REG-019: Verify strong password with all requirements passes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1896,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:17.043Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-03c58-ith-all-requirements-passes-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-afb94eba1f103e1ef161",
+              "file": "ui/registration.spec.ts",
+              "line": 189,
+              "column": 7
+            },
+            {
+              "title": "REG-020: Verify all-lowercase password is rejected [WILL FAIL — BUG-B]",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 6205,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:203:50",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 50,
+                          "line": 203
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 201 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39mconfirmPasswordInput\u001b[33m.\u001b[39mfill(\u001b[32m'password'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 202 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 203 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 204 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Password does not meet all requirements'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 205 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 206 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 50,
+                            "line": 203
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  201 |     await registrationPage.confirmPasswordInput.fill('password');\n  202 |     await registrationPage.submit();\n> 203 |     await expect(registrationPage.passwordError).toBeVisible();\n      |                                                  ^\n  204 |     await expect(registrationPage.passwordError).toHaveText('Password does not meet all requirements');\n  205 |   });\n  206 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:203:50"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:18.962Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 50,
+                        "line": 203
+                      }
+                    },
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 9677,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:203:50",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 50,
+                          "line": 203
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 201 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39mconfirmPasswordInput\u001b[33m.\u001b[39mfill(\u001b[32m'password'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 202 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 203 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 204 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Password does not meet all requirements'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 205 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 206 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 50,
+                            "line": 203
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  201 |     await registrationPage.confirmPasswordInput.fill('password');\n  202 |     await registrationPage.submit();\n> 203 |     await expect(registrationPage.passwordError).toBeVisible();\n      |                                                  ^\n  204 |     await expect(registrationPage.passwordError).toHaveText('Password does not meet all requirements');\n  205 |   });\n  206 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:203:50"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-12T07:16:26.929Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-a42bc-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 50,
+                        "line": 203
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-8fbe6b2eeb93da80dd2e",
+              "file": "ui/registration.spec.ts",
+              "line": 196,
+              "column": 7
+            },
+            {
+              "title": "REG-021: Verify all-uppercase password is rejected [WILL FAIL — BUG-B]",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 7088,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:214:50",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 50,
+                          "line": 214
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 212 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39mconfirmPasswordInput\u001b[33m.\u001b[39mfill(\u001b[32m'PASSWORD1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 213 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 214 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 215 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Password does not meet all requirements'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 216 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 217 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 50,
+                            "line": 214
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    13 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  212 |     await registrationPage.confirmPasswordInput.fill('PASSWORD1');\n  213 |     await registrationPage.submit();\n> 214 |     await expect(registrationPage.passwordError).toBeVisible();\n      |                                                  ^\n  215 |     await expect(registrationPage.passwordError).toHaveText('Password does not meet all requirements');\n  216 |   });\n  217 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:214:50"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:22.832Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 50,
+                        "line": 214
+                      }
+                    },
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 7389,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:214:50",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 50,
+                          "line": 214
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 212 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39mconfirmPasswordInput\u001b[33m.\u001b[39mfill(\u001b[32m'PASSWORD1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 213 |\u001b[39m     \u001b[36mawait\u001b[39m registrationPage\u001b[33m.\u001b[39msubmit()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 214 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 215 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mpasswordError)\u001b[33m.\u001b[39mtoHaveText(\u001b[32m'Password does not meet all requirements'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 216 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 217 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 50,
+                            "line": 214
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#passwordError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#passwordError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div class=\"error-msg\" id=\"passwordError\">Password does not meet all requirements</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  212 |     await registrationPage.confirmPasswordInput.fill('PASSWORD1');\n  213 |     await registrationPage.submit();\n> 214 |     await expect(registrationPage.passwordError).toBeVisible();\n      |                                                  ^\n  215 |     await expect(registrationPage.passwordError).toHaveText('Password does not meet all requirements');\n  216 |   });\n  217 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:214:50"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-12T07:16:32.189Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-8e7ed-rejected-WILL-FAIL-—-BUG-B--chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 50,
+                        "line": 214
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-cc795c5d751807b8b181",
+              "file": "ui/registration.spec.ts",
+              "line": 207,
+              "column": 7
+            },
+            {
+              "title": "REG-022: Verify too-short password is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1550,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:23.734Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-6723b--short-password-is-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-8c23b45b62c355669935",
+              "file": "ui/registration.spec.ts",
+              "line": 218,
+              "column": 7
+            },
+            {
+              "title": "REG-023: Verify live password strength indicator updates on each keystroke",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 881,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:26.030Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-e118c-r-updates-on-each-keystroke-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-8c5a2dc99679b23039f2",
+              "file": "ui/registration.spec.ts",
+              "line": 228,
+              "column": 7
+            },
+            {
+              "title": "REG-024: Verify matching passwords pass confirm check",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2326,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:27.367Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-ae8ff-asswords-pass-confirm-check-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-af2ab49252997ae94927",
+              "file": "ui/registration.spec.ts",
+              "line": 245,
+              "column": 7
+            },
+            {
+              "title": "REG-025: Verify non-matching confirm password shows error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1391,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:26.942Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-cc968-onfirm-password-shows-error-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-231080078937ff01d631",
+              "file": "ui/registration.spec.ts",
+              "line": 252,
+              "column": 7
+            },
+            {
+              "title": "REG-026: Verify unchecked Terms of Service blocks submission",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5289,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:28.372Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-d7215-f-Service-blocks-submission-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-a22b7d9d297640859e1f",
+              "file": "ui/registration.spec.ts",
+              "line": 263,
+              "column": 7
+            },
+            {
+              "title": "REG-027: Verify checked Terms of Service allows submission",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1219,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:30.577Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-b9125-f-Service-allows-submission-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-3ef4aa744f31b4db18b4",
+              "file": "ui/registration.spec.ts",
+              "line": 274,
+              "column": 7
+            },
+            {
+              "title": "REG-028: Verify all fields empty shows all validation errors simultaneously",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1308,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:31.836Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-56dc6-ation-errors-simultaneously-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-7cda8db9b3fcaa922d7f",
+              "file": "ui/registration.spec.ts",
+              "line": 283,
+              "column": 7
+            },
+            {
+              "title": "REG-029: Verify whitespace-only first name is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1882,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:33.186Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-09e36-only-first-name-is-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-04b7c2a07795ebf18943",
+              "file": "ui/registration.spec.ts",
+              "line": 302,
+              "column": 7
+            },
+            {
+              "title": "REG-030: Verify special characters in name field are rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2186,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:33.694Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-48fe2--in-name-field-are-rejected-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-b45f3453568a3bf190fe",
+              "file": "ui/registration.spec.ts",
+              "line": 311,
+              "column": 7
+            },
+            {
+              "title": "REG-031: Verify SQL injection in name fields is sanitized",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1891,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:35.097Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-c73c9-in-name-fields-is-sanitized-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-6ca0fd7a564fb2d5304d",
+              "file": "ui/registration.spec.ts",
+              "line": 322,
+              "column": 7
+            },
+            {
+              "title": "REG-032: Verify XSS in email field does not execute",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 6605,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:350:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 350
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 348 |\u001b[39m\n \u001b[90m 349 |\u001b[39m     expect(alertDialogs\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBe(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 350 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 351 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mtoast)\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoHaveClass(\u001b[35m/show/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 352 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 353 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 350
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  348 |\n  349 |     expect(alertDialogs.length).toBe(0);\n> 350 |     await expect(registrationPage.emailError).toBeVisible();\n      |                                               ^\n  351 |     await expect(registrationPage.toast).not.toHaveClass(/show/);\n  352 |   });\n  353 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:350:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:35.911Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 350
+                      }
+                    },
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6205,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:350:47",
+                        "location": {
+                          "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                          "column": 47,
+                          "line": 350
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 348 |\u001b[39m\n \u001b[90m 349 |\u001b[39m     expect(alertDialogs\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBe(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 350 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39memailError)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 351 |\u001b[39m     \u001b[36mawait\u001b[39m expect(registrationPage\u001b[33m.\u001b[39mtoast)\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoHaveClass(\u001b[35m/show/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 352 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 353 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                            "column": 47,
+                            "line": 350
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#emailError')\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#emailError')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"emailError\" class=\"error-msg\">Enter a valid email address (e.g. name@domain.com)</div>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  348 |\n  349 |     expect(alertDialogs.length).toBe(0);\n> 350 |     await expect(registrationPage.emailError).toBeVisible();\n      |                                               ^\n  351 |     await expect(registrationPage.toast).not.toHaveClass(/show/);\n  352 |   });\n  353 |\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts:350:47"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-06-12T07:16:43.461Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-da84f-mail-field-does-not-execute-chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\registration.spec.ts",
+                        "column": 47,
+                        "line": 350
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-ab2ec4edb5c1bc4a0624",
+              "file": "ui/registration.spec.ts",
+              "line": 339,
+              "column": 7
+            },
+            {
+              "title": "REG-033: Verify XSS in name fields does not execute",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1173,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-12T07:16:37.022Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-registration-Registrati-9b58e-ame-fields-does-not-execute-chromium\\test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d0536cdd17d6e3b61b4a-263e50fa892d879dcce0",
+              "file": "ui/registration.spec.ts",
+              "line": 354,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-12T07:15:54.420Z",
+    "duration": 56127.007,
+    "expected": 28,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

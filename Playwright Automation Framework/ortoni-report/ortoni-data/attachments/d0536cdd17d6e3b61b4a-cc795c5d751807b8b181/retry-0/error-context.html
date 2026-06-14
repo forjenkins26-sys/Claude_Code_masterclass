@@ -1,0 +1,267 @@
+<h1>Instructions</h1>
+<ul>
+<li>Following Playwright test failed.</li>
+<li>Explain why, be concise, respect Playwright best practices.</li>
+<li>Provide a snippet of code with the fix, if possible.</li>
+</ul>
+<h1>Test info</h1>
+<ul>
+<li>Name: ui\registration.spec.ts &gt;&gt; Registration Page Tests (SCRUM-142) &gt;&gt; REG-021: Verify all-uppercase password is rejected [WILL FAIL — BUG-B]</li>
+<li>Location: tests\ui\registration.spec.ts:207:7</li>
+</ul>
+<h1>Error details</h1>
+<pre><code>Error: expect(locator).toBeVisible() failed
+
+Locator:  locator(&#39;#passwordError&#39;)
+Expected: visible
+Received: hidden
+Timeout:  5000ms
+
+Call log:
+  - Expect &quot;toBeVisible&quot; with timeout 5000ms
+  - waiting for locator(&#39;#passwordError&#39;)
+    13 × locator resolved to &lt;div class=&quot;error-msg&quot; id=&quot;passwordError&quot;&gt;Password does not meet all requirements&lt;/div&gt;
+       - unexpected value &quot;hidden&quot;
+</code></pre>
+<pre><code class="language-yaml">- heading &quot;DemoApp&quot; [level=1]
+- paragraph: Create your account
+- text: First Name *
+- textbox &quot;First Name *&quot;:
+  - /placeholder: Rahul
+- text: Last Name *
+- textbox &quot;Last Name *&quot;:
+  - /placeholder: Sharma
+- text: Email Address *
+- textbox &quot;Email Address *&quot;:
+  - /placeholder: rahul.sharma@example.com
+- text: Mobile Number *
+- textbox &quot;Mobile Number *&quot;:
+  - /placeholder: &quot;9876543210&quot;
+- text: Date of Birth *
+- textbox &quot;Date of Birth *&quot;
+- text: Password *
+- textbox &quot;Password *&quot;:
+  - /placeholder: Create a strong password
+- button &quot;Toggle password visibility&quot;: 👁
+- paragraph: &quot;Password must contain:&quot;
+- text: At least 8 characters One uppercase letter (A-Z) One lowercase letter (a-z) One number (0-9) One special character (!@#$%^&amp;*) Confirm Password *
+- textbox &quot;Confirm Password *&quot;:
+  - /placeholder: Re-enter your password
+- button &quot;Toggle confirm password visibility&quot;: 👁
+- checkbox &quot;I agree to the Terms of Service and Privacy Policy&quot;
+- text: I agree to the
+- link &quot;Terms of Service&quot;:
+  - /url: &quot;#&quot;
+- text: and
+- link &quot;Privacy Policy&quot;:
+  - /url: &quot;#&quot;
+- button &quot;Create Account&quot;
+- text: or Already have an account?
+- link &quot;Sign in&quot;:
+  - /url: &quot;#&quot;
+- text: ✅ Account created successfully! Welcome aboard.
+</code></pre>
+<h1>Test source</h1>
+<pre><code class="language-ts">  114 |     await registrationPage.emailInput.fill(&#39;@only&#39;);
+  115 |     await registrationPage.submit();
+  116 |     await expect(registrationPage.emailError).toBeVisible();
+  117 |     await expect(registrationPage.emailError).toHaveText(&#39;Enter a valid email address (e.g. name@domain.com)&#39;);
+  118 |   });
+  119 | 
+  120 |   test(&#39;REG-012: Verify email with no @ symbol is rejected&#39;, async ({ registrationPage }) =&gt; {
+  121 |     // Source: SCRUM-142 — &quot;notanemail&quot; (no @) → FAIL
+  122 |     await registrationPage.fillValidForm();
+  123 |     await registrationPage.emailInput.fill(&#39;notanemail&#39;);
+  124 |     await registrationPage.submit();
+  125 |     await expect(registrationPage.emailError).toBeVisible();
+  126 |     await expect(registrationPage.emailError).toHaveText(&#39;Enter a valid email address (e.g. name@domain.com)&#39;);
+  127 |   });
+  128 | 
+  129 |   // ── Phone Validation ─────────────────────────────────────────────────────────
+  130 | 
+  131 |   test(&#39;REG-013: Verify valid 10-digit mobile passes validation&#39;, async ({ registrationPage }) =&gt; {
+  132 |     // Source: SCRUM-142 — &quot;9876543210&quot; (10 digits) → PASS
+  133 |     await registrationPage.fillValidForm();
+  134 |     await registrationPage.submit();
+  135 |     await expect(registrationPage.phoneError).not.toBeVisible();
+  136 |   });
+  137 | 
+  138 |   test(&#39;REG-014: Verify phone under 10 digits is rejected&#39;, async ({ registrationPage }) =&gt; {
+  139 |     // Source: SCRUM-142 — &quot;98765&quot; (5 digits) → FAIL: &quot;Enter a valid 10-digit mobile number&quot;
+  140 |     await registrationPage.fillValidForm();
+  141 |     await registrationPage.phoneInput.fill(&#39;&#39;);
+  142 |     await registrationPage.phoneInput.pressSequentially(&#39;98765&#39;);
+  143 |     await registrationPage.submit();
+  144 |     await expect(registrationPage.phoneError).toBeVisible();
+  145 |     await expect(registrationPage.phoneError).toHaveText(&#39;Enter a valid 10-digit mobile number&#39;);
+  146 |   });
+  147 | 
+  148 |   test(&#39;REG-015: Verify letters in phone field are rejected&#39;, async ({ registrationPage }) =&gt; {
+  149 |     // Source: SCRUM-142 — &quot;abcdefghij&quot; → FAIL
+  150 |     await registrationPage.fillValidForm();
+  151 |     await registrationPage.phoneInput.fill(&#39;&#39;);
+  152 |     await registrationPage.phoneInput.pressSequentially(&#39;abcdefghij&#39;);
+  153 |     await registrationPage.submit();
+  154 |     await expect(registrationPage.phoneError).toBeVisible();
+  155 |     await expect(registrationPage.phoneError).toHaveText(&#39;Enter a valid 10-digit mobile number&#39;);
+  156 |   });
+  157 | 
+  158 |   test(&#39;REG-016: Verify phone maxlength=10 enforced by browser via pressSequentially&#39;, async ({ registrationPage }) =&gt; {
+  159 |     // Source: SCRUM-142 — DOM maxlength=10 must be enforced
+  160 |     // AH-18: pressSequentially() respects maxlength; fill() bypasses it
+  161 |     await registrationPage.phoneInput.pressSequentially(&#39;12345678901234&#39;);
+  162 |     const value = await registrationPage.phoneInput.inputValue();
+  163 |     expect(value.length).toBeLessThanOrEqual(10);
+  164 |   });
+  165 | 
+  166 |   // ── Date of Birth (Age Gate) ─────────────────────────────────────────────────
+  167 | 
+  168 |   test(&#39;REG-017: Verify DOB making user exactly 18 passes age gate&#39;, async ({ registrationPage }) =&gt; {
+  169 |     // Source: SCRUM-142 — exactly 18 years old → PASS
+  170 |     // Date: user born 2008-06-12 is exactly 18 on 2026-06-12
+  171 |     await registrationPage.fillValidForm();
+  172 |     await registrationPage.dobInput.fill(&#39;2008-06-12&#39;);
+  173 |     await registrationPage.submit();
+  174 |     await expect(registrationPage.dobError).not.toBeVisible();
+  175 |   });
+  176 | 
+  177 |   test(&#39;REG-018: Verify DOB making user under 18 is rejected&#39;, async ({ registrationPage }) =&gt; {
+  178 |     // Source: SCRUM-142 — 17 yrs 11 months → FAIL: &quot;You must be at least 18 years old to register&quot;
+  179 |     // Date: 2008-07-12 = 17 years 11 months on 2026-06-12
+  180 |     await registrationPage.fillValidForm();
+  181 |     await registrationPage.dobInput.fill(&#39;2008-07-12&#39;);
+  182 |     await registrationPage.submit();
+  183 |     await expect(registrationPage.dobError).toBeVisible();
+  184 |     await expect(registrationPage.dobError).toHaveText(&#39;You must be at least 18 years old to register&#39;);
+  185 |   });
+  186 | 
+  187 |   // ── Password Strength Validation ─────────────────────────────────────────────
+  188 | 
+  189 |   test(&#39;REG-019: Verify strong password with all requirements passes&#39;, async ({ registrationPage }) =&gt; {
+  190 |     // Source: SCRUM-142 — &quot;Password1!&quot; → PASS (upper, lower, digit, special, length ≥ 8)
+  191 |     await registrationPage.fillValidForm();
+  192 |     await registrationPage.submit();
+  193 |     await expect(registrationPage.passwordError).not.toBeVisible();
+  194 |   });
+  195 | 
+  196 |   test(&#39;REG-020: Verify all-lowercase password is rejected [WILL FAIL — BUG-B]&#39;, async ({ registrationPage }) =&gt; {
+  197 |     // Source: SCRUM-142 — &quot;password&quot; → FAIL (missing uppercase, digit, special char)
+  198 |     // BUG-B: validatePassword() only checks length &gt;= 8 — &quot;password&quot; passes
+  199 |     await registrationPage.fillValidForm();
+  200 |     await registrationPage.passwordInput.fill(&#39;password&#39;);
+  201 |     await registrationPage.confirmPasswordInput.fill(&#39;password&#39;);
+  202 |     await registrationPage.submit();
+  203 |     await expect(registrationPage.passwordError).toBeVisible();
+  204 |     await expect(registrationPage.passwordError).toHaveText(&#39;Password does not meet all requirements&#39;);
+  205 |   });
+  206 | 
+  207 |   test(&#39;REG-021: Verify all-uppercase password is rejected [WILL FAIL — BUG-B]&#39;, async ({ registrationPage }) =&gt; {
+  208 |     // Source: SCRUM-142 — &quot;PASSWORD1&quot; → FAIL (missing lowercase, special char)
+  209 |     // BUG-B: &quot;PASSWORD1&quot; has length &gt;= 8 so passes validatePassword()
+  210 |     await registrationPage.fillValidForm();
+  211 |     await registrationPage.passwordInput.fill(&#39;PASSWORD1&#39;);
+  212 |     await registrationPage.confirmPasswordInput.fill(&#39;PASSWORD1&#39;);
+  213 |     await registrationPage.submit();
+&gt; 214 |     await expect(registrationPage.passwordError).toBeVisible();
+      |                                                  ^ Error: expect(locator).toBeVisible() failed
+  215 |     await expect(registrationPage.passwordError).toHaveText(&#39;Password does not meet all requirements&#39;);
+  216 |   });
+  217 | 
+  218 |   test(&#39;REG-022: Verify too-short password is rejected&#39;, async ({ registrationPage }) =&gt; {
+  219 |     // Source: SCRUM-142 — &quot;Pass1&quot; → FAIL (length &lt; 8)
+  220 |     await registrationPage.fillValidForm();
+  221 |     await registrationPage.passwordInput.fill(&#39;Pass1&#39;);
+  222 |     await registrationPage.confirmPasswordInput.fill(&#39;Pass1&#39;);
+  223 |     await registrationPage.submit();
+  224 |     await expect(registrationPage.passwordError).toBeVisible();
+  225 |     await expect(registrationPage.passwordError).toHaveText(&#39;Password does not meet all requirements&#39;);
+  226 |   });
+  227 | 
+  228 |   test(&#39;REG-023: Verify live password strength indicator updates on each keystroke&#39;, async ({ registrationPage }) =&gt; {
+  229 |     // Source: SCRUM-142 — &quot;Password requirements indicator must visually update live as user types&quot;
+  230 |     // Indicator gains .met class when condition satisfied
+  231 |     await registrationPage.passwordInput.fill(&#39;a&#39;);
+  232 |     await expect(registrationPage.reqLower).toHaveClass(/met/);
+  233 |     await expect(registrationPage.reqUpper).not.toHaveClass(/met/);
+  234 | 
+  235 |     await registrationPage.passwordInput.fill(&#39;Password1!&#39;);
+  236 |     await expect(registrationPage.reqLength).toHaveClass(/met/);
+  237 |     await expect(registrationPage.reqUpper).toHaveClass(/met/);
+  238 |     await expect(registrationPage.reqLower).toHaveClass(/met/);
+  239 |     await expect(registrationPage.reqDigit).toHaveClass(/met/);
+  240 |     await expect(registrationPage.reqSpecial).toHaveClass(/met/);
+  241 |   });
+  242 | 
+  243 |   // ── Confirm Password ─────────────────────────────────────────────────────────
+  244 | 
+  245 |   test(&#39;REG-024: Verify matching passwords pass confirm check&#39;, async ({ registrationPage }) =&gt; {
+  246 |     // Source: SCRUM-142 — matching passwords → PASS
+  247 |     await registrationPage.fillValidForm();
+  248 |     await registrationPage.submit();
+  249 |     await expect(registrationPage.confirmPasswordError).not.toBeVisible();
+  250 |   });
+  251 | 
+  252 |   test(&#39;REG-025: Verify non-matching confirm password shows error&#39;, async ({ registrationPage }) =&gt; {
+  253 |     // Source: SCRUM-142 — non-matching → FAIL: &quot;Passwords do not match&quot;
+  254 |     await registrationPage.fillValidForm();
+  255 |     await registrationPage.confirmPasswordInput.fill(&#39;DifferentPass1!&#39;);
+  256 |     await registrationPage.submit();
+  257 |     await expect(registrationPage.confirmPasswordError).toBeVisible();
+  258 |     await expect(registrationPage.confirmPasswordError).toHaveText(&#39;Passwords do not match&#39;);
+  259 |   });
+  260 | 
+  261 |   // ── Terms of Service ─────────────────────────────────────────────────────────
+  262 | 
+  263 |   test(&#39;REG-026: Verify unchecked Terms of Service blocks submission&#39;, async ({ registrationPage }) =&gt; {
+  264 |     // Source: SCRUM-142 — unchecked → FAIL: &quot;You must accept the Terms of Service to continue&quot;
+  265 |     // AFP-15: also confirm form was NOT submitted (success toast must NOT appear)
+  266 |     await registrationPage.fillValidForm();
+  267 |     await registrationPage.termsCheckbox.uncheck();
+  268 |     await registrationPage.submit();
+  269 |     await expect(registrationPage.termsError).toBeVisible();
+  270 |     await expect(registrationPage.termsError).toHaveText(&#39;You must accept the Terms of Service to continue&#39;);
+  271 |     await expect(registrationPage.toast).not.toHaveClass(/show/);
+  272 |   });
+  273 | 
+  274 |   test(&#39;REG-027: Verify checked Terms of Service allows submission&#39;, async ({ registrationPage }) =&gt; {
+  275 |     // Source: SCRUM-142 — checked → PASS
+  276 |     await registrationPage.fillValidForm();
+  277 |     await registrationPage.submit();
+  278 |     await expect(registrationPage.termsError).not.toBeVisible();
+  279 |   });
+  280 | 
+  281 |   // ── Edge Cases ───────────────────────────────────────────────────────────────
+  282 | 
+  283 |   test(&#39;REG-028: Verify all fields empty shows all validation errors simultaneously&#39;, async ({ registrationPage }) =&gt; {
+  284 |     // Source: SCRUM-142 — all empty submit → all errors shown at once
+  285 |     await registrationPage.submit();
+  286 |     await expect(registrationPage.firstNameError).toBeVisible();
+  287 |     await expect(registrationPage.firstNameError).toHaveText(&#39;Enter your first name (letters only, min 2 chars)&#39;);
+  288 |     await expect(registrationPage.lastNameError).toBeVisible();
+  289 |     await expect(registrationPage.lastNameError).toHaveText(&#39;Enter your last name (letters only, min 2 chars)&#39;);
+  290 |     await expect(registrationPage.emailError).toBeVisible();
+  291 |     await expect(registrationPage.emailError).toHaveText(&#39;Enter a valid email address (e.g. name@domain.com)&#39;);
+  292 |     await expect(registrationPage.phoneError).toBeVisible();
+  293 |     await expect(registrationPage.phoneError).toHaveText(&#39;Enter a valid 10-digit mobile number&#39;);
+  294 |     await expect(registrationPage.dobError).toBeVisible();
+  295 |     await expect(registrationPage.dobError).toHaveText(&#39;You must be at least 18 years old to register&#39;);
+  296 |     await expect(registrationPage.passwordError).toBeVisible();
+  297 |     await expect(registrationPage.passwordError).toHaveText(&#39;Password does not meet all requirements&#39;);
+  298 |     await expect(registrationPage.termsError).toBeVisible();
+  299 |     await expect(registrationPage.termsError).toHaveText(&#39;You must accept the Terms of Service to continue&#39;);
+  300 |   });
+  301 | 
+  302 |   test(&#39;REG-029: Verify whitespace-only first name is rejected&#39;, async ({ registrationPage }) =&gt; {
+  303 |     // Source: SCRUM-142 — whitespace → FAIL (validateName trims before regex)
+  304 |     await registrationPage.fillValidForm();
+  305 |     await registrationPage.firstNameInput.fill(&#39;   &#39;);
+  306 |     await registrationPage.submit();
+  307 |     await expect(registrationPage.firstNameError).toBeVisible();
+  308 |     await expect(registrationPage.firstNameError).toHaveText(&#39;Enter your first name (letters only, min 2 chars)&#39;);
+  309 |   });
+  310 | 
+  311 |   test(&#39;REG-030: Verify special characters in name field are rejected&#39;, async ({ registrationPage }) =&gt; {
+  312 |     // Source: SCRUM-142 — /^[A-Za-z]{2,}$/ — special chars fail regex
+  313 |     await registrationPage.fillValidForm();
+  314 |     await registrationPage.firstNameInput.fill(&#39;R@hul&#39;);
+</code></pre>

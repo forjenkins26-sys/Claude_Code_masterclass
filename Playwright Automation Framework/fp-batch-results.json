@@ -1,0 +1,696 @@
+﻿
+> facebook-playwright-automation@1.0.0 test
+> playwright test tests/ui/forgot-password.spec.ts --grep FP-005|FP-006|FP-007|FP-008|FP-009|FP-010|FP-011|FP-012|FP-013|FP-014|FP-015 --project=chromium --headed --reporter=json
+
+{
+  "config": {
+    "configFile": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\playwright.config.ts",
+    "rootDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "setup\\auth.setup.ts",
+      "file": "setup/auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 680,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Auth setup skipped - requires valid credentials\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-06-11T14:00:15.435Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e717b06d8d484d1cd946-ece6ea03d0ba8d9d0fd4",
+          "file": "setup/auth.setup.ts",
+          "line": 13,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "ui\\forgot-password.spec.ts",
+      "file": "ui/forgot-password.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Facebook Forgot Password Tests",
+          "file": "ui/forgot-password.spec.ts",
+          "line": 20,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "DOM Verification Tests (No Behavioral Assumptions) @smoke",
+              "file": "ui/forgot-password.spec.ts",
+              "line": 27,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "FP-005: Verify cancel button is clickable",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 6396,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:17.755Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-51683977aff2b13a2a90",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 67,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Behavioral Tests - VERIFICATION REQUIRED @regression",
+              "file": "ui/forgot-password.spec.ts",
+              "line": 79,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "FP-006: Password recovery with valid email - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 8378,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:17.765Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-dcd25e7e391bf29864f6",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 81,
+                  "column": 9
+                },
+                {
+                  "title": "FP-007: Password recovery with valid phone - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 9782,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:17.780Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-b9ea8a242120199fe30e",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 101,
+                  "column": 9
+                },
+                {
+                  "title": "FP-008: Password recovery with empty input - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 6658,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:17.832Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-60eed164c851eb47b742",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 118,
+                  "column": 9
+                },
+                {
+                  "title": "FP-009: Password recovery with invalid email format - VERIFICATION REQUIRED",
+                  "ok": false,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 14243,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[type=\"text\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"text\"]').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[type=\"text\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"text\"]').first()\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts:141:58",
+                            "location": {
+                              "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts",
+                              "column": 58,
+                              "line": 141
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 139 |\u001b[39m\n \u001b[90m 140 |\u001b[39m       \u001b[90m// Basic validation: page not crashed\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 141 |\u001b[39m       \u001b[36mawait\u001b[39m expect(forgotPasswordPage\u001b[33m.\u001b[39memailOrPhoneInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 142 |\u001b[39m\n \u001b[90m 143 |\u001b[39m       \u001b[90m// TODO: Verify actual behavior:\u001b[39m\n \u001b[90m 144 |\u001b[39m       \u001b[90m// - Error message shown? Yes/No: ______\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts",
+                                "column": 58,
+                                "line": 141
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[type=\"text\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"text\"]').first()\u001b[22m\n\n\n  139 |\n  140 |       // Basic validation: page not crashed\n> 141 |       await expect(forgotPasswordPage.emailOrPhoneInput).toBeVisible();\n      |                                                          ^\n  142 |\n  143 |       // TODO: Verify actual behavior:\n  144 |       // - Error message shown? Yes/No: ______\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts:141:58"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:24.818Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium\\video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium\\error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts",
+                            "column": 58,
+                            "line": 141
+                          }
+                        },
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 12731,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[type=\"text\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"text\"]').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[type=\"text\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"text\"]').first()\u001b[22m\n\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts:141:58",
+                            "location": {
+                              "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts",
+                              "column": 58,
+                              "line": 141
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 139 |\u001b[39m\n \u001b[90m 140 |\u001b[39m       \u001b[90m// Basic validation: page not crashed\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 141 |\u001b[39m       \u001b[36mawait\u001b[39m expect(forgotPasswordPage\u001b[33m.\u001b[39memailOrPhoneInput)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 142 |\u001b[39m\n \u001b[90m 143 |\u001b[39m       \u001b[90m// TODO: Verify actual behavior:\u001b[39m\n \u001b[90m 144 |\u001b[39m       \u001b[90m// - Error message shown? Yes/No: ______\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts",
+                                "column": 58,
+                                "line": 141
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('input[type=\"text\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"text\"]').first()\u001b[22m\n\n\n  139 |\n  140 |       // Basic validation: page not crashed\n> 141 |       await expect(forgotPasswordPage.emailOrPhoneInput).toBeVisible();\n      |                                                          ^\n  142 |\n  143 |       // TODO: Verify actual behavior:\n  144 |       // - Error message shown? Yes/No: ______\n    at C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts:141:58"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 1,
+                          "startTime": "2026-06-11T14:00:40.361Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium-retry1\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium-retry1\\video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium-retry1\\error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\test-results\\ui-forgot-password-Faceboo-68ee1-mat---VERIFICATION-REQUIRED-chromium-retry1\\trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\tests\\ui\\forgot-password.spec.ts",
+                            "column": 58,
+                            "line": 141
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-88bbe9cfd2e92e4a7ae5",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 134,
+                  "column": 9
+                },
+                {
+                  "title": "FP-010: Password recovery with non-existent account - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 6513,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:25.219Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-638961172d2b86487004",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 149,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Edge Cases - VERIFICATION REQUIRED",
+              "file": "ui/forgot-password.spec.ts",
+              "line": 167,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "FP-011: Password recovery with very long email (300+ chars)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 5568,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:27.400Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-98c7b09634c09e78a71a",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 169,
+                  "column": 9
+                },
+                {
+                  "title": "FP-012: Password recovery with special characters",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 5572,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:28.895Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-920fd6487dfcc7646e97",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 185,
+                  "column": 9
+                },
+                {
+                  "title": "FP-013: Double-click search button",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 6641,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:31.792Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-a18fdd11f73b6a81d362",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 198,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Security Tests - VERIFICATION REQUIRED",
+              "file": "ui/forgot-password.spec.ts",
+              "line": 215,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "FP-014: SQL injection attempt in email field",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 5298,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:33.013Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-770c820a53bc00e996b2",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 217,
+                  "column": 9
+                },
+                {
+                  "title": "FP-015: XSS attempt in email field",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 4907,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T14:00:34.525Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "20a695c8aaa2e622af7c-62d21feaa51c9e6446a6",
+                  "file": "ui/forgot-password.spec.ts",
+                  "line": 232,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-11T14:00:14.717Z",
+    "duration": 39581.247,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

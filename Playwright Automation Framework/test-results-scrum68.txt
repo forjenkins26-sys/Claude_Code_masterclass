@@ -1,0 +1,778 @@
+
+> facebook-playwright-automation@1.0.0 test
+> playwright test tests/ui/login.spec.ts --project=chromium --headed --reporter=json
+
+{
+  "config": {
+    "configFile": "C:\\ClaudeCodeMasterclass\\Playwright Automation Framework\\playwright.config.ts",
+    "rootDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/ClaudeCodeMasterclass/Playwright Automation Framework/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "setup\\auth.setup.ts",
+      "file": "setup/auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 744,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Auth setup skipped - requires valid credentials\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-06-10T12:03:49.062Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e717b06d8d484d1cd946-ece6ea03d0ba8d9d0fd4",
+          "file": "setup/auth.setup.ts",
+          "line": 13,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "ui\\login.spec.ts",
+      "file": "ui/login.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Facebook Login Tests",
+          "file": "ui/login.spec.ts",
+          "line": 20,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "DOM Verification Tests (No Behavioral Assumptions) @smoke",
+              "file": "ui/login.spec.ts",
+              "line": 30,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-001: Verify login page DOM elements exist",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4793,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:51.810Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-821acbf093e9a6f4e3de",
+                  "file": "ui/login.spec.ts",
+                  "line": 32,
+                  "column": 9
+                },
+                {
+                  "title": "TC-002: Verify form inputs accept text",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 4137,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:51.821Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-26b71d5eac821db0ce22",
+                  "file": "ui/login.spec.ts",
+                  "line": 41,
+                  "column": 9
+                },
+                {
+                  "title": "TC-003: Verify form can be cleared",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 3638,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:51.914Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-8548c3dac8e7a27062d0",
+                  "file": "ui/login.spec.ts",
+                  "line": 53,
+                  "column": 9
+                },
+                {
+                  "title": "TC-004: Verify login button is clickable",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 4577,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:51.815Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-2b7f5e03805976f26651",
+                  "file": "ui/login.spec.ts",
+                  "line": 66,
+                  "column": 9
+                },
+                {
+                  "title": "TC-005: Verify forgot password link is clickable",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 5538,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:57.191Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-48a4ece74537b75a9917",
+                  "file": "ui/login.spec.ts",
+                  "line": 77,
+                  "column": 9
+                },
+                {
+                  "title": "TC-006: Verify create account button is clickable",
+                  "ok": true,
+                  "tags": [
+                    "smoke"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4926,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:57.253Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-37acbabf6e910733e249",
+                  "file": "ui/login.spec.ts",
+                  "line": 91,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Behavioral Tests - VERIFICATION REQUIRED @regression",
+              "file": "ui/login.spec.ts",
+              "line": 106,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-008: Login with invalid email format - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 5217,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:57.308Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-b4db1bac57d88e2b29b5",
+                  "file": "ui/login.spec.ts",
+                  "line": 126,
+                  "column": 9
+                },
+                {
+                  "title": "TC-009: Login with empty email - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 4685,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:03:57.387Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-5ddf33217a47b185a391",
+                  "file": "ui/login.spec.ts",
+                  "line": 146,
+                  "column": 9
+                },
+                {
+                  "title": "TC-010: Login with empty password - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 10572,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:02.106Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-0078fb895d41a1708837",
+                  "file": "ui/login.spec.ts",
+                  "line": 158,
+                  "column": 9
+                },
+                {
+                  "title": "TC-011: Login with both fields empty - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 5930,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:02.241Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-ccdd5e7be40fc0b579bc",
+                  "file": "ui/login.spec.ts",
+                  "line": 170,
+                  "column": 9
+                },
+                {
+                  "title": "TC-012: Login with wrong credentials - VERIFICATION REQUIRED",
+                  "ok": true,
+                  "tags": [
+                    "regression"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 5029,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:02.577Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-47060c8c34d9ab5da52d",
+                  "file": "ui/login.spec.ts",
+                  "line": 181,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Edge Cases - VERIFICATION REQUIRED",
+              "file": "ui/login.spec.ts",
+              "line": 196,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-013: Login with very long email (300+ chars)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 4793,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:02.780Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-d0c3b2faeef0be0ff687",
+                  "file": "ui/login.spec.ts",
+                  "line": 198,
+                  "column": 9
+                },
+                {
+                  "title": "TC-014: Login with special characters in email",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 4265,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:07.613Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-249697205e08e114ba4b",
+                  "file": "ui/login.spec.ts",
+                  "line": 215,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Security Tests - VERIFICATION REQUIRED",
+              "file": "ui/login.spec.ts",
+              "line": 232,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "TC-015: SQL injection attempt in email field",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 4298,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:07.648Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-4cc89d7768f33ef9dcb0",
+                  "file": "ui/login.spec.ts",
+                  "line": 234,
+                  "column": 9
+                },
+                {
+                  "title": "TC-016: XSS attempt in email field",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4674,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:08.198Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-57385b6f56f0925be567",
+                  "file": "ui/login.spec.ts",
+                  "line": 254,
+                  "column": 9
+                },
+                {
+                  "title": "TC-017: Password field masks input",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 2114,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-10T12:04:11.915Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "25217b8bb4316ea872c4-199198101b0e9c37431b",
+                  "file": "ui/login.spec.ts",
+                  "line": 280,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-10T12:03:48.416Z",
+    "duration": 26190.391,
+    "expected": 17,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
