@@ -381,6 +381,12 @@
 
     if (valid) {
       showToast('✅ OTP sent to +91 ' + mobile.value.trim());
+      sessionStorage.setItem('blinkitUser', JSON.stringify({
+        firstName: firstName.value.trim(),
+        lastName: lastName.value.trim(),
+        mobile: mobile.value.trim()
+      }));
+      setTimeout(() => { window.location.href = 'blinkit-products.html'; }, 1500);
     }
   });
 

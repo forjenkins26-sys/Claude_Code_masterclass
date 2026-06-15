@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blinkit – Products</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #f8e71c;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg { fill: #f8e71c; }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-greeting {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .cart-btn {
+      background: #1a1a1a;
+      color: #f8e71c;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .cart-btn:hover { background: #2d2d2d; }
+
+    .cart-count {
+      background: #f8e71c;
+      color: #1a1a1a;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #1a1a1a;
+      transition: background 0.2s;
+    }
+
+    .logout-btn:hover { background: rgba(0,0,0,0.06); }
+
+    /* Search bar */
+    .search-bar {
+      background: #fff;
+      padding: 16px 32px;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      outline: none;
+      background: #fafafa;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: #f8e71c;
+      box-shadow: 0 0 0 3px rgba(248,231,28,0.18);
+    }
+
+    /* Category tabs */
+    .categories {
+      background: #fff;
+      padding: 0 32px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .category-tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .category-tab.active {
+      color: #1a1a1a;
+      border-bottom-color: #f8e71c;
+    }
+
+    .category-tab:hover { color: #1a1a1a; }
+
+    /* Main content */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 32px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+
+    /* Product grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+
+    .delivery-time {
+      background: #f0faf0;
+      color: #2e7d32;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.4;
+    }
+
+    .product-weight {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+    }
+
+    .product-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .add-btn {
+      background: #fff;
+      border: 1.5px solid #f8e71c;
+      border-radius: 6px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .add-btn:hover { background: #f8e71c; }
+
+    .add-btn.added {
+      background: #f8e71c;
+      border-color: #f8e71c;
+    }
+
+    /* Delivery banner */
+    .delivery-banner {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
+
+    .delivery-banner h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8e71c;
+      margin-bottom: 4px;
+    }
+
+    .delivery-banner p {
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    .delivery-time-large {
+      font-size: 36px;
+      font-weight: 800;
+      color: #f8e71c;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Cart drawer overlay */
+    .cart-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+    }
+
+    .cart-overlay.open { display: block; }
+
+    .cart-drawer {
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 360px;
+      background: #fff;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-drawer.open { transform: translateX(0); }
+
+    .cart-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cart-header h3 { font-size: 18px; font-weight: 700; }
+
+    .close-cart {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+      line-height: 1;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 24px;
+    }
+
+    .cart-empty {
+      text-align: center;
+      color: #888;
+      margin-top: 60px;
+      font-size: 14px;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .cart-item-emoji { font-size: 28px; }
+
+    .cart-item-info { flex: 1; }
+
+    .cart-item-name { font-size: 13px; font-weight: 600; }
+
+    .cart-item-price { font-size: 13px; color: #888; }
+
+    .cart-item-remove {
+      background: none;
+      border: none;
+      color: #e53935;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .cart-footer {
+      padding: 20px 24px;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 13px;
+      background: #f8e71c;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .checkout-btn:hover { background: #f0dc00; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="logo-text">blinkit</span>
+  </div>
+  <div class="nav-right">
+    <span class="user-greeting" id="userGreeting">Hi, Rahul 👋</span>
+    <button class="cart-btn" id="cartBtn" onclick="toggleCart()">
+      🛒 Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- Search -->
+<div class="search-bar">
+  <input type="text" class="search-input" id="searchInput" placeholder="🔍  Search for groceries, snacks, drinks..." oninput="filterProducts()" />
+</div>
+
+<!-- Category tabs -->
+<div class="categories" id="categoryTabs">
+  <button class="category-tab active" onclick="filterCategory('all', this)">All</button>
+  <button class="category-tab" onclick="filterCategory('fruits', this)">🍎 Fruits & Veggies</button>
+  <button class="category-tab" onclick="filterCategory('dairy', this)">🥛 Dairy</button>
+  <button class="category-tab" onclick="filterCategory('snacks', this)">🍿 Snacks</button>
+  <button class="category-tab" onclick="filterCategory('beverages', this)">🧃 Beverages</button>
+  <button class="category-tab" onclick="filterCategory('bakery', this)">🍞 Bakery</button>
+</div>
+
+<!-- Main content -->
+<main class="main">
+  <!-- Delivery banner -->
+  <div class="delivery-banner">
+    <div>
+      <h3>⚡ Express Delivery</h3>
+      <p>Fresh groceries at your doorstep</p>
+    </div>
+    <div class="delivery-time-large">10 min</div>
+  </div>
+
+  <h2 class="section-title" id="sectionTitle">All Products</h2>
+
+  <div class="product-grid" id="productGrid"></div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Cart overlay -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+<!-- Cart drawer -->
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>🛒 Your Cart</h3>
+    <button class="close-cart" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Your cart is empty.<br>Add items to get started!</div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotal">₹0</span>
+    </div>
+    <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<script>
+  const PRODUCTS = [
+    { id:1, name:'Fresh Tomatoes', weight:'500g', price:25,  emoji:'🍅', category:'fruits',    time:'8 min' },
+    { id:2, name:'Amul Full Cream Milk', weight:'1L', price:68, emoji:'🥛', category:'dairy', time:'10 min' },
+    { id:3, name:'Lay\'s Classic Salted', weight:'100g', price:20, emoji:'🍿', category:'snacks', time:'12 min' },
+    { id:4, name:'Tropicana Orange Juice', weight:'1L', price:110, emoji:'🧃', category:'beverages', time:'10 min' },
+    { id:5, name:'Brown Bread', weight:'400g', price:45, emoji:'🍞', category:'bakery', time:'9 min' },
+    { id:6, name:'Bananas', weight:'1 dozen', price:48, emoji:'🍌', category:'fruits', time:'8 min' },
+    { id:7, name:'Amul Butter', weight:'500g', price:260, emoji:'🧈', category:'dairy', time:'10 min' },
+    { id:8, name:'Kurkure Masala Munch', weight:'90g', price:20, emoji:'🌽', category:'snacks', time:'12 min' },
+    { id:9, name:'Coca-Cola', weight:'2L', price:95, emoji:'🥤', category:'beverages', time:'10 min' },
+    { id:10, name:'Whole Wheat Atta', weight:'5kg', price:260, emoji:'🌾', category:'bakery', time:'15 min' },
+    { id:11, name:'Onions', weight:'1kg', price:30, emoji:'🧅', category:'fruits', time:'8 min' },
+    { id:12, name:'Paneer', weight:'200g', price:80, emoji:'🧀', category:'dairy', time:'10 min' },
+    { id:13, name:'Bingo Mad Angles', weight:'130g', price:30, emoji:'🔺', category:'snacks', time:'12 min' },
+    { id:14, name:'Red Bull Energy Drink', weight:'250ml', price:125, emoji:'🐂', category:'beverages', time:'10 min' },
+    { id:15, name:'Pav Buns', weight:'6 pcs', price:30, emoji:'🫓', category:'bakery', time:'9 min' },
+    { id:16, name:'Apples', weight:'4 pcs', price:120, emoji:'🍎', category:'fruits', time:'8 min' },
+  ];
+
+  let cart = [];
+  let currentCategory = 'all';
+  let searchQuery = '';
+
+  // Load user from session
+  const user = JSON.parse(sessionStorage.getItem('blinkitUser') || '{"firstName":"User","mobile":""}');
+  document.getElementById('userGreeting').textContent = `Hi, ${user.firstName} 👋`;
+
+  function showToast(msg, duration = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  function renderProducts() {
+    const grid = document.getElementById('productGrid');
+    let filtered = PRODUCTS;
+
+    if (currentCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === currentCategory);
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<p style="color:#888;font-size:14px;grid-column:1/-1">No products found.</p>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(p => {
+      const inCart = cart.find(c => c.id === p.id);
+      return `
+        <div class="product-card" id="card-${p.id}">
+          <div class="product-img">${p.emoji}</div>
+          <span class="delivery-time">⚡ ${p.time}</span>
+          <div class="product-name">${p.name}</div>
+          <div class="product-weight">${p.weight}</div>
+          <div class="product-footer">
+            <span class="product-price">₹${p.price}</span>
+            <button class="add-btn ${inCart ? 'added' : ''}" id="btn-${p.id}" onclick="addToCart(${p.id})">
+              ${inCart ? '✓ Added' : '+ Add'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function addToCart(id) {
+    const product = PRODUCTS.find(p => p.id === id);
+    const existing = cart.find(c => c.id === id);
+
+    if (existing) {
+      cart = cart.filter(c => c.id !== id);
+      showToast(`❌ ${product.name} removed from cart`);
+    } else {
+      cart.push(product);
+      showToast(`✅ ${product.name} added to cart`);
+    }
+
+    updateCartCount();
+    renderProducts();
+    renderCartItems();
+  }
+
+  function updateCartCount() {
+    document.getElementById('cartCount').textContent = cart.length;
+  }
+
+  function renderCartItems() {
+    const container = document.getElementById('cartItems');
+    const footer = document.getElementById('cartFooter');
+
+    if (cart.length === 0) {
+      container.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Add items to get started!</div>';
+      footer.style.display = 'none';
+      return;
+    }
+
+    const total = cart.reduce((sum, p) => sum + p.price, 0);
+    container.innerHTML = cart.map(p => `
+      <div class="cart-item">
+        <span class="cart-item-emoji">${p.emoji}</span>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${p.name}</div>
+          <div class="cart-item-price">₹${p.price} · ${p.weight}</div>
+        </div>
+        <button class="cart-item-remove" onclick="addToCart(${p.id})">🗑</button>
+      </div>
+    `).join('');
+
+    document.getElementById('cartTotal').textContent = `₹${total}`;
+    footer.style.display = 'block';
+  }
+
+  function toggleCart() {
+    document.getElementById('cartOverlay').classList.toggle('open');
+    document.getElementById('cartDrawer').classList.toggle('open');
+  }
+
+  function filterCategory(cat, el) {
+    currentCategory = cat;
+    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const titles = {
+      all: 'All Products',
+      fruits: 'Fruits & Veggies',
+      dairy: 'Dairy',
+      snacks: 'Snacks',
+      beverages: 'Beverages',
+      bakery: 'Bakery'
+    };
+    document.getElementById('sectionTitle').textContent = titles[cat] || 'Products';
+    renderProducts();
+  }
+
+  function filterProducts() {
+    searchQuery = document.getElementById('searchInput').value;
+    renderProducts();
+  }
+
+  function checkout() {
+    showToast('🎉 Order placed! Arriving in 10 minutes');
+    cart = [];
+    updateCartCount();
+    renderCartItems();
+    toggleCart();
+  }
+
+  function logout() {
+    sessionStorage.removeItem('blinkitUser');
+    window.location.href = 'blinkit-login.html';
+  }
+
+  // Init
+  renderProducts();
+</script>
+
+</body>
+</html>
