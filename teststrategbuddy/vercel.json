@@ -21,9 +21,6 @@
     }
   ],
   "env": {
-    "JIRA_URL": "@jira_url",
-    "JIRA_EMAIL": "@jira_email",
-    "JIRA_TOKEN": "@jira_token",
-    "GROQ_KEY": "@groq_key"
+    "NODE_ENV": "production"
   }
 }
