@@ -89,3 +89,4 @@ npm run test:headed
 | 2026-06-15 | BLAST wired into 5 skills — `progress.md` + `rca-log.md` auto-logging | 5 SKILL.md files |
 | 2026-06-15 | `blinkit-products.html` — 16 products, cart, search, logout | `blinkit-products.html`, `blinkit-login.html` |
 | 2026-06-15 | CLAUDE.md split into core + `CLAUDE-skills.md` + `CLAUDE-schema.md` | `CLAUDE.md` |
+| 2026-06-15 | TestPlanBuddy built — React+Express, Jira→GROQ→13-section plan, localStorage Settings | `testplanbuddy/` (Phase 5 pending) |

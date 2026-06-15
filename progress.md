@@ -58,3 +58,32 @@
 - [ ] GROQ live generation verify
 
 ---
+
+## 2026-06-15 18:00 IST — TestStrategyBuddy App Build (BLAST Phases 0–5)
+
+**Triggered by:** User request — build React+Express test strategy generator, dark/light mode, GitHub + Vercel deploy
+**BLAST Phases completed:** 0 (Init) → 1 (Blueprint) → 2 (Link) → 3 (Architect) → 4 (Stylize) → 5 (Trigger)
+**RICEPOT applied:** ✅
+
+**Files Created:**
+| File | Purpose |
+|---|---|
+| `teststrategbuddy/tools/jiraClient.js` | Fetch + normalize Jira issue |
+| `teststrategbuddy/tools/groqClient.js` | GROQ prompt → 10-section strategy JSON |
+| `teststrategbuddy/tools/strategyDoc.js` | JSON → Markdown renderer |
+| `teststrategbuddy/server.js` | Express v4 — POST /api/generate, GET /api/handshake |
+| `teststrategbuddy/vercel.json` | Vercel routing config |
+| `teststrategbuddy/client/` | React 18 + Vite app |
+| `teststrategbuddy/client/src/App.jsx` | Dark/light toggle, Generate/Settings tabs |
+| `teststrategbuddy/client/src/components/StrategyViewer.jsx` | 10-section renderer |
+| `teststrategbuddy/task_plan.md` | BLAST task plan |
+
+**Dummy Jira story:** SCRUM-187 — Login & Dashboard Feature (Ecommerce)
+
+**Handshake Results:**
+- ✅ Jira: `SCRUM-187 — Login & Dashboard Feature` fetched OK
+- ✅ React build: `client/dist/` — 29 modules, 158KB
+- ✅ Server: `http://localhost:3002`
+- ✅ GROQ key present
+
+---
