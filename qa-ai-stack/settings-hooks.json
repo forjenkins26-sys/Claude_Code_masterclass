@@ -1,0 +1,31 @@
+{
+  "_comment": "Merge these hooks into ~/.claude/settings.json PostToolUse array",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const i=require('fs');const r='<YOUR_PROJECT_PATH>/test-results/results.json';if(i.existsSync(r)){const d=JSON.parse(i.readFileSync(r,'utf8'));const f=(d.suites||[]).flatMap(s=>s.specs||[]).filter(s=>!s.ok);if(f.length>0){console.log(JSON.stringify({systemMessage:'\\u26a0\\ufe0f '+f.length+' test(s) failed. Run: npm run ai:rca to auto-classify failures (LOCATOR/TEST/PRODUCT_BUG/FLAKY). Rule 22 active.'}))}}\" 2>/dev/null || true",
+            "timeout": 5,
+            "statusMessage": "Checking test results...",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const i=require('fs');try{const inp=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')||'{}');const f=inp.tool_input&&(inp.tool_input.file_path||inp.tool_input.filePath)||'';if(f.match(/[\\\\/](src[\\\\/]pages|tests[\\\\/]ui)[\\\\/].*\\.ts$/)&&i.existsSync('<YOUR_PROJECT_PATH>/scripts/rule-engine.js')){const{execSync}=require('child_process');const out=execSync('node scripts/rule-engine.js 2>&1',{cwd:'<YOUR_PROJECT_PATH>',timeout:10000,encoding:'utf8'});const lines=out.split('\\n').filter(l=>l.match(/ERROR|WARNING|checked/i)).slice(0,5).join(' | ');if(lines)console.log(JSON.stringify({systemMessage:'\\ud83d\\udccd rules:check: '+lines}))}}catch(e){}\" 2>/dev/null || true",
+            "timeout": 12,
+            "statusMessage": "Checking framework rules...",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

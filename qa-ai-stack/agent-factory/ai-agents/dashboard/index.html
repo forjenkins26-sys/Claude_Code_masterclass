@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>agent-factory · dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#fbf8f1; --panel:#fff; --ink:#1b1815; --soft:#3a342c; --muted:#7a6f5e;
+    --accent:#cc6633; --accent-strong:#a64d1f; --accent-soft:#fbe7d3;
+    --border:#ebe2cd; --border-strong:#d8cdb1;
+    --code-bg:#1a1714; --code-ink:#f3eee2;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Inter",sans-serif; font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  a { color:inherit; text-decoration:none; }
+  .shell { display:grid; grid-template-columns:280px 1fr; min-height:100vh; }
+  aside { background:#f7f2e6; border-right:1px solid var(--border); padding:24px 16px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  aside .brand { display:flex; align-items:center; gap:10px; margin-bottom:24px; }
+  aside .brand b { font-weight:700; font-size:.95rem; }
+  aside .brand i { width:36px; height:36px; border-radius:10px; background:var(--ink); color:var(--accent); display:grid; place-items:center; font-style:normal; font-weight:800; font-size:.9rem; }
+  aside .group { font-family:"JetBrains Mono",monospace; font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin:18px 0 8px; }
+  aside .nav { display:flex; flex-direction:column; gap:2px; }
+  aside .nav a { padding:8px 10px; border-radius:8px; font-size:.88rem; color:var(--ink); display:flex; gap:10px; align-items:center; }
+  aside .nav a:hover { background:rgba(204,102,51,.08); }
+  aside .nav a.active { background:var(--accent-soft); color:var(--accent-strong); font-weight:600; }
+  aside .nav a .em { font-size:1.1rem; }
+  main { padding:36px clamp(20px,4vw,52px); max-width:1080px; margin:0 auto; width:100%; }
+  h1 { font-family:"Inter",sans-serif; font-weight:700; font-size:clamp(1.8rem,3.5vw,2.5rem); line-height:1.05; letter-spacing:-.02em; margin:0 0 8px; }
+  h1 em { font-style:normal; color:var(--accent-strong); }
+  .lead { color:var(--soft); margin:0 0 28px; max-width:70ch; font-size:1.02rem; }
+  h2 { font-size:1.1rem; font-weight:700; margin:30px 0 10px; }
+  h3.kicker { font-family:"JetBrains Mono",monospace; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-strong); margin:0 0 8px; }
+  .grid { display:grid; gap:14px; }
+  .g-2 { grid-template-columns:1fr 1fr; }
+  .g-3 { grid-template-columns:repeat(3,1fr); }
+  @media (max-width:720px) { .g-2, .g-3 { grid-template-columns:1fr; } }
+  .card { border:1px solid var(--border); background:var(--panel); border-radius:12px; padding:18px; box-shadow:0 1px 2px rgba(26,23,20,.04); }
+  .card h4 { margin:0 0 8px; font-size:1.02rem; font-weight:700; }
+  .card p { margin:0; color:var(--soft); font-size:.9rem; }
+  pre.code {
+    font-family:"JetBrains Mono",monospace; font-size:12.5px; line-height:1.6;
+    background:var(--code-bg); color:var(--code-ink); border-radius:10px;
+    padding:18px 20px; position:relative; overflow:auto; margin:14px 0;
+  }
+  pre.code::before { content:attr(data-label); position:absolute; top:8px; left:14px; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:#ffb87a; }
+  pre.code { padding-top:30px; }
+  code:not(.code) { font-family:"JetBrains Mono",monospace; font-size:.85em; background:#ebe2cd; padding:.1em .4em; border-radius:5px; color:var(--accent-strong); }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; margin:8px 0 14px; }
+  th, td { padding:8px 10px; border:1px solid var(--border); text-align:left; vertical-align:top; }
+  th { font-family:"JetBrains Mono",monospace; font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-strong); background:#f7f2e6; }
+  td:first-child { font-family:"JetBrains Mono",monospace; font-size:.78rem; color:var(--ink); }
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent-strong); font-family:"JetBrains Mono",monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; font-weight:700; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+  .agent-color { width:14px; height:14px; border-radius:50%; flex:0 0 14px; }
+  footer { margin-top:60px; padding-top:22px; border-top:1px solid var(--border); color:var(--muted); font-family:"JetBrains Mono",monospace; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; }
+  footer a { color:var(--accent-strong); font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside>
+    <div class="brand">
+      <i>AF</i>
+      <b>agent-factory</b>
+    </div>
+    <div class="group">Overview</div>
+    <div class="nav">
+      <a href="#overview" data-target="overview" class="active">▸ Overview</a>
+      <a href="#quickstart" data-target="quickstart">▸ Quickstart</a>
+    </div>
+    <div class="group">Agents</div>
+    <div class="nav" id="agentNav"></div>
+    <div class="group">Use</div>
+    <div class="nav">
+      <a href="#triage" data-target="triage">▸ Triage (all three)</a>
+      <a href="#claude-code" data-target="claude-code">▸ In Claude Code</a>
+    </div>
+  </aside>
+
+  <main>
+    <section id="overview">
+      <span class="badge"><span class="dot"></span> agent-factory-cli</span>
+      <h1>Three AI agents for <em>Playwright</em>.</h1>
+      <p class="lead">RCA · Flaky Detector · Self-Healing Locator. One swappable LLM (Groq, DeepSeek, Ollama). Orchestrated by Claude Code in production. Designed for The Testing Academy QA Masterclass.</p>
+
+      <div class="grid g-3" id="agentCards"></div>
+    </section>
+
+    <section id="quickstart">
+      <h3 class="kicker">Quickstart</h3>
+      <h2>From clone to first verdict</h2>
+      <pre class="code" data-label="install"># 1. install the CLI globally
+npm i -g agent-factory-cli
+
+# 2. point it at a Playwright report
+agent-factory-cli rca ./test-results/results.json
+
+# 3. or run all three at once
+agent-factory-cli triage ./test-results/results.json ./runs</pre>
+
+      <h3 class="kicker" style="margin-top:24px">Configure your LLM</h3>
+      <pre class="code" data-label=".env"># Groq (recommended free tier)
+LLM_MODE=live
+LLM_BASE_URL=https://api.groq.com/openai/v1
+LLM_API_KEY=gsk_xxx
+LLM_MODEL=llama-3.3-70b-versatile
+
+# Or DeepSeek
+# LLM_BASE_URL=https://api.deepseek.com
+# LLM_MODEL=deepseek-chat
+
+# Or Ollama (local, no key)
+# LLM_BASE_URL=http://localhost:11434/v1
+# LLM_MODEL=qwen2.5-coder:7b</pre>
+    </section>
+
+    <section id="agent-detail">
+      <h3 class="kicker">Agent detail</h3>
+      <h2 id="agentTitle">Pick an agent ↗</h2>
+      <div id="agentBody"></div>
+    </section>
+
+    <section id="triage">
+      <h3 class="kicker">Crew · triage</h3>
+      <h2>Run all three with one command</h2>
+      <p>RCA → Heal (for locator-shaped failures) → Flaky. Mirrors the Claude Code <code>/triage</code> skill.</p>
+      <pre class="code" data-label="cli">agent-factory-cli triage ./test-results/results.json ./runs</pre>
+    </section>
+
+    <section id="claude-code">
+      <h3 class="kicker">In Claude Code (production)</h3>
+      <h2>Same three agents, real Jira + real edits</h2>
+      <p>The local CLI prints diffs. Claude Code subagents (<code>.claude/agents/*.md</code>) call the Atlassian MCP to <strong>actually</strong> file Jira bugs and Edit the real Page Objects, then re-run the spec to verify.</p>
+      <pre class="code" data-label="claude code">@rca   analyze the last failed run
+@heal  fix the broken locator
+/triage</pre>
+    </section>
+
+    <footer>
+      <span>agent-factory-cli · MIT</span>
+      &nbsp;·&nbsp;
+      <a href="https://qamasterclass.vercel.app/claudeCodeForQA-Part4">Masterclass guide ↗</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/PramodDutta/agent-factory-cli">GitHub ↗</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+(async function(){
+  const reg = await fetch('/registry.json').then(r => r.json()).catch(() => ({ agents: [] }));
+  const navEl = document.getElementById('agentNav');
+  const cardsEl = document.getElementById('agentCards');
+  reg.agents.forEach(a => {
+    const link = document.createElement('a');
+    link.href = '#agent-' + a.id;
+    link.dataset.target = 'agent-' + a.id;
+    link.innerHTML = '<span class="em">' + a.emoji + '</span>' + a.name;
+    link.addEventListener('click', e => { e.preventDefault(); renderAgent(a); });
+    navEl.appendChild(link);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<h4 style="display:flex;align-items:center;gap:8px"><span class="agent-color" style="background:' + a.color + '"></span> ' + a.emoji + ' ' + a.name + '</h4><p>' + a.purpose + '</p>';
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => renderAgent(a));
+    cardsEl.appendChild(card);
+  });
+
+  function renderAgent(a) {
+    document.getElementById('agentTitle').textContent = a.emoji + '  ' + a.name;
+    const body = document.getElementById('agentBody');
+    body.innerHTML = '';
+    const meta = document.createElement('div');
+    meta.innerHTML = '<table>' +
+      '<tr><th>Purpose</th><td>' + a.purpose + '</td></tr>' +
+      '<tr><th>Input</th><td>' + a.input + '</td></tr>' +
+      '<tr><th>Output</th><td>' + a.output + '</td></tr>' +
+      '<tr><th>Config</th><td>' + a.config + '</td></tr>' +
+      '<tr><th>Run</th><td><code>' + a.run + '</code></td></tr>' +
+      '<tr><th>How to use</th><td>' + a.howToUse + '</td></tr>' +
+      '</table>';
+    body.appendChild(meta);
+
+    const pe = document.createElement('div');
+    pe.innerHTML = '<h3 class="kicker">Prompt excerpt</h3><pre class="code" data-label="system prompt">' + escapeHtml(a.promptExcerpt) + '</pre>';
+    body.appendChild(pe);
+
+    // Run button · POST /run/<id>
+    const runWrap = document.createElement('div');
+    runWrap.innerHTML = '<h3 class="kicker" style="margin-top:24px">Run it</h3>';
+    const runBtn = document.createElement('button');
+    runBtn.textContent = '▶ Run ' + a.name;
+    runBtn.style.cssText = 'padding:10px 16px;border:1px solid ' + a.color + ';background:' + a.color + ';color:#fff;font:600 .88rem "Inter",sans-serif;border-radius:8px;cursor:pointer';
+    const runOut = document.createElement('pre');
+    runOut.className = 'code';
+    runOut.dataset.label = 'live output';
+    runOut.style.marginTop = '12px';
+    runOut.style.display = 'none';
+    runBtn.addEventListener('click', async () => {
+      runBtn.disabled = true; runBtn.textContent = '… running ' + a.name;
+      runOut.style.display = 'block'; runOut.textContent = 'running…';
+      try {
+        const r = await fetch('/run/' + a.id, { method: 'POST' }).then(x => x.json());
+        runOut.textContent = (r.stdout || '') + (r.stderr ? '\n[stderr]\n' + r.stderr : '');
+      } catch (e) {
+        runOut.textContent = 'Run endpoint not available (static preview). Start the dashboard via `npm run ai:dashboard` to run agents live.';
+      }
+      runBtn.disabled = false; runBtn.textContent = '▶ Run ' + a.name;
+    });
+    runWrap.appendChild(runBtn);
+    runWrap.appendChild(runOut);
+    body.appendChild(runWrap);
+
+    // Last verdict · from /api/runs if available
+    const lastWrap = document.createElement('div');
+    lastWrap.innerHTML = '<h3 class="kicker" style="margin-top:24px">Last verdict</h3>';
+    const lastPre = document.createElement('pre');
+    lastPre.className = 'code'; lastPre.dataset.label = 'latest run';
+    const last = (window.__runs && window.__runs[a.id]) || a.sampleOutput;
+    lastPre.textContent = JSON.stringify(last, null, 2);
+    lastWrap.appendChild(lastPre);
+    body.appendChild(lastWrap);
+
+    history.replaceState(null, '', '#agent-' + a.id);
+    document.querySelectorAll('aside .nav a').forEach(x => x.classList.toggle('active', x.dataset.target === 'agent-' + a.id));
+    document.getElementById('agent-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  // Pull latest verdicts (no-op on static hosts)
+  window.__runs = {};
+  try { window.__runs = await fetch('/api/runs').then(r => r.json()); } catch (e) { /* static */ }
+
+  // Auto-open the first agent
+  if (reg.agents[0]) renderAgent(reg.agents[0]);
+})();
+</script>
+</body>
+</html>

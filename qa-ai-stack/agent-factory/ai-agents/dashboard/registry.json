@@ -1,0 +1,80 @@
+{
+  "version": "0.2.0",
+  "agents": [
+    {
+      "id": "triage",
+      "emoji": "🎯",
+      "name": "Triage Orchestrator",
+      "color": "#8b5cf6",
+      "purpose": "The crew lead. Runs RCA, hands locator failures to Heal, runs the Flaky detector, and posts one PR-ready summary. The single command you wire into CI.",
+      "input": "test-results/results.json + ./runs (run history)",
+      "output": "Combined markdown summary: counts per RCA category, healed vs escalated, flaky vs quarantined, Jira drafts.",
+      "run": "npm run ai:triage",
+      "config": "LLM_MODE · LLM_MODEL · JIRA_PROJECT_KEY",
+      "promptExcerpt": "Run RCA on the report, hand locator failures to heal, then run the flaky detector. Print a one-line summary. Keep each sub-agent independent.",
+      "sampleOutput": { "rca": { "product": 1, "locator": 1 }, "heal": { "patched": 1 }, "flaky": { "quarantined": 1 }, "jira": 1 },
+      "howToUse": "Run after every CI build. This is the orchestrator — the other three are its workers."
+    },
+    {
+      "id": "rca",
+      "emoji": "🔍",
+      "name": "Root Cause Analysis",
+      "color": "#cc6633",
+      "purpose": "Classify every Playwright failure into product / test / env / locator, with confidence + suggested fix. Files Jira bugs for product defects.",
+      "input": "test-results/results.json (Playwright JSON reporter)",
+      "output": "RcaVerdict[] — per-failure category + rootCause + confidence + evidence + severity + suggestedFix + routeTo",
+      "run": "agent-factory-cli rca ./test-results/results.json",
+      "config": "LLM_MODE · LLM_MODEL · JIRA_PROJECT_KEY · --file-bugs --jira-project",
+      "promptExcerpt": "You are a senior SDET. Classify failures into product|test|env|locator. Return STRICT JSON only.",
+      "sampleOutput": {
+        "category": "locator",
+        "confidence": 0.82,
+        "rootCause": "Locator timeout · 'Add to cart' button accessible name drifted.",
+        "suggestedFix": "Re-locate by role with case-insensitive name.",
+        "routeTo": "heal"
+      },
+      "howToUse": "Pipe your Playwright report into RCA after every CI run. Configure --file-bugs to auto-draft Jira tickets (via Atlassian MCP inside Claude Code)."
+    },
+    {
+      "id": "flaky",
+      "emoji": "🎲",
+      "name": "Flaky Detector",
+      "color": "#1f4d8a",
+      "purpose": "Diff N runs of the same commit, find tests that pass sometimes / fail sometimes, rank by rate, name the cause, recommend quarantine.",
+      "input": "Directory of *.json Playwright reports (run the suite N times)",
+      "output": "FlakyDiagnosis[] — file + title + rate + cause + reason + fix + quarantine flag",
+      "run": "agent-factory-cli flaky ./runs",
+      "config": "LLM_MODE · LLM_MODEL · quarantine rate threshold (default 0.30)",
+      "promptExcerpt": "Diagnose flaky Playwright tests. Pick the cause: race | hardWait | network | animation | sharedState | unknown.",
+      "sampleOutput": {
+        "file": "tests/cart.spec.ts",
+        "title": "cart count updates",
+        "rate": 0.67,
+        "cause": "hardWait",
+        "fix": "Replace waitForTimeout(2000) with expect(cartCount).toHaveText('1')",
+        "quarantine": true
+      },
+      "howToUse": "Run after every nightly. Quarantined tests get @flaky tag and are skipped on PR runs."
+    },
+    {
+      "id": "heal",
+      "emoji": "🩹",
+      "name": "Self-Healing Locator",
+      "color": "#0a7d5e",
+      "purpose": "When a locator breaks, read the real DOM and propose a resilient replacement (role > testid > text > css). Refuses to hallucinate fixes.",
+      "input": "Playwright report with attached error-context.md (DOM aria snapshot)",
+      "output": "HealVerdict[] — oldLocator, newLocator, strategy, confidence, reason, escalate flag",
+      "run": "agent-factory-cli heal --report ./test-results/results.json --apply",
+      "config": "LLM_MODE · confidence gate (0.7) · --pom <path> to target Page Object",
+      "promptExcerpt": "Propose the most resilient replacement. Preference order: role > testid > text > css. NEVER invent attributes the DOM does not show.",
+      "sampleOutput": {
+        "oldLocator": "button[name=\"Add to cart\"]",
+        "newLocator": "page.getByRole('button', { name: /add to cart/i })",
+        "strategy": "role",
+        "confidence": 0.86,
+        "escalate": false
+      },
+      "howToUse": "Wire as a post-failure hook in CI · with --apply it writes the patch and re-runs the spec to verify. Inside Claude Code (.claude/agents/heal.md) it edits the real Page Object."
+    }
+  ]
+}

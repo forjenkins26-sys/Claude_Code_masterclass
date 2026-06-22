@@ -1,0 +1,14 @@
+{
+  "_comment": "Add these scripts to your project's package.json scripts section",
+  "scripts": {
+    "ai:rca": "ts-node ../agent-factory-cli/ai-agents/cli.ts rca test-results/results.json",
+    "ai:flaky": "ts-node ../agent-factory-cli/ai-agents/cli.ts flaky ./runs",
+    "ai:heal": "ts-node ../agent-factory-cli/ai-agents/cli.ts heal --report test-results/results.json",
+    "ai:triage": "ts-node ../agent-factory-cli/ai-agents/cli.ts triage test-results/results.json ./runs",
+    "ai:dashboard": "ts-node ../agent-factory-cli/ai-agents/cli.ts dashboard",
+    "rules:check": "node scripts/rule-engine.js",
+    "rules:changed": "node scripts/rule-engine.js --changed",
+    "rules:staged": "node scripts/rule-engine.js --staged"
+  },
+  "_note": "agent-factory-cli must be at same level as your Playwright project folder. Update path if different."
+}

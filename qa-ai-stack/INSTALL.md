@@ -1,0 +1,111 @@
+# QA AI Stack — Bootstrap Install
+
+Drop this folder into any Playwright TypeScript project. Then give Claude this prompt:
+
+---
+
+## Bootstrap Prompt (copy-paste to Claude)
+
+```
+I have a qa-ai-stack/ folder in this repo. It contains a complete AI QA automation stack.
+Please install everything:
+
+1. Copy qa-ai-stack/skills/* into ~/.claude/skills/ (one subfolder per skill)
+2. Merge the hooks from qa-ai-stack/settings-hooks.json into ~/.claude/settings.json
+   - Replace <YOUR_PROJECT_PATH> with the absolute path to this Playwright project
+   - Preserve all existing hooks — append only
+3. Copy qa-ai-stack/agent-factory/ → agent-factory-cli/ (sibling of this Playwright project folder)
+4. Copy qa-ai-stack/scripts/rule-engine.js → scripts/rule-engine.js
+5. Copy qa-ai-stack/rules/framework-rule-engine.json → rules/framework-rule-engine.json
+6. Copy qa-ai-stack/ANTI-HALLUCINATION-RULES.md → project root
+7. Copy qa-ai-stack/AUTO-FIX-PROTOCOL.md → project root
+8. Merge scripts from qa-ai-stack/package-scripts.json into this project's package.json
+   - Update agent-factory path if folder structure differs
+
+After install verify:
+- Run: npm run rules:check → should scan .ts files
+- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug
+- Confirm hooks in ~/.claude/settings.json: Bash matcher (ai:rca reminder) + Write|Edit matcher (rules:check)
+
+Then show me the 5-skill QA flow for this project.
+```
+
+---
+
+## What Gets Installed
+
+| Component | What it does |
+|---|---|
+| `/explore` skill | Live DOM → TypeScript POM, 95% accuracy |
+| `/test-case-creation` skill | Epic AC → Jira test cases + spec file |
+| `/test-case-execution` skill | Runs tests, auto-fixes locators, files bugs, updates Jira |
+| `/bug-triage` skill | Manual bug investigation fallback |
+| `/create-bug` skill | Manual Jira bug creation fallback |
+| `playwright-ai-mcp-tutor` skill | 3-agent Planner/Generator/Healer workflow |
+| `agent-factory-cli/` | RCA/Heal/Flaky/Triage AI agents |
+| `rule-engine.js` | Enforces POM/spec file placement + naming + tags |
+| `framework-rule-engine.json` | Rules config — edit to match your folder structure |
+| `ANTI-HALLUCINATION-RULES.md` | 22 rules preventing selector guessing, wrong assertions |
+| `AUTO-FIX-PROTOCOL.md` | 15 rules for autonomous fix (max 3 attempts before escalate) |
+| settings-hooks | Auto-triggers ai:rca on test failure + rules:check on file write |
+
+---
+
+## 5-Skill Flow (after install)
+
+```
+User Story assigned
+      ↓
+1. /explore <url>              ← POM from live DOM
+      ↓
+2. /test-case-creation EPIC-XX ← test cases from Epic AC → Jira + spec
+      ↓
+3. /test-case-execution EPIC-XX ← runs tests, auto-fixes, files bugs
+      ↓
+   ALL PASS → DONE ✅
+      ↓
+   FAIL → hook fires ⚠️ → npm run ai:rca → follow verdict
+      ↓
+4. /bug-triage (manual fallback only)
+5. /create-bug (manual fallback only)
+```
+
+---
+
+## Folder Structure Required
+
+```
+your-company-project/
+  playwright-project/          ← your Playwright TypeScript project
+    scripts/rule-engine.js     ← installed from qa-ai-stack
+    rules/framework-rule-engine.json
+    ANTI-HALLUCINATION-RULES.md
+    AUTO-FIX-PROTOCOL.md
+    package.json               ← add scripts from package-scripts.json
+  agent-factory-cli/           ← installed from qa-ai-stack (sibling folder)
+    ai-agents/
+
+~/.claude/
+  skills/
+    explore/
+    test-case-creation/
+    test-case-execution/
+    bug-triage/
+    create-bug/
+    playwright-ai-mcp-tutor/
+  settings.json                ← hooks merged from settings-hooks.json
+```
+
+---
+
+## Customize for New Company
+
+Edit `rules/framework-rule-engine.json` to match folder structure:
+- Change `sourceRoots` if project uses `src/test/` instead of `tests/ui/`
+- Change `placementRules` fileRegex if naming convention differs
+- Add `contentRules` for company-specific patterns (e.g., required ticket tags)
+
+Edit `settings-hooks.json`:
+- Replace `<YOUR_PROJECT_PATH>` with absolute path to Playwright project
+
+That's it. Full AI QA automation live in 10 minutes.
