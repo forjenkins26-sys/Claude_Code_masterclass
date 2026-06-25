@@ -721,6 +721,8 @@ Test case now shows:
 | TC-012  | SCRUM-79   | 🔴 Blocked | 30.0s | In Review | App bug: [SCRUM-85] |
 | TC-015  | SCRUM-82   | ❌ Fail | 30.0s    | In Progress | Stuck after 3 attempts |
 
+## Session Score: {score}% · {PASS|FAIL}  ({passed}/{total} tests)
+
 ## Summary
 - **Total:** N tests
 - **Passed:** X (clean)
@@ -728,6 +730,7 @@ Test case now shows:
 - **Flaky:** Z (needs attention)
 - **Blocked:** W (app bugs found)
 - **Failed:** V (stuck, needs manual fix)
+- **Network:** {requests} API calls intercepted · {assertions} assertions
 
 ## Auto-Fixed Tests
 
@@ -863,6 +866,47 @@ grep -r "TC-001" "Playwright Automation Framework/tests/"
    - Try running entire spec file
    - Parse results to find matching test
    - If still not found, report error
+
+## Step 7A: Composite Session Score (NexQA-style)
+
+After all TC results collected, calculate session-level score:
+
+```javascript
+const passed  = results.filter(r => r.ok).length;
+const score   = Math.round((passed / results.length) * 100);
+const verdict = score >= 70 ? 'PASS ✅' : 'FAIL ❌';
+```
+
+Add to summary header:
+```
+## Session Score: 87% · PASS ✅  (38/42 passed)
+```
+
+Threshold: ≥70% = PASS. Below 70% = FAIL.
+
+## Step 7A2: Network Interception — API Validation Alongside UI
+
+Capture Playwright network calls during each test:
+
+```javascript
+const networkLog = [];
+page.on('request',  req  => networkLog.push({ url: req.url(), method: req.method() }));
+page.on('response', resp => {
+  const entry = networkLog.find(r => r.url === resp.url());
+  if (entry) entry.status = resp.status();
+});
+```
+
+POST to QA Buddy for validation:
+```
+POST http://localhost:3003/api/network/intercept
+{ requests: networkLog, config: { ... } }
+```
+
+Report in summary:
+```
+🔌 Network: 115 requests · 247 assertions · Score: 94%
+```
 
 ## BLAST Progress Logging (Step 7B)
 

@@ -257,6 +257,52 @@ mcp__atlassian__searchJiraIssuesUsingJql({
 
 ---
 
+## Rule 23: Use 4-category failure taxonomy for all test failures (Added 2026-06-25)
+
+Stolen from nirarad/playwright-ai-qa-agent. Every test failure must be classified into exactly one of these 4 categories before any fix is attempted.
+
+| Category | Label | Signals | Action |
+|---|---|---|---|
+| `BROKEN_LOCATOR` | Selector broke — UI changed | `locator resolved to 0 elements`, `element not found` | Run `ai:heal` → auto-patch POM |
+| `REAL_BUG` | App defect — test is correct | Element visible+enabled, interaction has no effect; manual test confirms break | File Jira Bug → mark test Blocked |
+| `FLAKY` | Non-deterministic failure | Passes on retry, timing-sensitive, race condition | Run `ai:flaky` → confirm → add `@flaky` |
+| `ENV_ISSUE` | Environment/config problem | Auth failure, network timeout, credentials expired | Check env vars, network, credentials |
+
+**Why this matters:** Misclassifying `REAL_BUG` as `BROKEN_LOCATOR` → you auto-fix the test → you MASK a real defect. Never auto-fix without classifying first.
+
+**Rule 23 gate:** Cannot apply auto-fix (AFP) until failure is classified. Classification comes from `ai:rca` verdict OR manual investigation in headed mode.
+
+---
+
+## Rule 22: Use agent-factory RCA before classifying failure root cause (Added 2026-06-22)
+
+**Don't manually guess root cause. Let AI agent read the actual error first.**
+
+❌ DON'T: Read stack trace → assume "selector expired" → immediately write investigation script or fix
+
+✅ DO:
+```bash
+cd "Playwright Automation Framework"
+npm run ai:rca
+```
+→ Agent reads `test-results/results.json` → classifies with confidence score → THEN act on verdict
+
+**Verdict → Action table:**
+
+| RCA verdict | Action |
+|---|---|
+| `LOCATOR` | Write investigation script → headed mode → fix selector |
+| `TEST` | Fix test logic (assertion, wait, flow) |
+| `PRODUCT_BUG` | Skip fix → file Jira bug → mark test BLOCKED |
+| `ENV` | Check test environment, credentials, network |
+| `FLAKY` | Run `npm run ai:flaky` → confirm → add `@flaky` tag |
+
+**Why:** Manual classification from stack trace = reading symptoms. RCA agent traces the actual input → validation → failure path = reading root cause.
+
+**Lesson (2026-06-22):** One upstream bug can cause multiple test categories to fail. RCA agent identifies the FIRST broken gate — manual reading often misidentifies secondary effects as root cause.
+
+---
+
 ## Rule 17: Run headed mode FIRST for UI testing (Added 2026-06-11)
 
 **When test fails "element not found":**

@@ -257,6 +257,21 @@ mcp__atlassian__searchJiraIssuesUsingJql({
 
 ---
 
+## Rule 23: Use 4-category failure taxonomy for all test failures (Added 2026-06-25)
+
+Every test failure must be classified into exactly one category before any fix is attempted.
+
+| Category | Signals | Action |
+|---|---|---|
+| `BROKEN_LOCATOR` | `locator resolved to 0 elements`, `element not found` | Run `ai:heal` → auto-patch POM |
+| `REAL_BUG` | Element visible+enabled, interaction has no effect; manual test confirms | File Jira Bug → mark test Blocked |
+| `FLAKY` | Passes on retry, timing-sensitive, race condition | Run `ai:flaky` → confirm → add `@flaky` |
+| `ENV_ISSUE` | Auth failure, network timeout, credentials expired | Check env vars, network, credentials |
+
+**Gate:** Cannot apply auto-fix until failure is classified. Classification from `ai:rca` verdict OR manual headed mode investigation.
+
+---
+
 ## Rule 22: Use agent-factory RCA before classifying failure root cause (Added 2026-06-22)
 
 **Don't manually guess root cause. Let AI agent read the actual error first.**
