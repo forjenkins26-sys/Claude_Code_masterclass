@@ -46,6 +46,17 @@ Execute automated test cases from Jira Epic or individual test case link. Runs c
 - Test issue → AFP applies → fix and rerun
 - Application bug → DO NOT fix test → file Jira bug → mark test Blocked
 
+### Coding Discipline (karpathy-guidelines skill)
+
+When applying any auto-fix to a POM or spec (Step 5B), follow `karpathy-guidelines`:
+
+| Guideline | What it enforces here |
+|---|---|
+| **Surgical Changes** | Patch ONLY the failing locator/assertion. Don't "improve" adjacent locators, reformat the file, or refactor unrelated methods. Every changed line traces to the failure. |
+| **Simplicity First** | Minimum fix. No speculative waits, no extra config, no defensive code for impossible states. |
+| **Think Before Coding** | Surface the assumption (which selector, why) before editing. Matches AH Rule 17 (headed-mode investigation first). |
+| **Goal-Driven Execution** | Fix = "make the failing test pass, verified 3×" (AFP-11). Don't declare done without the rerun. |
+
 ---
 
 ## Instructions
@@ -323,6 +334,8 @@ node investigate-tc-001.js
 ### Step 5B: Auto-Fix Protocol (For Test Issues Only)
 
 **Only applies when:** Investigation confirms TEST ISSUE, not app bug.
+
+**Before editing — apply `karpathy-guidelines`:** the fix must be surgical (only the failing locator/assertion), minimal (no speculative code), and verified by rerun. Do NOT touch adjacent code, reformat, or refactor unrelated methods. Every changed line must trace to this failure.
 
 **Auto-Fix Process (Max 3 attempts):**
 
@@ -732,6 +745,8 @@ Test case now shows:
 - **Failed:** V (stuck, needs manual fix)
 - **Network:** {requests} API calls intercepted · {assertions} assertions
 
+**Evidence Report:** Generate via `POST /api/report/html` → self-contained HTML with screenshots embedded
+
 ## Auto-Fixed Tests
 
 ### SCRUM-75: TC-008 - Invalid email format
@@ -869,11 +884,12 @@ grep -r "TC-001" "Playwright Automation Framework/tests/"
 
 ## Step 7A: Composite Session Score (NexQA-style)
 
-After all TC results collected, calculate session-level score:
+After collecting all TC results, calculate a session-level composite score:
 
 ```javascript
 const passed  = results.filter(r => r.ok).length;
-const score   = Math.round((passed / results.length) * 100);
+const total   = results.length;
+const score   = Math.round((passed / total) * 100);
 const verdict = score >= 70 ? 'PASS ✅' : 'FAIL ❌';
 ```
 
@@ -882,28 +898,29 @@ Add to summary header:
 ## Session Score: 87% · PASS ✅  (38/42 passed)
 ```
 
-Threshold: ≥70% = PASS. Below 70% = FAIL.
+Threshold: ≥70% = PASS. Below 70% = FAIL (same as LLM-as-Judge).
 
-## Step 7A2: Network Interception — API Validation Alongside UI
+## Step 7A2: Network Interception (GAP 1 — API validation alongside UI)
 
-Capture Playwright network calls during each test:
+During each test, capture network calls via Playwright:
 
 ```javascript
+// In test setup — intercept all API requests
 const networkLog = [];
 page.on('request',  req  => networkLog.push({ url: req.url(), method: req.method() }));
 page.on('response', resp => {
   const entry = networkLog.find(r => r.url === resp.url());
-  if (entry) entry.status = resp.status();
+  if (entry) { entry.status = resp.status(); entry.responseBody = resp.text().catch(() => ''); }
 });
 ```
 
-POST to QA Buddy for validation:
+After test completes, POST captured requests to QA Buddy for validation:
 ```
 POST http://localhost:3003/api/network/intercept
 { requests: networkLog, config: { ... } }
 ```
 
-Report in summary:
+Report format:
 ```
 🔌 Network: 115 requests · 247 assertions · Score: 94%
 ```
@@ -994,6 +1011,8 @@ Before finishing:
 - Change assertions to match broken app behavior
 - Mark test "Done" when underlying app defect exists
 - Continue without filing bug when app bug detected
+- **File bug without linking it to the test case** — always run Step 5 (`createIssueLink`) immediately after `createJiraIssue`. Bug key → blocks → test case key. Never skip this step.
+*(Lesson — 2026-06-25: Bug SCRUM-269 filed but link to SCRUM-263 was forgotten and had to be done manually after execution completed)*
 
 ❌ **Don't (Auto-Fix Protocol Violations):**
 - Give up after first failure (max 3 attempts required)

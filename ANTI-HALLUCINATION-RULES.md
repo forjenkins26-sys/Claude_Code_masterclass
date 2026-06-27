@@ -274,6 +274,29 @@ Stolen from nirarad/playwright-ai-qa-agent. Every test failure must be classifie
 
 ---
 
+## Rule 24: Scope getByText() to parent locator when text appears in multiple elements (Added 2026-06-25)
+
+**`getByText('X')` in strict mode fails if text appears in more than one element.**
+
+❌ DON'T: Use bare `getByText()` for labels that appear in multiple page sections:
+```typescript
+// WRONG — "Placed" matches both order-date div AND timeline step-label → strict mode violation
+await expect(page.getByText('Placed')).toBeVisible();
+```
+
+✅ DO: Scope to parent container + use `{ exact: true }`:
+```typescript
+// RIGHT — scoped to .timeline, unambiguous
+const timeline = page.locator('.timeline');
+await expect(timeline.getByText('Placed', { exact: true })).toBeVisible();
+```
+
+**When to apply:** Any time page text is used as a label in multiple sections (e.g., status labels that also appear in date strings, breadcrumbs, headers).
+
+**Lesson (2026-06-25 OD-006):** `getByText('Placed')` matched order-date div ("Placed on Wednesday...") AND `.step-label` — strict mode threw `resolved to 2 elements`. Fix: scope to `.timeline` + `exact: true`.
+
+---
+
 ## Rule 22: Use agent-factory RCA before classifying failure root cause (Added 2026-06-22)
 
 **Don't manually guess root cause. Let AI agent read the actual error first.**

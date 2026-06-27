@@ -16,3 +16,9 @@ node_modules/
 
 # One-off generated session-recap HTML
 919a6e828f599e85.html
+
+# Secrets — never commit (CLAUDE.md hard rule)
+.env
+**/.env
+.vercel/
+**/.vercel/

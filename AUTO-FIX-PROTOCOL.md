@@ -47,7 +47,16 @@ Auto-fix activates when:
 
 **Fix-Specific Rules (from real experience):**
 
-7. **Create investigation script** - Check actual state (exists vs visible vs enabled)
+7. **Run ai:rca BEFORE investigation script** - Agent reads `test-results/results.json`, classifies failure (LOCATOR / TEST / PRODUCT_BUG / ENV / FLAKY) with confidence score in seconds. Only write investigation script AFTER RCA says LOCATOR or TEST.
+```bash
+cd "Playwright Automation Framework"
+npm run ai:rca        # classify failure
+npm run ai:heal       # if LOCATOR → auto-patch POM
+npm run ai:flaky      # if FLAKY → confirm + tag
+npm run ai:triage     # all 3 + Jira draft
+```
+
+7a. **Create investigation script** - Only after RCA verdict = LOCATOR/TEST. Check actual state (exists vs visible vs enabled)
 8. **Find ALL matches** - .first() may be wrong one. Check all, pick right one
 9. **Verify in headed mode** - Before applying fix, confirm it targets correct element
 10. **Document rejected approaches** - Note what didn't work and why
@@ -114,6 +123,16 @@ Auto-fix activates when:
    expect(formInput).toHaveAttribute('aria-invalid', 'true'); // Field marked invalid
    ```
 
+16. **Surgical fixes only (karpathy-guidelines)** - The fix must touch ONLY what the failure requires. This is the counterweight to Rule 13: Rule 13 says "fix ALL artifacts the change makes inconsistent" — Rule 16 says "don't change anything the failure does NOT touch."
+   - ❌ Don't "improve" adjacent locators, reformat the file, or refactor unrelated methods while you're in there
+   - ❌ Don't add speculative waits, defensive code for impossible states, or config nobody asked for
+   - ❌ Don't rewrite working assertions to your preferred style
+   - ✅ Every changed line traces directly to the failure being fixed
+   - ✅ Match existing file style even if you'd write it differently
+   - ✅ Noticed unrelated dead code / a second bug? Mention it in the report — don't fix it inline
+   - **Test:** if a reviewer asked "why did this line change?", every answer is "because test X was failing." If any answer is "while I was there…" — revert that line.
+   - *(Skill: `karpathy-guidelines`. Rule 13 = consistency of YOUR change's blast radius; Rule 16 = minimality of the change itself. Both apply together.)*
+
 ---
 
 ## PROCESS YOU MUST FOLLOW
@@ -121,6 +140,10 @@ Auto-fix activates when:
 **Step 1:** DETECT - Extract what/where/why failed. Classify root cause.
 
 **Step 2:** INVESTIGATE - Run domain-specific checks. Inspect actual state.
+   - **Run RCA agent FIRST:** `npm run ai:rca` → get verdict before any manual investigation
+   - If `PRODUCT_BUG` → skip to Step 5C (bug filing). Do NOT investigate or fix test.
+   - If `LOCATOR/TEST` → continue investigation below
+   - If `FLAKY` → `npm run ai:flaky` → confirm → add `@flaky` → skip fix
    - **Failure screenshots:** Check `screenshots-archive/{timestamp}/` — NOT `test-results/` (cleared every run). `globalSetup` archives before each run. Latest archive = most recent failure evidence.
 
 **Step 3:** FIX - Apply fix based on investigation. Document why it works.

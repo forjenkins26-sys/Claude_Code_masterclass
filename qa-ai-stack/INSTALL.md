@@ -24,7 +24,7 @@ Please install everything:
 
 After install verify:
 - Run: npm run rules:check → should scan .ts files
-- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug
+- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug, karpathy-guidelines
 - Confirm hooks in ~/.claude/settings.json: Bash matcher (ai:rca reminder) + Write|Edit matcher (rules:check)
 
 Then show me the 5-skill QA flow for this project.
@@ -42,11 +42,12 @@ Then show me the 5-skill QA flow for this project.
 | `/bug-triage` skill | Manual bug investigation fallback |
 | `/create-bug` skill | Manual Jira bug creation fallback |
 | `playwright-ai-mcp-tutor` skill | 3-agent Planner/Generator/Healer workflow |
+| `karpathy-guidelines` skill | Coding-discipline guardrail — surgical changes, simplicity-first, surface assumptions, goal-driven loops (applies to all POM/spec/server edits) |
 | `agent-factory-cli/` | RCA/Heal/Flaky/Triage AI agents |
 | `rule-engine.js` | Enforces POM/spec file placement + naming + tags |
 | `framework-rule-engine.json` | Rules config — edit to match your folder structure |
-| `ANTI-HALLUCINATION-RULES.md` | 22 rules preventing selector guessing, wrong assertions |
-| `AUTO-FIX-PROTOCOL.md` | 15 rules for autonomous fix (max 3 attempts before escalate) |
+| `ANTI-HALLUCINATION-RULES.md` | 24 rules preventing selector guessing, wrong assertions |
+| `AUTO-FIX-PROTOCOL.md` | 16 rules for autonomous fix (max 3 attempts before escalate; Rule 16 = surgical changes) |
 | settings-hooks | Auto-triggers ai:rca on test failure + rules:check on file write |
 
 ---
@@ -93,6 +94,7 @@ your-company-project/
     bug-triage/
     create-bug/
     playwright-ai-mcp-tutor/
+    karpathy-guidelines/
   settings.json                ← hooks merged from settings-hooks.json
 ```
 

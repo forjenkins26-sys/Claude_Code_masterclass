@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blinkit – Checkout</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #f8e71c;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 36px; height: 36px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { fill: #f8e71c; }
+    .logo-text { font-size: 22px; font-weight: 800; color: #1a1a1a; }
+    .nav-back { font-size: 14px; font-weight: 600; color: #1a1a1a; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .nav-back:hover { opacity: 0.7; }
+
+    /* Layout */
+    .page { max-width: 1100px; margin: 0 auto; padding: 28px 20px; display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+    @media (max-width: 768px) { .page { grid-template-columns: 1fr; } }
+
+    /* Card */
+    .card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 16px; }
+    .card-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+    .card-title .step-badge { width: 26px; height: 26px; background: #f8e71c; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #1a1a1a; flex-shrink: 0; }
+
+    /* Delivery address */
+    .address-block { display: flex; align-items: flex-start; gap: 14px; padding: 14px; border: 2px solid #f8e71c; border-radius: 10px; background: #fffde7; }
+    .address-icon { font-size: 20px; }
+    .address-name { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+    .address-text { font-size: 13px; color: #555; margin-top: 2px; line-height: 1.5; }
+    .address-change { font-size: 12px; font-weight: 700; color: #0a8f3c; cursor: pointer; margin-top: 6px; display: inline-block; }
+    .address-change:hover { text-decoration: underline; }
+
+    .eta-badge { display: inline-flex; align-items: center; gap: 6px; background: #0a8f3c; color: #fff; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; margin-top: 10px; }
+
+    /* Payment methods */
+    .payment-tabs { display: flex; gap: 0; border: 1.5px solid #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+    .payment-tab {
+      flex: 1; padding: 11px 8px; text-align: center; font-size: 12px; font-weight: 600; color: #555;
+      background: #fafafa; cursor: pointer; border: none; border-right: 1.5px solid #e0e0e0; transition: all 0.15s;
+    }
+    .payment-tab:last-child { border-right: none; }
+    .payment-tab.active { background: #f8e71c; color: #1a1a1a; font-weight: 700; }
+    .payment-tab:hover:not(.active) { background: #f5f5f5; }
+
+    /* Payment panels */
+    .payment-panel { display: none; }
+    .payment-panel.active { display: block; }
+
+    /* UPI */
+    .upi-apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .upi-app {
+      border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center;
+      cursor: pointer; transition: all 0.15s; background: #fff;
+    }
+    .upi-app:hover { border-color: #f8e71c; background: #fffde7; }
+    .upi-app.selected { border-color: #f8e71c; background: #fffde7; }
+    .upi-app-icon { font-size: 26px; margin-bottom: 4px; }
+    .upi-app-name { font-size: 11px; font-weight: 600; color: #333; }
+
+    .divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #aaa; font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e0e0e0; }
+
+    /* Inputs */
+    .input-group { margin-bottom: 14px; }
+    .input-label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
+    .input-field {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+      font-size: 14px; color: #1a1a1a; outline: none; font-family: inherit; transition: border-color 0.15s;
+    }
+    .input-field:focus { border-color: #f8e71c; box-shadow: 0 0 0 3px rgba(248,231,28,0.2); }
+    .input-field.error { border-color: #e53935; }
+    .input-error { font-size: 11px; color: #e53935; margin-top: 4px; display: none; }
+    .input-error.show { display: block; }
+
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Card icons */
+    .card-network-icons { display: flex; gap: 8px; margin-bottom: 14px; }
+    .card-network { padding: 4px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; font-size: 11px; font-weight: 700; color: #555; }
+    .card-network.visa { color: #1a1f71; }
+    .card-network.master { color: #eb001b; }
+    .card-network.rupay { color: #0a8f3c; }
+
+    /* Net Banking */
+    .bank-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .bank-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+    }
+    .bank-item:hover { border-color: #f8e71c; background: #fffde7; }
+    .bank-item.selected { border-color: #f8e71c; background: #fffde7; }
+    .bank-icon { font-size: 20px; }
+    .bank-name { font-size: 12px; font-weight: 600; color: #333; }
+    .bank-select { width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; color: #1a1a1a; outline: none; font-family: inherit; background: #fff; cursor: pointer; }
+    .bank-select:focus { border-color: #f8e71c; }
+
+    /* Wallets */
+    .wallet-list { display: flex; flex-direction: column; gap: 10px; }
+    .wallet-item {
+      display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;
+      border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+    }
+    .wallet-item:hover { border-color: #f8e71c; background: #fffde7; }
+    .wallet-item.selected { border-color: #f8e71c; background: #fffde7; }
+    .wallet-left { display: flex; align-items: center; gap: 12px; }
+    .wallet-icon { font-size: 24px; }
+    .wallet-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+    .wallet-balance { font-size: 12px; color: #0a8f3c; font-weight: 600; }
+    .wallet-cashback { font-size: 11px; color: #ff6b00; font-weight: 600; background: #fff3e0; padding: 2px 8px; border-radius: 10px; }
+
+    /* COD */
+    .cod-box { text-align: center; padding: 30px 20px; }
+    .cod-icon { font-size: 56px; margin-bottom: 12px; }
+    .cod-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .cod-desc { font-size: 13px; color: #666; line-height: 1.6; }
+    .cod-note { display: inline-flex; align-items: center; gap: 6px; background: #fff3e0; color: #e65100; border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; margin-top: 14px; }
+
+    /* EMI */
+    .emi-banks { display: flex; flex-direction: column; gap: 10px; }
+    .emi-item {
+      display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;
+      border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+    }
+    .emi-item:hover { border-color: #f8e71c; background: #fffde7; }
+    .emi-item.selected { border-color: #f8e71c; background: #fffde7; }
+    .emi-left { display: flex; align-items: center; gap: 12px; }
+    .emi-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+    .emi-tenures { font-size: 12px; color: #666; margin-top: 2px; }
+    .emi-badge { background: #e8f5e9; color: #0a8f3c; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 2px 8px; }
+
+    /* Order summary */
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; color: #333; border-bottom: 1px solid #f0f0f0; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row.total { font-size: 16px; font-weight: 800; color: #1a1a1a; padding-top: 12px; }
+    .summary-row .label { color: #666; }
+    .summary-row .value { font-weight: 600; }
+    .discount-value { color: #0a8f3c; }
+    .free-badge { background: #e8f5e9; color: #0a8f3c; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 2px 8px; }
+
+    /* Cart items */
+    .cart-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img { width: 44px; height: 44px; border-radius: 8px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .cart-item-name { flex: 1; font-size: 13px; font-weight: 600; color: #1a1a1a; }
+    .cart-item-qty { font-size: 12px; color: #888; }
+    .cart-item-price { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+
+    /* Promo */
+    .promo-row { display: flex; gap: 8px; }
+    .promo-input { flex: 1; padding: 10px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; }
+    .promo-input:focus { border-color: #f8e71c; }
+    .promo-btn { padding: 10px 18px; background: #1a1a1a; color: #f8e71c; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .promo-btn:hover { background: #333; }
+    .promo-success { display: none; align-items: center; gap: 6px; color: #0a8f3c; font-size: 13px; font-weight: 600; margin-top: 8px; }
+    .promo-success.show { display: flex; }
+
+    /* Place order */
+    .place-order-btn {
+      width: 100%; padding: 16px; background: #f8e71c; color: #1a1a1a; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+    }
+    .place-order-btn:hover { background: #f0dc00; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(248,231,28,0.4); }
+    .place-order-btn:active { transform: none; }
+    .place-order-btn:disabled { background: #e0e0e0; color: #aaa; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .secure-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #888; margin-top: 10px; }
+
+    /* Success modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 20px; padding: 40px 32px; text-align: center; max-width: 380px; width: 90%; animation: popIn 0.3s ease; }
+    @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-icon { font-size: 64px; margin-bottom: 16px; }
+    .modal-title { font-size: 22px; font-weight: 800; color: #1a1a1a; margin-bottom: 8px; }
+    .modal-sub { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 20px; }
+    .modal-order-id { font-size: 12px; color: #aaa; font-family: monospace; margin-bottom: 24px; }
+    .modal-btn { padding: 14px 32px; background: #f8e71c; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; color: #1a1a1a; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: #fff; padding: 12px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+
+    /* Offer chip */
+    .offer-chip { display: inline-flex; align-items: center; gap: 6px; background: #e8f5e9; color: #0a8f3c; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="logo-text">blinkit</span>
+  </div>
+  <a href="blinkit-products.html" class="nav-back">← Back to Products</a>
+</nav>
+
+<!-- Page -->
+<div class="page">
+
+  <!-- LEFT COLUMN -->
+  <div>
+
+    <!-- Step 1: Delivery Address -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">1</span> Delivery Address</div>
+      <div class="address-block">
+        <div class="address-icon">📍</div>
+        <div>
+          <div class="address-name">Rahul Sharma (Home)</div>
+          <div class="address-text">42, Green Park Extension<br>New Delhi, Delhi – 110016</div>
+          <div class="eta-badge">⚡ Delivery in 10 minutes</div>
+          <div class="address-change" onclick="showToast('Address change coming soon!')">Change Address</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Payment Method -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">2</span> Payment Method</div>
+
+      <div class="offer-chip">🎁 Use code BLINK50 to get ₹50 off on orders above ₹299</div>
+
+      <!-- Tabs -->
+      <div class="payment-tabs" role="tablist">
+        <button class="payment-tab active" role="tab" data-panel="upi" onclick="switchTab(this)" id="tab-upi">📱 UPI</button>
+        <button class="payment-tab" role="tab" data-panel="card" onclick="switchTab(this)" id="tab-card">💳 Card</button>
+        <button class="payment-tab" role="tab" data-panel="netbanking" onclick="switchTab(this)" id="tab-netbanking">🏦 Net Banking</button>
+        <button class="payment-tab" role="tab" data-panel="wallet" onclick="switchTab(this)" id="tab-wallet">👛 Wallet</button>
+        <button class="payment-tab" role="tab" data-panel="emi" onclick="switchTab(this)" id="tab-emi">📅 EMI</button>
+        <button class="payment-tab" role="tab" data-panel="cod" onclick="switchTab(this)" id="tab-cod">💵 COD</button>
+      </div>
+
+      <!-- UPI Panel -->
+      <div class="payment-panel active" id="panel-upi">
+        <div class="upi-apps">
+          <div class="upi-app selected" onclick="selectUpiApp(this)" data-app="gpay" id="upi-gpay">
+            <div class="upi-app-icon">🟦</div>
+            <div class="upi-app-name">Google Pay</div>
+          </div>
+          <div class="upi-app" onclick="selectUpiApp(this)" data-app="phonepe" id="upi-phonepe">
+            <div class="upi-app-icon">🟣</div>
+            <div class="upi-app-name">PhonePe</div>
+          </div>
+          <div class="upi-app" onclick="selectUpiApp(this)" data-app="paytm" id="upi-paytm">
+            <div class="upi-app-icon">🔵</div>
+            <div class="upi-app-name">Paytm</div>
+          </div>
+          <div class="upi-app" onclick="selectUpiApp(this)" data-app="bhim" id="upi-bhim">
+            <div class="upi-app-icon">🇮🇳</div>
+            <div class="upi-app-name">BHIM</div>
+          </div>
+        </div>
+        <div class="divider">or enter UPI ID</div>
+        <div class="input-group">
+          <label class="input-label" for="upi-id">UPI ID</label>
+          <input type="text" id="upi-id" class="input-field" placeholder="yourname@upi" data-field="upi" />
+          <div class="input-error" id="upi-id-error">Enter a valid UPI ID (e.g. name@okaxis)</div>
+        </div>
+      </div>
+
+      <!-- Card Panel -->
+      <div class="payment-panel" id="panel-card">
+        <div class="card-network-icons">
+          <span class="card-network visa">VISA</span>
+          <span class="card-network master">MASTER</span>
+          <span class="card-network rupay">RuPay</span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="card-number">Card Number</label>
+          <input type="text" id="card-number" class="input-field" placeholder="1234 5678 9012 3456" maxlength="19" data-field="card-number" oninput="formatCardNumber(this)" />
+          <div class="input-error" id="card-number-error">Enter a valid 16-digit card number</div>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="card-name">Cardholder Name</label>
+          <input type="text" id="card-name" class="input-field" placeholder="Name on card" data-field="card-name" />
+          <div class="input-error" id="card-name-error">Enter cardholder name</div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label" for="card-expiry">Expiry (MM/YY)</label>
+            <input type="text" id="card-expiry" class="input-field" placeholder="MM/YY" maxlength="5" data-field="card-expiry" oninput="formatExpiry(this)" />
+            <div class="input-error" id="card-expiry-error">Invalid expiry date</div>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="card-cvv">CVV</label>
+            <input type="password" id="card-cvv" class="input-field" placeholder="•••" maxlength="3" data-field="card-cvv" />
+            <div class="input-error" id="card-cvv-error">Enter 3-digit CVV</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Net Banking Panel -->
+      <div class="payment-panel" id="panel-netbanking">
+        <div class="bank-list">
+          <div class="bank-item selected" onclick="selectBank(this)" data-bank="sbi" id="bank-sbi">
+            <span class="bank-icon">🏦</span><span class="bank-name">SBI</span>
+          </div>
+          <div class="bank-item" onclick="selectBank(this)" data-bank="hdfc" id="bank-hdfc">
+            <span class="bank-icon">🏦</span><span class="bank-name">HDFC Bank</span>
+          </div>
+          <div class="bank-item" onclick="selectBank(this)" data-bank="icici" id="bank-icici">
+            <span class="bank-icon">🏦</span><span class="bank-name">ICICI Bank</span>
+          </div>
+          <div class="bank-item" onclick="selectBank(this)" data-bank="axis" id="bank-axis">
+            <span class="bank-icon">🏦</span><span class="bank-name">Axis Bank</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="bank-select">All Other Banks</label>
+          <select id="bank-select" class="bank-select" onchange="selectBankFromDropdown(this)">
+            <option value="">Select your bank</option>
+            <option value="kotak">Kotak Mahindra Bank</option>
+            <option value="yes">Yes Bank</option>
+            <option value="pnb">Punjab National Bank</option>
+            <option value="bob">Bank of Baroda</option>
+            <option value="indusind">IndusInd Bank</option>
+            <option value="idfc">IDFC First Bank</option>
+            <option value="canara">Canara Bank</option>
+            <option value="union">Union Bank</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Wallet Panel -->
+      <div class="payment-panel" id="panel-wallet">
+        <div class="wallet-list">
+          <div class="wallet-item selected" onclick="selectWallet(this)" data-wallet="paytm" id="wallet-paytm">
+            <div class="wallet-left">
+              <span class="wallet-icon">🔵</span>
+              <div>
+                <div class="wallet-name">Paytm Wallet</div>
+                <div class="wallet-balance">Balance: ₹342.50</div>
+              </div>
+            </div>
+            <span class="wallet-cashback">5% cashback</span>
+          </div>
+          <div class="wallet-item" onclick="selectWallet(this)" data-wallet="phonepe" id="wallet-phonepe">
+            <div class="wallet-left">
+              <span class="wallet-icon">🟣</span>
+              <div>
+                <div class="wallet-name">PhonePe Wallet</div>
+                <div class="wallet-balance">Balance: ₹120.00</div>
+              </div>
+            </div>
+            <span class="wallet-cashback">3% cashback</span>
+          </div>
+          <div class="wallet-item" onclick="selectWallet(this)" data-wallet="amazon" id="wallet-amazon">
+            <div class="wallet-left">
+              <span class="wallet-icon">🟠</span>
+              <div>
+                <div class="wallet-name">Amazon Pay</div>
+                <div class="wallet-balance">Balance: ₹75.00</div>
+              </div>
+            </div>
+            <span class="wallet-cashback">2% cashback</span>
+          </div>
+          <div class="wallet-item" onclick="selectWallet(this)" data-wallet="mobikwik" id="wallet-mobikwik">
+            <div class="wallet-left">
+              <span class="wallet-icon">💜</span>
+              <div>
+                <div class="wallet-name">MobiKwik</div>
+                <div class="wallet-balance">Balance: ₹55.00</div>
+              </div>
+            </div>
+            <span class="wallet-cashback">4% cashback</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMI Panel -->
+      <div class="payment-panel" id="panel-emi">
+        <div style="font-size:13px;color:#666;margin-bottom:14px;">No-cost EMI available on select cards. Interest charged by bank.</div>
+        <div class="emi-banks">
+          <div class="emi-item selected" onclick="selectEmi(this)" data-emi="hdfc">
+            <div class="emi-left">
+              <span style="font-size:20px;">🏦</span>
+              <div>
+                <div class="emi-name">HDFC Credit Card</div>
+                <div class="emi-tenures">3, 6, 9, 12 months</div>
+              </div>
+            </div>
+            <span class="emi-badge">No Cost</span>
+          </div>
+          <div class="emi-item" onclick="selectEmi(this)" data-emi="icici">
+            <div class="emi-left">
+              <span style="font-size:20px;">🏦</span>
+              <div>
+                <div class="emi-name">ICICI Credit Card</div>
+                <div class="emi-tenures">3, 6, 12 months</div>
+              </div>
+            </div>
+            <span class="emi-badge">No Cost</span>
+          </div>
+          <div class="emi-item" onclick="selectEmi(this)" data-emi="sbi">
+            <div class="emi-left">
+              <span style="font-size:20px;">🏦</span>
+              <div>
+                <div class="emi-name">SBI Credit Card</div>
+                <div class="emi-tenures">3, 6, 9 months</div>
+              </div>
+            </div>
+            <span class="emi-badge">No Cost</span>
+          </div>
+          <div class="emi-item" onclick="selectEmi(this)" data-emi="axis">
+            <div class="emi-left">
+              <span style="font-size:20px;">🏦</span>
+              <div>
+                <div class="emi-name">Axis Credit Card</div>
+                <div class="emi-tenures">3, 6, 12, 24 months</div>
+              </div>
+            </div>
+            <span class="emi-badge">No Cost</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COD Panel -->
+      <div class="payment-panel" id="panel-cod">
+        <div class="cod-box">
+          <div class="cod-icon">💵</div>
+          <div class="cod-title">Cash on Delivery</div>
+          <div class="cod-desc">Pay with cash when your order arrives. Our delivery partner will collect the exact amount.</div>
+          <div class="cod-note">⚠️ Please keep exact change ready</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Promo Code -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">3</span> Promo Code / Coupon</div>
+      <div class="promo-row">
+        <input type="text" id="promo-input" class="promo-input" placeholder="Enter promo code" />
+        <button class="promo-btn" onclick="applyPromo()" id="promo-btn">Apply</button>
+      </div>
+      <div class="promo-success" id="promo-success">✅ BLINK50 applied — ₹50 off!</div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div>
+
+    <!-- Order Summary -->
+    <div class="card" style="position:sticky;top:80px;">
+      <div class="card-title">🛒 Order Summary</div>
+
+      <!-- Cart items -->
+      <div id="cart-items">
+        <div class="cart-item">
+          <div class="cart-item-img">🥛</div>
+          <div>
+            <div class="cart-item-name">Amul Taza Milk 1L</div>
+            <div class="cart-item-qty">Qty: 2</div>
+          </div>
+          <div class="cart-item-price">₹110</div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-img">🍞</div>
+          <div>
+            <div class="cart-item-name">Britannia Bread 400g</div>
+            <div class="cart-item-qty">Qty: 1</div>
+          </div>
+          <div class="cart-item-price">₹45</div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-img">🥚</div>
+          <div>
+            <div class="cart-item-name">Farm Fresh Eggs (6 pcs)</div>
+            <div class="cart-item-qty">Qty: 1</div>
+          </div>
+          <div class="cart-item-price">₹72</div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-img">🧴</div>
+          <div>
+            <div class="cart-item-name">Dove Body Wash 200ml</div>
+            <div class="cart-item-qty">Qty: 1</div>
+          </div>
+          <div class="cart-item-price">₹185</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="summary-row">
+          <span class="label">Subtotal (4 items)</span>
+          <span class="value">₹412</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Delivery Fee</span>
+          <span class="free-badge">FREE</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Platform Fee</span>
+          <span class="value">₹3</span>
+        </div>
+        <div class="summary-row" id="discount-row" style="display:none;">
+          <span class="label">Promo Discount</span>
+          <span class="value discount-value" id="discount-value">−₹50</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="total-amount">₹415</span>
+        </div>
+      </div>
+
+      <button class="place-order-btn" id="place-order-btn" onclick="placeOrder()" style="margin-top:20px;" data-testid="place-order-btn">
+        Place Order · ₹<span id="btn-amount">415</span>
+      </button>
+      <div class="secure-note">🔒 Secured by 256-bit SSL encryption</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="success-modal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">Order Placed!</div>
+    <div class="modal-sub">Your order is confirmed and will arrive in <strong>10 minutes</strong>.</div>
+    <div class="modal-order-id" id="order-id">Order ID: BLK-000000</div>
+    <button class="modal-btn" onclick="goHome()">Back to Home</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let promoApplied = false;
+
+  // Tab switching
+  function switchTab(btn) {
+    document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.payment-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  }
+
+  // UPI app selection
+  function selectUpiApp(el) {
+    document.querySelectorAll('.upi-app').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('upi-id').value = '';
+  }
+
+  // Net banking
+  function selectBank(el) {
+    document.querySelectorAll('.bank-item').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('bank-select').value = '';
+  }
+
+  function selectBankFromDropdown(sel) {
+    if (sel.value) document.querySelectorAll('.bank-item').forEach(b => b.classList.remove('selected'));
+  }
+
+  // Wallet selection
+  function selectWallet(el) {
+    document.querySelectorAll('.wallet-item').forEach(w => w.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // EMI selection
+  function selectEmi(el) {
+    document.querySelectorAll('.emi-item').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Card number formatting
+  function formatCardNumber(input) {
+    let val = input.value.replace(/\D/g, '').slice(0, 16);
+    input.value = val.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  // Expiry formatting
+  function formatExpiry(input) {
+    let val = input.value.replace(/\D/g, '').slice(0, 4);
+    if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2);
+    input.value = val;
+  }
+
+  // Promo code
+  function applyPromo() {
+    const code = document.getElementById('promo-input').value.trim().toUpperCase();
+    if (code === 'BLINK50') {
+      promoApplied = true;
+      document.getElementById('promo-success').classList.add('show');
+      document.getElementById('discount-row').style.display = 'flex';
+      document.getElementById('total-amount').textContent = '₹365';
+      document.getElementById('btn-amount').textContent = '365';
+      document.getElementById('promo-btn').textContent = '✅ Applied';
+      document.getElementById('promo-btn').disabled = true;
+      showToast('🎉 Promo code BLINK50 applied!');
+    } else {
+      showToast('Invalid promo code. Try BLINK50');
+    }
+  }
+
+  // Enter key for promo
+  document.getElementById('promo-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') applyPromo();
+  });
+
+  // Validation
+  function validateCard() {
+    let valid = true;
+    const num = document.getElementById('card-number').value.replace(/\s/g, '');
+    if (num.length !== 16) { showFieldError('card-number'); valid = false; }
+    else hideFieldError('card-number');
+
+    const name = document.getElementById('card-name').value.trim();
+    if (!name) { showFieldError('card-name'); valid = false; }
+    else hideFieldError('card-name');
+
+    const exp = document.getElementById('card-expiry').value;
+    if (!/^\d{2}\/\d{2}$/.test(exp)) { showFieldError('card-expiry'); valid = false; }
+    else hideFieldError('card-expiry');
+
+    const cvv = document.getElementById('card-cvv').value;
+    if (cvv.length !== 3) { showFieldError('card-cvv'); valid = false; }
+    else hideFieldError('card-cvv');
+
+    return valid;
+  }
+
+  function validateUpi() {
+    const upiId = document.getElementById('upi-id').value.trim();
+    const hasApp = document.querySelector('.upi-app.selected');
+    if (upiId) {
+      if (!/^[\w.\-]{2,256}@[a-zA-Z]{2,64}$/.test(upiId)) {
+        showFieldError('upi-id'); return false;
+      }
+      hideFieldError('upi-id');
+    }
+    return true;
+  }
+
+  function showFieldError(id) {
+    document.getElementById(id).classList.add('error');
+    const err = document.getElementById(id + '-error');
+    if (err) err.classList.add('show');
+  }
+
+  function hideFieldError(id) {
+    document.getElementById(id).classList.remove('error');
+    const err = document.getElementById(id + '-error');
+    if (err) err.classList.remove('show');
+  }
+
+  // Place order
+  function placeOrder() {
+    const activeTab = document.querySelector('.payment-tab.active').dataset.panel;
+
+    if (activeTab === 'card' && !validateCard()) {
+      showToast('Please fill in all card details correctly');
+      return;
+    }
+    if (activeTab === 'upi') {
+      const upiId = document.getElementById('upi-id').value.trim();
+      const hasApp = document.querySelector('.upi-app.selected');
+      if (upiId && !validateUpi()) {
+        showToast('Invalid UPI ID format');
+        return;
+      }
+    }
+
+    // Show loading
+    const btn = document.getElementById('place-order-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Placing Order…';
+
+    setTimeout(() => {
+      const orderId = 'BLK-' + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('order-id').textContent = 'Order ID: ' + orderId;
+      document.getElementById('success-modal').classList.add('show');
+    }, 1500);
+  }
+
+  function goHome() {
+    window.location.href = 'blinkit-products.html';
+  }
+
+  // Toast
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

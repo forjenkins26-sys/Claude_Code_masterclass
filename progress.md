@@ -3,6 +3,44 @@
 
 ---
 
+## 2026-06-25 20:12 — /test-case-execution SCRUM-255
+
+**Epic:** SCRUM-255 — Order Details Page — View, Track & Manage Orders
+**Spec:** `Playwright Automation Framework/tests/ui/order-details.spec.ts`
+**Browser:** Chromium (headed)
+**Total:** 13 tests | **Passed:** 12 | **Failed:** 1 (intentional bug)
+
+| Test ID | Jira | Result | Notes |
+|---|---|---|---|
+| OD-001 | SCRUM-256 | ✅ PASS | Order ID displayed |
+| OD-002 | SCRUM-257 | ✅ PASS | All items listed |
+| OD-003 | SCRUM-258 | ✅ PASS | Bill totals correct |
+| OD-004 | SCRUM-259 | ✅ PASS | Delivery address shown |
+| OD-005 | SCRUM-260 | ✅ PASS | Payment method shown |
+| OD-006 | SCRUM-261 | ✅ PASS | Timeline highlighted (fixed strict mode) |
+| OD-007 | SCRUM-262 | ✅ PASS | ETA displayed |
+| OD-008 | SCRUM-263 | ❌ FAIL | REAL BUG — Cancel visible in Dispatched state. Bug: SCRUM-269 |
+| OD-009 | SCRUM-264 | ✅ PASS | Reorder toast shown |
+| OD-010 | SCRUM-265 | ✅ PASS | Invoice download triggered |
+| OD-011 | SCRUM-266 | ✅ PASS | Cancel confirm → status=Cancelled |
+| OD-012 | SCRUM-267 | ✅ PASS | Back button navigates away |
+| OD-013 | SCRUM-268 | ✅ PASS | Cancel dismissed → status unchanged |
+
+**Jira Updates:** SCRUM-256–262, SCRUM-264–268 → Done | SCRUM-263 → BLOCKED (comment added)
+**Bug Filed:** SCRUM-269 — Cancel Order button visible in Dispatched state (P2/High)
+**Fix Applied:** OD-006 strict mode fix — scoped `getByText('Placed')` to `.timeline` locator
+
+---
+
+## 2026-06-25 16:30 — /test-case-creation SCRUM-255
+
+**Epic:** SCRUM-255 — Order Details Page — View, Track & Manage Orders
+**Mode:** A (requirements-driven)
+**Test Cases Created:** 13 in Jira
+**Jira Keys:** SCRUM-256 to SCRUM-268
+**Requirement Gaps Found:** 1 — Cancel Order button visible in Dispatched state (AC line 8 says Placed/Confirmed only — potential bug)
+**POM Created:** OrderDetailsPage.ts (created via /explore)
+
 ## 2026-06-15 12:30 IST — Blinkit Demo App Enhancement
 
 **Triggered by:** Manual request — add products page + login redirect
@@ -85,5 +123,33 @@
 - ✅ React build: `client/dist/` — 29 modules, 158KB
 - ✅ Server: `http://localhost:3002`
 - ✅ GROQ key present
+
+---
+
+## 2026-06-27 14:10 IST — Test Execution: SCRUM-255 Order Details Page (headed, chromium)
+
+**Triggered by:** /test-case-execution SCRUM-255 (resumed — re-run after OD-006 strict-mode fix)
+**Spec:** `Playwright Automation Framework/tests/ui/order-details.spec.ts`
+**Result:** 13 passed, 1 failed (21.2s)
+
+| Test | Jira | Result | Status | Notes |
+|---|---|---|---|---|
+| OD-001 Order ID | SCRUM-256 | PASS | Done | |
+| OD-002 Items list | SCRUM-257 | PASS | Done | |
+| OD-003 Order total | SCRUM-258 | PASS | Done | |
+| OD-004 Delivery address | SCRUM-259 | PASS | Done | |
+| OD-005 Payment method | SCRUM-260 | PASS | Done | |
+| OD-006 Status timeline | SCRUM-261 | PASS | Done | Fixed — getByText scoped to .timeline + exact:true (AH Rule 24) |
+| OD-007 ETA | SCRUM-262 | PASS | Done | |
+| OD-008 Cancel hidden when Dispatched | SCRUM-263 | **FAIL** | In Review | REAL_BUG — Cancel visible in Dispatched state. Bug SCRUM-269 (Blocks). Test correct. |
+| OD-009 Reorder | SCRUM-264 | PASS | Done | |
+| OD-010 Invoice download | SCRUM-265 | PASS | Done | |
+| OD-011 Cancel flow | SCRUM-266 | PASS | Done | |
+| OD-012 Back button | SCRUM-267 | PASS | Done | |
+| OD-013 Cancel dismissed | SCRUM-268 | PASS | Done | |
+
+**Classification (AH Rule 23):** OD-008 = REAL_BUG (element visible+enabled, page logic does not hide Cancel in non-cancellable states). Not auto-fixed — test correctly catches defect.
+**Bug:** SCRUM-269 filed + linked (Blocks SCRUM-263). Test → In Review.
+**Pass rate:** 12/13 (92%). 1 fail is intentional defect catch, not a test issue.
 
 ---

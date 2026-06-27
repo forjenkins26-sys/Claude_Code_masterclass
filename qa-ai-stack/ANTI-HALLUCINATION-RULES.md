@@ -259,16 +259,41 @@ mcp__atlassian__searchJiraIssuesUsingJql({
 
 ## Rule 23: Use 4-category failure taxonomy for all test failures (Added 2026-06-25)
 
-Every test failure must be classified into exactly one category before any fix is attempted.
+Stolen from nirarad/playwright-ai-qa-agent. Every test failure must be classified into exactly one of these 4 categories before any fix is attempted.
 
-| Category | Signals | Action |
-|---|---|---|
-| `BROKEN_LOCATOR` | `locator resolved to 0 elements`, `element not found` | Run `ai:heal` → auto-patch POM |
-| `REAL_BUG` | Element visible+enabled, interaction has no effect; manual test confirms | File Jira Bug → mark test Blocked |
-| `FLAKY` | Passes on retry, timing-sensitive, race condition | Run `ai:flaky` → confirm → add `@flaky` |
-| `ENV_ISSUE` | Auth failure, network timeout, credentials expired | Check env vars, network, credentials |
+| Category | Label | Signals | Action |
+|---|---|---|---|
+| `BROKEN_LOCATOR` | Selector broke — UI changed | `locator resolved to 0 elements`, `element not found` | Run `ai:heal` → auto-patch POM |
+| `REAL_BUG` | App defect — test is correct | Element visible+enabled, interaction has no effect; manual test confirms break | File Jira Bug → mark test Blocked |
+| `FLAKY` | Non-deterministic failure | Passes on retry, timing-sensitive, race condition | Run `ai:flaky` → confirm → add `@flaky` |
+| `ENV_ISSUE` | Environment/config problem | Auth failure, network timeout, credentials expired | Check env vars, network, credentials |
 
-**Gate:** Cannot apply auto-fix until failure is classified. Classification from `ai:rca` verdict OR manual headed mode investigation.
+**Why this matters:** Misclassifying `REAL_BUG` as `BROKEN_LOCATOR` → you auto-fix the test → you MASK a real defect. Never auto-fix without classifying first.
+
+**Rule 23 gate:** Cannot apply auto-fix (AFP) until failure is classified. Classification comes from `ai:rca` verdict OR manual investigation in headed mode.
+
+---
+
+## Rule 24: Scope getByText() to parent locator when text appears in multiple elements (Added 2026-06-25)
+
+**`getByText('X')` in strict mode fails if text appears in more than one element.**
+
+❌ DON'T: Use bare `getByText()` for labels that appear in multiple page sections:
+```typescript
+// WRONG — "Placed" matches both order-date div AND timeline step-label → strict mode violation
+await expect(page.getByText('Placed')).toBeVisible();
+```
+
+✅ DO: Scope to parent container + use `{ exact: true }`:
+```typescript
+// RIGHT — scoped to .timeline, unambiguous
+const timeline = page.locator('.timeline');
+await expect(timeline.getByText('Placed', { exact: true })).toBeVisible();
+```
+
+**When to apply:** Any time page text is used as a label in multiple sections (e.g., status labels that also appear in date strings, breadcrumbs, headers).
+
+**Lesson (2026-06-25 OD-006):** `getByText('Placed')` matched order-date div ("Placed on Wednesday...") AND `.step-label` — strict mode threw `resolved to 2 elements`. Fix: scope to `.timeline` + `exact: true`.
 
 ---
 

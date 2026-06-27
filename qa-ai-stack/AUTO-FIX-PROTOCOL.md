@@ -123,6 +123,16 @@ npm run ai:triage     # all 3 + Jira draft
    expect(formInput).toHaveAttribute('aria-invalid', 'true'); // Field marked invalid
    ```
 
+16. **Surgical fixes only (karpathy-guidelines)** - The fix must touch ONLY what the failure requires. This is the counterweight to Rule 13: Rule 13 says "fix ALL artifacts the change makes inconsistent" — Rule 16 says "don't change anything the failure does NOT touch."
+   - ❌ Don't "improve" adjacent locators, reformat the file, or refactor unrelated methods while you're in there
+   - ❌ Don't add speculative waits, defensive code for impossible states, or config nobody asked for
+   - ❌ Don't rewrite working assertions to your preferred style
+   - ✅ Every changed line traces directly to the failure being fixed
+   - ✅ Match existing file style even if you'd write it differently
+   - ✅ Noticed unrelated dead code / a second bug? Mention it in the report — don't fix it inline
+   - **Test:** if a reviewer asked "why did this line change?", every answer is "because test X was failing." If any answer is "while I was there…" — revert that line.
+   - *(Skill: `karpathy-guidelines`. Rule 13 = consistency of YOUR change's blast radius; Rule 16 = minimality of the change itself. Both apply together.)*
+
 ---
 
 ## PROCESS YOU MUST FOLLOW

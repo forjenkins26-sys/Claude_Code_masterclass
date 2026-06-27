@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Details — Blinkit</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+    /* Header */
+    .header {
+      background: #fff200;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header .logo { font-size: 22px; font-weight: 900; color: #1a1a1a; letter-spacing: -0.5px; }
+    .header .back-btn {
+      background: #1a1a1a;
+      color: #fff200;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .header .back-btn:hover { background: #333; }
+
+    /* Main layout */
+    .container { max-width: 780px; margin: 24px auto; padding: 0 16px; }
+
+    /* Order header card */
+    .order-header-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .order-id { font-size: 13px; color: #666; margin-bottom: 4px; }
+    .order-id span { font-weight: 700; color: #1a1a1a; }
+    .order-date { font-size: 13px; color: #666; margin-bottom: 16px; }
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .status-placed    { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #cce5ff; color: #004085; }
+    .status-dispatched{ background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+
+    /* Timeline */
+    .timeline-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 20px; }
+    .timeline { display: flex; justify-content: space-between; position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      height: 3px;
+      background: #e0e0e0;
+      z-index: 0;
+    }
+    .timeline-step { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 1; flex: 1; }
+    .step-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .step-dot.active   { background: #0c831f; color: #fff; }
+    .step-dot.current  { background: #fff200; color: #1a1a1a; border: 3px solid #0c831f; }
+    .step-label { font-size: 11px; font-weight: 600; color: #666; text-align: center; }
+    .step-label.active { color: #0c831f; }
+    .step-label.current { color: #1a1a1a; }
+    .step-time { font-size: 10px; color: #999; text-align: center; }
+
+    /* ETA bar */
+    .eta-bar {
+      background: #f0fff4;
+      border: 1.5px solid #0c831f;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0c831f;
+    }
+    .eta-icon { font-size: 20px; }
+
+    /* Items card */
+    .items-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-img {
+      width: 56px; height: 56px;
+      border-radius: 10px;
+      background: #f5f5f5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .item-info { flex: 1; }
+    .item-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .item-qty  { font-size: 12px; color: #666; }
+    .item-price { font-size: 14px; font-weight: 700; }
+
+    /* Price summary */
+    .price-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 6px 0;
+      color: #444;
+    }
+    .price-row.total {
+      font-weight: 700;
+      font-size: 16px;
+      color: #1a1a1a;
+      border-top: 2px solid #f0f0f0;
+      margin-top: 8px;
+      padding-top: 12px;
+    }
+    .price-row.discount { color: #0c831f; }
+
+    /* Delivery + Payment */
+    .info-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .info-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+    .info-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .info-label { font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .info-value { font-size: 14px; font-weight: 600; }
+    .info-sub   { font-size: 12px; color: #666; margin-top: 2px; }
+
+    /* Action buttons */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-cancel {
+      background: #fff;
+      color: #e53935;
+      border: 2px solid #e53935;
+    }
+    .btn-cancel:hover { background: #fff5f5; }
+    .btn-reorder {
+      background: #0c831f;
+      color: #fff;
+    }
+    .btn-reorder:hover { background: #0a6b19; }
+    .btn-invoice {
+      background: #fff200;
+      color: #1a1a1a;
+      border: 2px solid #e6d800;
+    }
+    .btn-invoice:hover { background: #ffe600; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="history.back()">← Back</button>
+  <div class="logo">blinkit</div>
+</div>
+
+<!-- Main -->
+<div class="container">
+
+  <!-- Order Header -->
+  <div class="order-header-card">
+    <div class="order-id">Order ID: <span id="orderId">#BLK-20240625-8842</span></div>
+    <div class="order-date">Placed on Wednesday, 25 June 2026 · 10:42 AM</div>
+    <span class="status-badge status-dispatched" id="statusBadge">Out for Delivery</span>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-card">
+    <div class="card-title">Order Tracking</div>
+    <div class="timeline">
+      <div class="timeline-step">
+        <div class="step-dot active" id="dot-placed">✓</div>
+        <div class="step-label active">Placed</div>
+        <div class="step-time">10:42 AM</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-dot active" id="dot-confirmed">✓</div>
+        <div class="step-label active">Confirmed</div>
+        <div class="step-time">10:43 AM</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-dot current" id="dot-dispatched">🛵</div>
+        <div class="step-label current">Dispatched</div>
+        <div class="step-time">10:51 AM</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-dot" id="dot-delivered">📦</div>
+        <div class="step-label">Delivered</div>
+        <div class="step-time">—</div>
+      </div>
+    </div>
+    <div class="eta-bar">
+      <span class="eta-icon">⚡</span>
+      <span>Arriving in <strong>8 minutes</strong> · Est. 11:05 AM</span>
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="items-card">
+    <div class="card-title">Items Ordered (4)</div>
+
+    <div class="item-row">
+      <div class="item-img">🥛</div>
+      <div class="item-info">
+        <div class="item-name">Amul Full Cream Milk 500ml</div>
+        <div class="item-qty">Qty: 2 × ₹32</div>
+      </div>
+      <div class="item-price">₹64</div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-img">🍞</div>
+      <div class="item-info">
+        <div class="item-name">Britannia Brown Bread</div>
+        <div class="item-qty">Qty: 1 × ₹45</div>
+      </div>
+      <div class="item-price">₹45</div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-img">🥚</div>
+      <div class="item-info">
+        <div class="item-name">Farm Fresh Eggs (6 pack)</div>
+        <div class="item-qty">Qty: 1 × ₹72</div>
+      </div>
+      <div class="item-price">₹72</div>
+    </div>
+
+    <div class="item-row">
+      <div class="item-img">🧴</div>
+      <div class="item-info">
+        <div class="item-name">Dove Body Wash 200ml</div>
+        <div class="item-qty">Qty: 1 × ₹199</div>
+      </div>
+      <div class="item-price">₹199</div>
+    </div>
+  </div>
+
+  <!-- Price Summary -->
+  <div class="price-card">
+    <div class="card-title">Bill Details</div>
+    <div class="price-row"><span>Item Total</span><span>₹380</span></div>
+    <div class="price-row discount"><span>Discount (BLINK20)</span><span>−₹38</span></div>
+    <div class="price-row"><span>Delivery Fee</span><span>₹25</span></div>
+    <div class="price-row"><span>Platform Fee</span><span>₹5</span></div>
+    <div class="price-row total"><span>Total Paid</span><span>₹372</span></div>
+  </div>
+
+  <!-- Delivery + Payment -->
+  <div class="info-card">
+    <div class="card-title">Delivery & Payment Info</div>
+
+    <div class="info-row">
+      <div class="info-icon">📍</div>
+      <div>
+        <div class="info-label">Delivery Address</div>
+        <div class="info-value">Rahul Sharma</div>
+        <div class="info-sub">42, Green Park Colony, Sector 14, Gurugram — 122001</div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-icon">💳</div>
+      <div>
+        <div class="info-label">Payment Method</div>
+        <div class="info-value">UPI — rahul@okaxis</div>
+        <div class="info-sub">Amount paid: ₹372</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button class="btn btn-cancel" id="cancelBtn" onclick="handleCancel()">Cancel Order</button>
+    <button class="btn btn-reorder" onclick="handleReorder()">Reorder</button>
+    <button class="btn btn-invoice" onclick="handleInvoice()">Invoice 🧾</button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function handleCancel() {
+    if (confirm('Cancel this order? This cannot be undone.')) {
+      document.getElementById('statusBadge').textContent = 'Cancelled';
+      document.getElementById('statusBadge').className = 'status-badge';
+      document.getElementById('statusBadge').style.background = '#fde8e8';
+      document.getElementById('statusBadge').style.color = '#c62828';
+      document.getElementById('cancelBtn').disabled = true;
+      document.getElementById('cancelBtn').style.opacity = '0.5';
+      showToast('✅ Order cancelled successfully');
+    }
+  }
+
+  function handleReorder() {
+    showToast('🛒 Items added to cart!');
+  }
+
+  function handleInvoice() {
+    showToast('📄 Invoice downloading...');
+    setTimeout(() => {
+      const content = `BLINKIT INVOICE\n================\nOrder ID: #BLK-20240625-8842\nDate: 25 June 2026\n\nItems:\n- Amul Full Cream Milk 500ml x2 = ₹64\n- Britannia Brown Bread x1 = ₹45\n- Farm Fresh Eggs (6 pack) x1 = ₹72\n- Dove Body Wash 200ml x1 = ₹199\n\nDiscount (BLINK20): -₹38\nDelivery: ₹25\nPlatform Fee: ₹5\nTotal Paid: ₹372\n\nPayment: UPI — rahul@okaxis\nDelivery: 42, Green Park Colony, Gurugram`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'BLK-20240625-8842-invoice.txt';
+      a.click();
+    }, 500);
+  }
+</script>
+
+</body>
+</html>

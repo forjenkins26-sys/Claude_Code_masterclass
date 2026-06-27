@@ -1,8 +1,8 @@
 ---
 name: explore
 description: Explore any URL using Playwright MCP browser — finds all interactive elements (inputs, buttons, links, dropdowns, checkboxes, forms) from live DOM and generates a ready-to-use Playwright TypeScript Page Object Model (POM). Use when user says "/explore [URL]", "explore this page", "find locators for [URL]", or "create POM for [URL]".
-improvements: 2
-last-improved: 2026-06-14
+improvements: 3
+last-improved: 2026-06-25
 ---
 
 # Explore — Live DOM Locator Discovery & POM Generator
@@ -240,3 +240,7 @@ Do NOT overwrite — always append.
 ❌ **Don't:** Generate `data-test` locators from convention/memory — accessibility snapshot doesn't expose data-test attrs
 ✅ **Do:** Only use locators visible in snapshot output. If attribute not confirmed, use role-based locator + add `// VERIFICATION REQUIRED` comment.
 *(Lesson #2 — 2026-06-14)*
+
+❌ **Don't:** Use bare `getByText('X')` for labels that may appear in multiple page sections (date strings, headers, status badges, timeline labels)
+✅ **Do:** Scope to parent container + `{ exact: true }`: `page.locator('.timeline').getByText('Placed', { exact: true })`. Prevents strict mode violations at test runtime.
+*(Lesson #3 — 2026-06-25)*
