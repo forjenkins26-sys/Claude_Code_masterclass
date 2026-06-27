@@ -15,12 +15,13 @@ Git remote: `https://github.com/forjenkins26-sys/Claude_Code_masterclass.git`
 | `Advance-Playwright-Framework/` | Pramod Dutta's advanced POM+Module pattern — API/UI/Mobile, rule-engine, AI MCP tutor skill | npm + `@playwright/test` |
 | `agent-factory-cli/` | 4 AI agents (RCA, Flaky, Self-Healing, Triage) — pluggable LLM (GROQ/DeepSeek/Ollama) | npm + ts-node |
 | `qa-ai-stack/` | Portable bootstrap — drop into any Playwright project to install skills + hooks + agent-factory | npm scripts |
-| `qabuddy/` | QA Buddy — React+Express, Jira→GROQ→Test Plan/Strategy/Test Cases + Pipeline tab, Vercel deploy | npm (client + server) |
+| `qabuddy/` | QA Buddy v2.0 — 5-tab React+Express: Plan/Strategy/TestCases/Pipeline/NexQAMode + LLM-as-Judge | npm (client + server) |
 | `testplanbuddy/` | TestPlanBuddy — React+Express, Jira→GROQ→13-section test plan | npm (client + server) |
 | `teststrategbuddy/` | TestStrategyBuddy — React+Express, Jira→GROQ→10-section QA strategy | npm (client + server) |
-| `AI Agents_N8n/` | n8n workflow JSON exports — AI agent workflows (Bug Creator, PRD→Test Cases) | n8n import |
-| `QA Portfolio/` | Portfolio site (index.html) + credentials (.env) | static |
-| `blinkit-login.html` + `blinkit-products.html` | Local demo app — served at `localhost:7000` | Python `http.server` |
+| `AI Agents_N8n/` | n8n workflow JSON exports — 5 AI agent workflows (ChitChat, Jira Bug, PRD→Excel x2, E2E) | n8n import |
+| `QA Portfolio/` | Portfolio site — Vercel deploy, own `CLAUDE.md`, live at `anand-soni-qa-portfolio.vercel.app` | static + Vercel |
+| `scripts/` | Workspace-level scripts — `fetch-local-page.js`, `generate_portfolio.py`, `testplan/` | node / python |
+| `blinkit-login.html` + `blinkit-products.html` + `blinkit-checkout.html` | Local demo app — served at `localhost:7000` | Python `http.server` |
 | `registration-demo.html` | Registration demo for SCRUM-142 | Python `http.server` |
 | `myTest.java` | Hello World Java sandbox | `javac` / `java` |
 | `output/` | Generated test plans, PRD docs, batch outputs | disposable |
@@ -221,7 +222,7 @@ qabuddy/
   tools/
     jiraClient.js             ← fetchJiraIssue() — ADF description flattener
     groqClient.js             ← generateTestPlan/Strategy/TestCases()
-    aiClient.js               ← judgeTestCaseQuality() — LLM-as-Judge scorer
+    aiClient.js               ← judgeTestCaseQuality() + scoreAppLLMResponse() + calcSessionScore() — LLM-as-Judge + 3-method scorer + composite session
     renderers.js              ← planToMarkdown/strategyToMarkdown/testCasesToMarkdown()
   client/src/
     App.jsx                   ← Header (tabs) + left sidebar (API config) + main content
@@ -230,9 +231,12 @@ qabuddy/
       StrategyTab.jsx         ← Test Strategy Buddy
       TestCasesTab.jsx        ← Test Case Generator (expandable rows)
       PipelineTab.jsx         ← 3-stage Pipeline: Explore→TestCases→Execute
+      NexQATab.jsx            ← NexQA Mode: ResponseScorer + NetworkInterceptor + SessionReporter
       Settings.jsx
   vercel.json                 ← @vercel/static (client/dist) + @vercel/node (server.js)
 ```
+
+**AI Providers:** Groq / OpenRouter / OpenAI / Gemini — sidebar selector, key in localStorage
 
 **Routes:** `POST /api/plan` | `POST /api/strategy` | `POST /api/testcases` | `POST /api/pipeline/explore` | `POST /api/pipeline/testcases` | `POST /api/network/intercept` | `POST /api/score/response` | `POST /api/score/session` | `POST /api/report/html` | `GET /api/config` | `GET /api/handshake`
 
@@ -250,11 +254,32 @@ qabuddy/
 
 ```
 AI Agents_N8n/
-  AI Buddy Basic ChitChat.json   ← Basic QA chatbot (GROQ brain + system message)
-  AI Buddy Jira.json             ← Bug creator agent (chat → Jira bug creation)
+  AI Buddy Basic ChitChat.json            ← Basic QA chatbot (GROQ brain + system message)
+  AI Buddy Jira.json                      ← Bug creator agent (chat → Jira bug creation)
+  AI Buddy PRD_TestCases_Excel.json       ← PRD → test cases → Excel export (v1)
+  AI Buddy PRD_TestCases_Excel v2.json    ← PRD → test cases → Excel export (v2, improved)
+  AI Buddy PRD_TestCases_WorkFlow_E2E.json ← Full E2E workflow: PRD → test cases → execute
 ```
 
-**Pattern:** Chat Trigger → AI Agent (GROQ Brain + System Message) → Tool nodes (Jira MCP / Google Sheets)
+**Pattern:** Chat Trigger → AI Agent (GROQ Brain + System Message) → Tool nodes (Jira MCP / Google Sheets / Excel)
+
+**QA Portfolio:**
+```
+QA Portfolio/
+  index.html    ← Portfolio site
+  CLAUDE.md     ← Portfolio-specific deploy instructions
+  .env          ← VERCEL_TOKEN (NEVER commit)
+```
+Live at: `https://anand-soni-qa-portfolio.vercel.app`
+Deploy: `cd "QA Portfolio" && vercel deploy --prod --yes --scope anandsoni2641-1308s-projects --token $env:VERCEL_TOKEN`
+
+**Workspace Scripts:**
+```
+scripts/
+  fetch-local-page.js     ← DOM fetcher for localhost pages (replaces WebFetch for local URLs)
+  generate_portfolio.py   ← Generates QA Portfolio HTML
+  testplan/               ← Test plan generation scripts
+```
 
 ## Active Jira Epics
 
@@ -266,9 +291,11 @@ AI Agents_N8n/
 | SCRUM-121 | Blinkit Login | BL-001–BL-019 (18/19; BL-010 blocked) | Active |
 | SCRUM-142 | Registration Demo Page | New | Active |
 | SCRUM-178 | TTACart PRD | Product Requirements doc | To Do |
+| SCRUM-255 | Order Details Page | OD-001–OD-013 (12/13; OD-008 blocked by SCRUM-269) | Active |
 
 ## Open Bugs
 - SCRUM-141: `#signupBtn` no click handler — intentional defect in `blinkit-login.html`
+- SCRUM-269: Cancel Order button visible in Dispatched state (violates SCRUM-255 AC line 8) — caught by OD-008/SCRUM-263, Blocks link
 
 ## MCP Integrations Active
 
@@ -292,9 +319,10 @@ AI Agents_N8n/
 - `CLAUDE-skills.md` — all skill docs, MCP setup, trigger patterns
 - `CLAUDE-schema.md` — JSON contracts, A.N.T. layer map, secrets policy
 - `BLAST.md` — full 5-phase BLAST framework reference
-- `ANTI-HALLUCINATION-RULES.md` — 22 QA verification rules (Rule 22: use ai:rca before manual classification)
-- `AUTO-FIX-PROTOCOL.md` — autonomous fix protocol (max 3 attempts)
+- `ANTI-HALLUCINATION-RULES.md` — 24 QA verification rules (Rule 24: getByText scope to parent + exact; Rule 23: 4-category failure taxonomy; Rule 22: ai:rca before manual classification)
+- `AUTO-FIX-PROTOCOL.md` — autonomous fix protocol, 16 rules (max 3 attempts; Rule 16: surgical changes — minimality counterweight to Rule 13 consistency)
 - `RICEPOT.md` — RICEPOT prompt methodology reference
+- `karpathy-guidelines` skill — coding-discipline guardrail (Surgical Changes / Simplicity First / Think Before Coding / Goal-Driven Execution). Wired into `test-case-execution` Step 5B + AUTO-FIX Rule 16
 
 ## Key File Locations
 
@@ -302,9 +330,11 @@ AI Agents_N8n/
 - Tests: `Playwright Automation Framework/tests/ui/`
 - Screenshots: `Playwright Automation Framework/screenshots/{EpicKey}/`
 - Skills: `~/.claude/skills/{skill-name}/SKILL.md`
-- DOM fetcher: `Playwright Automation Framework/scripts/fetch-local-page.js`
+- DOM fetcher: `scripts/fetch-local-page.js` (workspace root) or `Playwright Automation Framework/scripts/fetch-local-page.js`
 - n8n workflows: `AI Agents_N8n/`
 - Output/generated docs: `output/`
+- Portfolio: `QA Portfolio/index.html` + `QA Portfolio/CLAUDE.md`
+- Local demo HTML: `blinkit-login.html`, `blinkit-products.html`, `blinkit-checkout.html`, `registration-demo.html`
 
 ## Maintenance Log
 
@@ -332,3 +362,9 @@ AI Agents_N8n/
 | 2026-06-25 | AH Rule 23 added — 4-category failure taxonomy (BROKEN_LOCATOR/REAL_BUG/FLAKY/ENV_ISSUE) | `ANTI-HALLUCINATION-RULES.md` |
 | 2026-06-25 | test-case-execution skill updated — composite score + network interception steps | `~/.claude/skills/test-case-execution/SKILL.md` |
 | 2026-06-25 | QA Buddy Architecture updated — PipelineTab, LLM-as-Judge, new routes documented | `CLAUDE.md` |
+| 2026-06-25 | CLAUDE.md full audit — NexQATab, 5 n8n workflows, aiClient functions, AH rule count (23), scripts/, QA Portfolio, blinkit-checkout.html added | `CLAUDE.md` |
+| 2026-06-27 | SCRUM-255 Order Details execution — OD-006 strict-mode fix (getByText → .timeline scope + exact:true); 12/13 pass, OD-008 REAL_BUG → SCRUM-269 filed+linked | `order-details.spec.ts`, `OrderDetailsPage.ts`, `progress.md` |
+| 2026-06-27 | karpathy-guidelines skill installed (multica-ai repo) — wired into `test-case-execution` Step 5B; synced to qa-ai-stack | `~/.claude/skills/karpathy-guidelines/`, `qa-ai-stack/skills/`, `test-case-execution/SKILL.md` |
+| 2026-06-27 | AUTO-FIX Rule 16 added (surgical changes) — counts synced 15→16 across protocol + cheatsheets + INSTALL.md | `AUTO-FIX-PROTOCOL.md`, `QA-SKILLS-CHEATSHEET.md`, `qa-ai-stack/*` |
+| 2026-06-27 | Playwright framework package.json — ai:rca/heal/flaky/triage/dashboard + rules:check/changed/staged scripts wired to agent-factory-cli | `Playwright Automation Framework/package.json` |
+| 2026-06-27 | .gitignore hardened — `.env` + `.vercel/` locked out (secrets never commit) | `.gitignore` |

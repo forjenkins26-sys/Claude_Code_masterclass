@@ -16,7 +16,15 @@
     "report": "playwright show-report",
     "codegen": "playwright codegen https://www.facebook.com",
     "install:browsers": "playwright install",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "ai:rca": "ts-node ../agent-factory-cli/ai-agents/cli.ts rca test-results/results.json",
+    "ai:flaky": "ts-node ../agent-factory-cli/ai-agents/cli.ts flaky ./runs",
+    "ai:heal": "ts-node ../agent-factory-cli/ai-agents/cli.ts heal --report test-results/results.json",
+    "ai:triage": "ts-node ../agent-factory-cli/ai-agents/cli.ts triage test-results/results.json ./runs",
+    "ai:dashboard": "ts-node ../agent-factory-cli/ai-agents/cli.ts dashboard",
+    "rules:check": "node scripts/rule-engine.js",
+    "rules:changed": "node scripts/rule-engine.js --changed",
+    "rules:staged": "node scripts/rule-engine.js --staged"
   },
   "keywords": [
     "playwright",
