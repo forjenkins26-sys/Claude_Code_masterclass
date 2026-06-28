@@ -8,10 +8,12 @@
 
 | Asset | Where | Pushes to company? |
 |---|---|---|
-| Skills | `~/.claude/skills/` | ❌ outside the repo — can't leak |
+| **Installed** skills | `~/.claude/skills/` | ❌ outside the repo — can't leak |
 | Settings hooks | `~/.claude/settings.json` | ❌ outside the repo |
 
-Only **repo-root** stack files need guarding: `CLAUDE.md`, `ANTI-HALLUCINATION-RULES.md`, `AUTO-FIX-PROTOCOL.md`, `QA-SKILLS-CHEATSHEET.md`, `knowledge-base/`, `agent-factory-cli/`, `rules/framework-rule-engine.json`, `scripts/rule-engine.js`, plus secrets (`.env`, `.vercel/`) and BLAST memory (`progress.md`, `rca-log.md`, `findings.md`, `task_plan.md`).
+> ⚠️ **Do NOT confuse `~/.claude/skills/` (installed, safe) with the stack repo's OWN tracked `skills/` folder.** The stack repo ships `skills/`, `agent-factory/`, `knowledge-base/`, `rules/`, `scripts/` as committed source. If those land inside the company working tree (via copy OR clone), they CAN push. They are in the block list below.
+
+**Repo-root stack files/folders to guard:** `CLAUDE.md`, `ANTI-HALLUCINATION-RULES.md`, `AUTO-FIX-PROTOCOL.md`, `QA-SKILLS-CHEATSHEET.md`, `LOCAL-GUARD-SETUP.md`, `INSTALL.md`, `skills/`, `agent-factory/`, `agent-factory-cli/`, `knowledge-base/`, `rules/`, `scripts/rule-engine.js`, `settings-hooks.json`, `package-scripts.json`, plus secrets (`.env`, `.vercel/`) and BLAST memory (`progress.md`, `rca-log.md`, `findings.md`, `task_plan.md`).
 
 ## Two guards
 
@@ -22,6 +24,17 @@ Only **repo-root** stack files need guarding: `CLAUDE.md`, `ANTI-HALLUCINATION-R
 | Stage-by-name rule | behavior | — | `git add -A` sweeping everything |
 
 `.git/info/exclude` is used **instead of** `.gitignore` on purpose: `.gitignore` is tracked and would push to the company repo, revealing you run a private stack. `.git/info/exclude` is local — zero footprint.
+
+### ⚠️ CRITICAL — clone vs init (this changes everything)
+
+`.git/info/exclude` only ignores files that are **not already tracked**. How the company project was created decides your risk:
+
+| How the working project was made | Stack folders (`skills/`, `agent-factory/`, `knowledge-base/`, `rules/`) | What you must do |
+|---|---|---|
+| **`git init`** then stack files copied in | Untracked → `exclude` hides them | Just run Prompt 1 + 2. Safe. |
+| **`git clone` of the stack repo** as your working project | **Already TRACKED** → `exclude` does NOTHING, they WILL push | Run Prompt 1, then `git rm -r --cached skills agent-factory knowledge-base rules` + the `.md` files, commit the removal, THEN they stop pushing |
+
+**Rule of thumb:** never clone the stack repo AS your company working project. Clone it to a SEPARATE folder, install FROM it into a fresh `git init` project. That way the stack folders are never tracked by the company repo and `exclude` is enough. Prompt 1 step 3 scans for the tracked-folder case either way.
 
 ---
 
@@ -38,10 +51,16 @@ This is a COMPANY repo. qa-ai-stack files (my private rules/skills/KB) must NEVE
    ANTI-HALLUCINATION-RULES.md
    AUTO-FIX-PROTOCOL.md
    QA-SKILLS-CHEATSHEET.md
+   LOCAL-GUARD-SETUP.md
+   INSTALL.md
    knowledge-base/
+   skills/
+   agent-factory/
    agent-factory-cli/
-   rules/framework-rule-engine.json
+   rules/
    scripts/rule-engine.js
+   settings-hooks.json
+   package-scripts.json
    .env
    .vercel/
    verify-locators-*.js
@@ -50,11 +69,14 @@ This is a COMPANY repo. qa-ai-stack files (my private rules/skills/KB) must NEVE
    findings.md
    task_plan.md
 
-2. Verify ignored: git check-ignore CLAUDE.md ANTI-HALLUCINATION-RULES.md knowledge-base/ agent-factory-cli/ .env
+2. Verify ignored: git check-ignore CLAUDE.md skills/ knowledge-base/ agent-factory/ agent-factory-cli/ .env
    (every line must echo back = ignored)
 
-3. Confirm none already tracked: git ls-files | grep -E 'CLAUDE.md|ANTI-HALLUCINATION|AUTO-FIX|knowledge-base|agent-factory|rule-engine'
-   (empty = clean. If any show: git rm --cached <file> — do NOT delete from disk)
+3. Confirm none already tracked (CRITICAL — if this project was CLONED from the stack repo,
+   skills/ + agent-factory/ + knowledge-base/ + rules/ are TRACKED and WILL push):
+   git ls-files | grep -E 'CLAUDE.md|ANTI-HALLUCINATION|AUTO-FIX|QA-SKILLS|knowledge-base|^skills/|agent-factory|rule-engine|settings-hooks|package-scripts'
+   (empty = clean. If ANY show: git rm -r --cached <path> for each — do NOT delete from disk.
+    Then commit the removal so the company remote drops them.)
 
 4. Show git status — stack files must NOT appear under untracked or staged.
 
@@ -74,7 +96,7 @@ Create .git/hooks/pre-commit with EXACTLY:
 # Local guard — blocks committing private qa-ai-stack files to company repo.
 # Lives in .git/hooks/, never pushed. Bypass (DON'T) with --no-verify.
 
-BLOCKED='CLAUDE\.md|ANTI-HALLUCINATION|AUTO-FIX|QA-SKILLS-CHEATSHEET|knowledge-base/|agent-factory-cli/|rule-engine|framework-rule-engine|verify-locators-|progress\.md|rca-log\.md|findings\.md|task_plan\.md|\.env$|\.vercel/'
+BLOCKED='CLAUDE\.md|ANTI-HALLUCINATION|AUTO-FIX|QA-SKILLS-CHEATSHEET|LOCAL-GUARD-SETUP|knowledge-base/|^skills/|agent-factory/|agent-factory-cli/|rule-engine|framework-rule-engine|settings-hooks|package-scripts|verify-locators-|progress\.md|rca-log\.md|findings\.md|task_plan\.md|\.env$|\.vercel/'
 
 STAGED=$(git diff --cached --name-only | grep -E "$BLOCKED")
 
