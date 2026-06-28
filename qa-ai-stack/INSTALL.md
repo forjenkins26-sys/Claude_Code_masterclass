@@ -28,6 +28,10 @@ Please install everything:
 11. Add .env + .vercel/ to .gitignore (secrets policy — see CLAUDE.md). Verify: git check-ignore .env
 12. Merge scripts from qa-ai-stack/package-scripts.json into this project's package.json
     - Update agent-factory path if folder structure differs
+13. If this is a COMPANY repo (stack must stay private, never pushed): open qa-ai-stack/LOCAL-GUARD-SETUP.md
+    and run its two prompts. They add a local-only ignore (.git/info/exclude) + a pre-commit hook
+    (.git/hooks/pre-commit) so the stack files are invisible to the company's git and cannot be pushed.
+    These are NOT cloned and NOT pushed — re-run once per machine / per clone.
 
 After install verify:
 - Run: npm run rules:check → should scan .ts files
@@ -59,6 +63,7 @@ Then show me the 3-step QA flow for this project.
 | `AUTO-FIX-PROTOCOL.md` | 16 rules for autonomous fix (max 3 attempts before escalate; Rule 16 = surgical changes) |
 | `CLAUDE.md` | Stack constitution — Hard Rules, 3-step flow, KB, agent-factory verdict table. Copy/merge into host project root |
 | `QA-SKILLS-CHEATSHEET.md` | One-page reference for the 3-step flow + gotchas |
+| `LOCAL-GUARD-SETUP.md` | Company-repo privacy — 2 prompts to keep the stack OFF the company GitHub (local `.git/info/exclude` + pre-commit hook). Re-run per machine/clone |
 | settings-hooks | Auto-triggers ai:rca on test failure + rules:check on file write |
 
 ---
