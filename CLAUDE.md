@@ -320,7 +320,7 @@ scripts/
 - `CLAUDE-schema.md` — JSON contracts, A.N.T. layer map, secrets policy
 - `BLAST.md` — full 5-phase BLAST framework reference
 - `ANTI-HALLUCINATION-RULES.md` — 25 QA verification rules (Rule 25: KB bug-oracle + Confirmed/Suspected tiers; Rule 24: getByText scope to parent + exact; Rule 23: 4-category failure taxonomy; Rule 22: ai:rca before manual classification)
-- `AUTO-FIX-PROTOCOL.md` — autonomous fix protocol, 16 rules (max 3 attempts; Rule 16: surgical changes — minimality counterweight to Rule 13 consistency)
+- `AUTO-FIX-PROTOCOL.md` — autonomous fix protocol, 17 rules (max 3 attempts; Rule 16: surgical changes — minimality counterweight to Rule 13 consistency; Rule 17: independent verify before DONE — maker≠checker, default-REJECT, adapted from loop-engineering)
 - `RICEPOT.md` — RICEPOT prompt methodology reference
 - `karpathy-guidelines` skill — coding-discipline guardrail (Surgical Changes / Simplicity First / Think Before Coding / Goal-Driven Execution). Wired into `test-case-execution` Step 5B + AUTO-FIX Rule 16
 - `knowledge-base/<PROJECT>/` — persistent product memory (adapted from imransdet/qa-assistant): `business-rules.md` (bug-vs-intended oracle, `BR-xx`), `known-defects.md` (dedup), `feature-map.md` (regression blast radius), `product-flows.md`. Loaded by `test-case-creation` Step 1A + `test-case-execution` Step 0. Drives AH Rule 25 Confirmed/Suspected bug tiers. See `knowledge-base/GUIDE.md`

@@ -36,7 +36,7 @@ Please install everything:
 After install verify:
 - Run: npm run rules:check → should scan .ts files
 - Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug, karpathy-guidelines
-- Confirm CLAUDE.md, ANTI-HALLUCINATION-RULES.md (25 rules), AUTO-FIX-PROTOCOL.md (16 rules), knowledge-base/ in project root
+- Confirm CLAUDE.md, ANTI-HALLUCINATION-RULES.md (25 rules), AUTO-FIX-PROTOCOL.md (17 rules), knowledge-base/ in project root
 - Confirm hooks in ~/.claude/settings.json: Bash matcher (ai:rca reminder) + Write|Edit matcher (rules:check)
 
 Then show me the 3-step QA flow for this project.
@@ -60,7 +60,7 @@ Then show me the 3-step QA flow for this project.
 | `framework-rule-engine.json` | Rules config — edit to match your folder structure |
 | `ANTI-HALLUCINATION-RULES.md` | 25 rules preventing selector guessing, wrong assertions (Rule 25: KB bug-oracle + Confirmed/Suspected tiers) |
 | `knowledge-base/_TEMPLATE/` | Per-product memory scaffold — copy to `knowledge-base/<PROJECT>/`. 4 files: business-rules (bug oracle), known-defects (dedup), feature-map (regression scope), product-flows |
-| `AUTO-FIX-PROTOCOL.md` | 16 rules for autonomous fix (max 3 attempts before escalate; Rule 16 = surgical changes) |
+| `AUTO-FIX-PROTOCOL.md` | 17 rules for autonomous fix (max 3 attempts before escalate; Rule 16 = surgical changes; Rule 17 = independent verify, maker≠checker) |
 | `CLAUDE.md` | Stack constitution — Hard Rules, 3-step flow, KB, agent-factory verdict table. Copy/merge into host project root |
 | `QA-SKILLS-CHEATSHEET.md` | One-page reference for the 3-step flow + gotchas |
 | `LOCAL-GUARD-SETUP.md` | Company-repo privacy — 2 prompts to keep the stack OFF the company GitHub (local `.git/info/exclude` + pre-commit hook). Re-run per machine/clone |

@@ -133,6 +133,15 @@ npm run ai:triage     # all 3 + Jira draft
    - **Test:** if a reviewer asked "why did this line change?", every answer is "because test X was failing." If any answer is "while I was there…" — revert that line.
    - *(Skill: `karpathy-guidelines`. Rule 13 = consistency of YOUR change's blast radius; Rule 16 = minimality of the change itself. Both apply together.)*
 
+17. **Independent verify before DONE — maker ≠ checker (loop-engineering maker/checker)** - A fix is NOT done because the agent that made it says so. Before marking ✅, run a separate verification pass with a **default-REJECT** stance — assume the fix is wrong until evidence proves otherwise. This catches self-deception: the same reasoning that produced a wrong fix will rationalize it as correct.
+   - **Re-run the test yourself — don't trust the prior run.** Execute the failing test again (`--headed`), capture the actual pass/fail + output snippet. "It should pass now" is not evidence; a green run is.
+   - **Confirm diff scope (Rule 16 enforcement):** `git diff` the change. Every changed line traces to the failure. Any unrelated edit → REJECT, revert it, re-verify.
+   - **No-cheating check:** the fix did NOT disable a test, weaken an assertion (`toBeTruthy` swapped in for a real expectation), add `.skip`, comment out a check, or relax a constraint to force green. If green was achieved by lowering the bar → REJECT.
+   - **Intent check:** the change addresses the ORIGINAL failure, not a different/easier one. A locator fix that makes the test pass by skipping the assertion it was meant to verify = REJECT.
+   - **Verdict:** APPROVE (evidence strong, scope clean, no cheating) → mark ✅. REJECT (any check fails) → back to fix, counts as one of the 3 attempts. ESCALATE_HUMAN (can't run tests / env broken / medium+ risk even if green).
+   - **Why separate from Rule 4:** Rule 4 says "test the fix 3x" (the MAKER re-running their own work). Rule 17 is the CHECKER stance — actively hunting for reasons to reject, scope + cheating audit, not just "did it pass." Both apply: maker verifies it works, checker verifies it works *for the right reason without gaming.*
+   - *(Adapted from `cobusgreyling/loop-engineering` `loop-verifier`: "Default stance: REJECT until proven otherwise. Do not trust implementer's claim that tests passed — run them.")*
+
 ---
 
 ## PROCESS YOU MUST FOLLOW
@@ -150,7 +159,9 @@ npm run ai:triage     # all 3 + Jira draft
 
 **Step 4:** VERIFY - Test fix (single → related → all → 3x repeat)
 
-**Step 5:** REPORT or ESCALATE - Success if 100% pass. Escalate if stuck after 3 attempts.
+**Step 4B:** INDEPENDENT CHECK (Rule 17, maker ≠ checker) - Switch to default-REJECT stance. Re-run the failing test yourself (don't trust Step 4's run), `git diff` for scope creep, audit for cheating (no disabled tests / weakened assertions / `.skip`). Verdict: APPROVE → Step 5. REJECT → back to Step 3 (counts as an attempt). ESCALATE_HUMAN if untestable.
+
+**Step 5:** REPORT or ESCALATE - Success only when Step 4B = APPROVE. Escalate if stuck after 3 attempts.
 
 ---
 
