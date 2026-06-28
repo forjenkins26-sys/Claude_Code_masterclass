@@ -319,10 +319,26 @@ scripts/
 - `CLAUDE-skills.md` — all skill docs, MCP setup, trigger patterns
 - `CLAUDE-schema.md` — JSON contracts, A.N.T. layer map, secrets policy
 - `BLAST.md` — full 5-phase BLAST framework reference
-- `ANTI-HALLUCINATION-RULES.md` — 24 QA verification rules (Rule 24: getByText scope to parent + exact; Rule 23: 4-category failure taxonomy; Rule 22: ai:rca before manual classification)
+- `ANTI-HALLUCINATION-RULES.md` — 25 QA verification rules (Rule 25: KB bug-oracle + Confirmed/Suspected tiers; Rule 24: getByText scope to parent + exact; Rule 23: 4-category failure taxonomy; Rule 22: ai:rca before manual classification)
 - `AUTO-FIX-PROTOCOL.md` — autonomous fix protocol, 16 rules (max 3 attempts; Rule 16: surgical changes — minimality counterweight to Rule 13 consistency)
 - `RICEPOT.md` — RICEPOT prompt methodology reference
 - `karpathy-guidelines` skill — coding-discipline guardrail (Surgical Changes / Simplicity First / Think Before Coding / Goal-Driven Execution). Wired into `test-case-execution` Step 5B + AUTO-FIX Rule 16
+- `knowledge-base/<PROJECT>/` — persistent product memory (adapted from imransdet/qa-assistant): `business-rules.md` (bug-vs-intended oracle, `BR-xx`), `known-defects.md` (dedup), `feature-map.md` (regression blast radius), `product-flows.md`. Loaded by `test-case-creation` Step 1A + `test-case-execution` Step 0. Drives AH Rule 25 Confirmed/Suspected bug tiers. See `knowledge-base/GUIDE.md`
+
+## Knowledge Base (persistent product memory)
+
+```
+knowledge-base/
+  GUIDE.md              ← how the KB works + grow workflow
+  _TEMPLATE/            ← copy to start a new product (4 files)
+  SCRUM/                ← active project — seeded from real ACs + bugs
+    business-rules.md   ← BR-01..BR-12 (Order Details SCRUM-255, Blinkit SCRUM-121) — bug oracle
+    known-defects.md    ← SCRUM-269 (BR-08 violation), SCRUM-141 — dedup before filing
+    feature-map.md      ← Login→Products→Checkout→Order Details deps + blast radius
+    product-flows.md    ← Blinkit purchase flow, Order Details status states
+```
+
+**Bug oracle flow:** `test-case-execution` loads KB first → on REAL_BUG checks `business-rules.md` → **Confirmed** (violates `BR-xx`, cite it) or **Suspected** (`[SUSPECTED]` prefix) → checks `known-defects.md` for dedup before JQL/filing → after filing proposes new defect row (Step 7C compounding memory).
 
 ## Key File Locations
 
@@ -368,3 +384,4 @@ scripts/
 | 2026-06-27 | AUTO-FIX Rule 16 added (surgical changes) — counts synced 15→16 across protocol + cheatsheets + INSTALL.md | `AUTO-FIX-PROTOCOL.md`, `QA-SKILLS-CHEATSHEET.md`, `qa-ai-stack/*` |
 | 2026-06-27 | Playwright framework package.json — ai:rca/heal/flaky/triage/dashboard + rules:check/changed/staged scripts wired to agent-factory-cli | `Playwright Automation Framework/package.json` |
 | 2026-06-27 | .gitignore hardened — `.env` + `.vercel/` locked out (secrets never commit) | `.gitignore` |
+| 2026-06-27 | Knowledge Base added (gap-fill vs imransdet/qa-assistant) — 4-file per-product memory, seeded SCRUM/ from real ACs+bugs; AH Rule 25 Confirmed/Suspected bug tiers; wired into test-case-creation Step 1A + test-case-execution Step 0/5C/7C; synced _TEMPLATE to qa-ai-stack | `knowledge-base/`, `ANTI-HALLUCINATION-RULES.md`, 2 skills, `qa-ai-stack/` |

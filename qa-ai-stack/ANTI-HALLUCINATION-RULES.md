@@ -297,6 +297,29 @@ await expect(timeline.getByText('Placed', { exact: true })).toBeVisible();
 
 ---
 
+## Rule 25: Assign bug confidence tier from the Knowledge Base oracle (Added 2026-06-27)
+
+**Adapted from imransdet/qa-assistant, layered onto our Rule 23 taxonomy.** Once a failure is classified `REAL_BUG` (Rule 23), assign a confidence tier by checking it against `knowledge-base/<JIRA_PROJECT>/business-rules.md`.
+
+| Tier | Condition | Action |
+|------|-----------|--------|
+| **Confirmed** | Observed behavior violates a documented `BR-xx` rule | Cite the rule ID in the bug (`Violates BR-08`). File normally. High confidence. |
+| **Suspected** | Bug is heuristic only — no matching `BR-xx` rule exists | Prefix bug summary `[SUSPECTED]`. File but flag for human review. Consider adding a new `BR-xx` if the rule is real. |
+
+**Load sequence (before classifying any failure):**
+1. Read `knowledge-base/<JIRA_PROJECT>/business-rules.md` (oracle) + `known-defects.md` (dedup).
+2. On `REAL_BUG` → match against `BR-xx` rules → assign Confirmed/Suspected.
+3. Before filing → check `known-defects.md` for an existing `Ref` (dedup ahead of JQL Rule 21). If found, reference it, do NOT re-file.
+4. After filing → propose appending the new defect (Ref, area, symptom, Confirmed/Suspected) to `known-defects.md`.
+
+**Why this beats heuristic-only classification:** a standing rule registry means "Cancel visible in Dispatched" is not re-judged from scratch each run — it deterministically maps to `BR-08` violation = Confirmed. Removes per-run variance, enables dedup, and cites authoritative source in the bug.
+
+**Anti-hallucination guard:** `BR-xx` rules must trace to a real source (Epic AC, filed bug, observed+verified). Never invent a rule to force a Confirmed tier. If no rule matches and you can't source one → Suspected.
+
+**Lesson (2026-06-27):** SCRUM-269 (Cancel in Dispatched) maps cleanly to `BR-08` violation → Confirmed. Without the oracle, each run re-derives "is this a bug?" from the Epic; with it, the answer is a rule lookup + citation.
+
+---
+
 ## Rule 22: Use agent-factory RCA before classifying failure root cause (Added 2026-06-22)
 
 **Don't manually guess root cause. Let AI agent read the actual error first.**

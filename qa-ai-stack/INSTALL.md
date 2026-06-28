@@ -46,7 +46,8 @@ Then show me the 5-skill QA flow for this project.
 | `agent-factory-cli/` | RCA/Heal/Flaky/Triage AI agents |
 | `rule-engine.js` | Enforces POM/spec file placement + naming + tags |
 | `framework-rule-engine.json` | Rules config — edit to match your folder structure |
-| `ANTI-HALLUCINATION-RULES.md` | 24 rules preventing selector guessing, wrong assertions |
+| `ANTI-HALLUCINATION-RULES.md` | 25 rules preventing selector guessing, wrong assertions (Rule 25: KB bug-oracle + Confirmed/Suspected tiers) |
+| `knowledge-base/_TEMPLATE/` | Per-product memory scaffold — copy to `knowledge-base/<PROJECT>/`. 4 files: business-rules (bug oracle), known-defects (dedup), feature-map (regression scope), product-flows |
 | `AUTO-FIX-PROTOCOL.md` | 16 rules for autonomous fix (max 3 attempts before escalate; Rule 16 = surgical changes) |
 | settings-hooks | Auto-triggers ai:rca on test failure + rules:check on file write |
 

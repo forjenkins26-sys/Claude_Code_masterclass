@@ -1,8 +1,8 @@
 ---
 name: explore
 description: Explore any URL using Playwright MCP browser — finds all interactive elements (inputs, buttons, links, dropdowns, checkboxes, forms) from live DOM and generates a ready-to-use Playwright TypeScript Page Object Model (POM). Use when user says "/explore [URL]", "explore this page", "find locators for [URL]", or "create POM for [URL]".
-improvements: 3
-last-improved: 2026-06-25
+improvements: 4
+last-improved: 2026-06-27
 ---
 
 # Explore — Live DOM Locator Discovery & POM Generator
@@ -20,7 +20,13 @@ Extract URL from user input:
 
 If no URL provided, ask: "Which URL should I explore?"
 
-### Step 2: Load Playwright MCP Tools
+### Step 1.5: Load Known Defects (light KB read — defect-aware POM)
+
+Read ONLY `knowledge-base/<PROJECT>/known-defects.md` if it exists (default `PROJECT=SCRUM`). Hold the defect list (Ref, Area, Symptom) as context.
+
+**Scope guard (two-source model):** explore loads `known-defects.md` ONLY — never `business-rules.md` or Epic ACs. Explore discovers *locators*, not *expected behavior*. Defects are used purely to **annotate** risky locators with a comment, never to write assertions. Assertions remain `/test-case-creation`'s job (Epic = truth).
+
+If the file is missing → continue silently. KB is additive.
 
 ```
 ToolSearch: select:mcp__playwright__browser_navigate,mcp__playwright__browser_snapshot,mcp__playwright__browser_take_screenshot
@@ -165,6 +171,15 @@ export class PageNamePage {
 
 **Never use:** `page.locator('div > span:nth-child(3)')` — fragile, breaks on DOM change.
 
+**Annotate known-defect locators (from Step 1.5):** if a generated locator maps to an element named in `known-defects.md` (by area/symptom — e.g. a Cancel button on a page with an open status-gating defect), add a comment above that property:
+
+```typescript
+// ⚠️ KNOWN DEFECT: SCRUM-269 — Cancel visible in non-cancellable states (BR-08). Test all status states.
+readonly cancelOrderButton: Locator;
+```
+
+This is a **comment only** — no assertion, no behavior change. It surfaces risk to the human + the downstream `/test-case-creation` run. Never invent a defect link; only annotate when the element clearly matches a `known-defects.md` row.
+
 ### Step 8: Output
 
 Output in this order:
@@ -244,3 +259,7 @@ Do NOT overwrite — always append.
 ❌ **Don't:** Use bare `getByText('X')` for labels that may appear in multiple page sections (date strings, headers, status badges, timeline labels)
 ✅ **Do:** Scope to parent container + `{ exact: true }`: `page.locator('.timeline').getByText('Placed', { exact: true })`. Prevents strict mode violations at test runtime.
 *(Lesson #3 — 2026-06-25)*
+
+❌ **Don't:** Load `business-rules.md` or Epic ACs into explore, or write assertions from defects — that breaks the two-source model (explore = locators only)
+✅ **Do:** Load `known-defects.md` ONLY (Step 1.5), and use it purely to add `// ⚠️ KNOWN DEFECT` comments on matching locators. Comment only — never an assertion. Assertions stay in `/test-case-creation`.
+*(Lesson #4 — 2026-06-27)*

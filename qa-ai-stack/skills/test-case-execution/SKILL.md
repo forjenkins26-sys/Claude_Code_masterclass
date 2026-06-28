@@ -26,6 +26,7 @@ Execute automated test cases from Jira Epic or individual test case link. Runs c
 | AH-18 | Constraint tests (maxlength, pattern) must use `pressSequentially()` not `fill()` |
 | AH-19 | Test failing ≠ wrong test. Test may be CORRECTLY catching a bug. Investigate before modifying assertions. |
 | AH-21 | Search existing open bugs via JQL before filing — never create duplicate reports for same defect. |
+| AH-25 | Load Knowledge Base oracle first. On REAL_BUG → assign Confirmed (violates a `BR-xx`) or Suspected (heuristic only). Check `known-defects.md` for dedup before JQL. |
 
 ### AUTO-FIX Protocol (AUTO-FIX-PROTOCOL.md) — FULL PROTOCOL
 
@@ -60,6 +61,21 @@ When applying any auto-fix to a POM or spec (Step 5B), follow `karpathy-guidelin
 ---
 
 ## Instructions
+
+### Step 0: Load Knowledge Base (MANDATORY — runs first, AH Rule 25)
+
+Before parsing input, load the standing product memory so the bug oracle + dedup list are in context for the whole session.
+
+1. Determine project: default `SCRUM` (from `JIRA_PROJECT`, or the Epic/issue key prefix).
+2. Read, if the folder exists:
+   - `knowledge-base/<PROJECT>/business-rules.md` — **bug-vs-intended oracle** (`BR-xx` rules)
+   - `knowledge-base/<PROJECT>/known-defects.md` — **dedup list** (existing `Ref`s)
+   - `knowledge-base/<PROJECT>/feature-map.md` — regression blast radius (optional)
+   - `knowledge-base/<PROJECT>/product-flows.md` — real flows (optional)
+3. Hold as context for failure classification (Step 5A) and bug filing (Step 5C).
+4. If the folder is missing → continue silently (KB is additive, never blocks). Note once that no KB exists and suggest `cp -r knowledge-base/_TEMPLATE knowledge-base/<PROJECT>`.
+
+**Never load another project's folder.** Only `<PROJECT>/` is in scope.
 
 ### Step 1: Parse Input
 
@@ -442,7 +458,13 @@ From test failure + investigation:
 
 **3. Duplicate Bug Check (MANDATORY before creating)**
 
-Search existing bugs — same defect may already be filed from a prior run or manual report.
+**3a. Knowledge Base check FIRST (AH Rule 25):** before any JQL, scan `knowledge-base/<PROJECT>/known-defects.md` (loaded in Step 0) for an entry matching this defect's area + symptom. If a `Ref` exists → it's a known defect → skip create, link test to that `Ref`, do NOT re-file. (e.g. Cancel-in-Dispatched already = SCRUM-269.)
+
+**3b. Assign confidence tier (AH Rule 25):** match the defect against `business-rules.md`:
+- Violates a `BR-xx` → **Confirmed**. Record the rule ID for the bug body.
+- No matching rule → **Suspected**. Bug summary gets `[SUSPECTED]` prefix.
+
+**3c. JQL fallback** (only if KB had no matching Ref): search existing bugs — same defect may have been filed from a prior run or manual report.
 
 ```
 mcp__atlassian__searchJiraIssuesUsingJql({
@@ -492,6 +514,10 @@ mcp__atlassian__createJiraIssue({
 ```
 
 **Important:** Replace `"SCRUM-68"` with the actual Epic key being executed. The Epic key is known at execution time (it's the input to the skill). This links the bug as a child of the Epic so it appears in Epic reports and PM/QA dashboards — industry standard for bug traceability.
+
+**Confidence tier in bug body (AH Rule 25):**
+- **Confirmed** → add line: `**Confidence:** Confirmed — violates BR-08 (knowledge-base/SCRUM/business-rules.md)`. Cite the exact rule.
+- **Suspected** → prefix summary with `[SUSPECTED]` and add: `**Confidence:** Suspected — no documented business rule; heuristic detection. Needs human review.`
 
 Capture bug key (e.g., SCRUM-85).
 
@@ -960,6 +986,20 @@ If `progress.md` doesn't exist → create it with header:
 ```
 
 **Do NOT overwrite** — always append. Each run adds one dated entry.
+
+## Step 7C: Grow the Knowledge Base (compounding memory — AH Rule 25)
+
+After the run, propose KB additions so each session leaves the agent smarter (mirrors qa-assistant's compounding memory, but gated by our anti-hallucination guard — only record what the run actually established).
+
+For every NEW confirmed defect filed this run, append a row to `knowledge-base/<PROJECT>/known-defects.md`:
+
+```markdown
+| {BUG-KEY} | {area} | {symptom} | Open | {Confirmed|Suspected} | Violates {BR-xx} — {how to repro} |
+```
+
+If the run established a NEW business rule (from the Epic AC, not previously in `business-rules.md`), propose a `BR-xx` row with its source.
+
+**Guard:** never invent. Only append defects actually filed + rules actually sourced from this run's Epic/observation. Append, never overwrite. Report what was added in the summary.
 
 ## Quality Gates
 

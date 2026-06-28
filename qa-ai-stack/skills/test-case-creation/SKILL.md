@@ -112,6 +112,13 @@ Wait for user answer before proceeding to Step 2.
 
 ### Step 1A: Fetch Requirements (Mode A only — MANDATORY)
 
+**Load Knowledge Base first (AH Rule 25 — additive context):** read `knowledge-base/<PROJECT>/` if it exists (default `SCRUM`):
+- `business-rules.md` — `BR-xx` rules reinforce the Epic ACs as assertion baseline (Epic AC still wins per-run; rules are the standing baseline)
+- `feature-map.md` — add the feature's `Used by` chain as **regression-risk scenarios** in the test scope (widens coverage beyond the single Epic)
+- `known-defects.md` — probe `Open` weak spots harder when generating edge cases
+
+If no folder → continue silently (KB is additive). Then proceed to fetch the Epic.
+
 **Load Jira MCP tool:**
 ```
 ToolSearch: select:mcp__atlassian__getJiraIssue
