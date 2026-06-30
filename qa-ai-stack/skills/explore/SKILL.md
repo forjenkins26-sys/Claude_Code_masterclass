@@ -1,8 +1,8 @@
 ---
 name: explore
 description: Explore any URL using Playwright MCP browser — finds all interactive elements (inputs, buttons, links, dropdowns, checkboxes, forms) from live DOM and generates a ready-to-use Playwright TypeScript Page Object Model (POM). Use when user says "/explore [URL]", "explore this page", "find locators for [URL]", or "create POM for [URL]".
-improvements: 4
-last-improved: 2026-06-27
+improvements: 6
+last-improved: 2026-06-29
 ---
 
 # Explore — Live DOM Locator Discovery & POM Generator
@@ -80,15 +80,23 @@ Extract from snapshot ALL interactive elements:
 - `/url:` for links
 - `options` for dropdowns
 
-### Step 6: If Multiple Pages/Sections Detected
+### Step 6: If Multiple SAME-URL States Detected
 
-If page has tabs, modals, or multi-step forms, navigate to each:
+Capture states that appear **without changing the URL** — tabs, modals,
+dropdowns, accordions, multi-step forms that stay on the same route:
 ```
-mcp__playwright__browser_click({ ref: "<tab-ref>" })
+mcp__playwright__browser_click({ target: "<ref>" })
 mcp__playwright__browser_snapshot({})
 ```
 
-Capture all states before generating POM.
+**URL-boundary guard (scope = the explored URL only):** before capturing a
+new state, check the URL. If the click **changes the URL** (full nav, SPA
+hash-route change like `#/` → `#/cart`, new page), that destination is a
+DIFFERENT page — STOP. Do NOT capture it or add its elements to this POM.
+It needs its own `/explore` run. An element that merely *links* to another
+URL stays IN (the `<a>` lives in this DOM); the *page it leads to* is OUT.
+
+Capture all SAME-URL states before generating POM.
 
 ### Step 7: Generate Page Object Model
 
@@ -263,3 +271,11 @@ Do NOT overwrite — always append.
 ❌ **Don't:** Load `business-rules.md` or Epic ACs into explore, or write assertions from defects — that breaks the two-source model (explore = locators only)
 ✅ **Do:** Load `known-defects.md` ONLY (Step 1.5), and use it purely to add `// ⚠️ KNOWN DEFECT` comments on matching locators. Comment only — never an assertion. Assertions stay in `/test-case-creation`.
 *(Lesson #4 — 2026-06-27)*
+
+❌ **Don't:** Silently filter out links that leave the page or go to another domain (external links, "Flight Booking", recruiter banners). "ALL interactive elements" means ALL — deciding what's worth keeping is scope creep (AH Rule 26).
+✅ **Do:** Include every `link` with a `/url:` from the snapshot. Tag off-domain ones with an `// EXTERNAL → <domain>` comment so tests know clicking leaves the app. Capture, then annotate — never drop.
+*(Lesson #5 — 2026-06-29)*
+
+❌ **Don't:** Navigate past the explored URL into a different page and pull its elements into this POM. Clicking PROCEED TO CHECKOUT (`#/` → `#/cart`) then adding the checkout table/promo/Place Order to the landing-page POM mixes two pages. URL change = scope boundary (AH Rule 26 + Step 6 guard).
+✅ **Do:** Explore exactly the URL given. Capture same-URL states (dropdowns, modals, tabs that don't change the route). The moment a click changes the URL, STOP — that page is a separate `/explore`. A link *element* to another page stays IN; the *destination page* is OUT.
+*(Lesson #6 — 2026-06-29)*

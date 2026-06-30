@@ -4,10 +4,35 @@
 >
 > **First time here?** Read `INSTALL.md` for the copy-paste bootstrap, then this file is the law for how the stack behaves.
 
+## 🔒 FIRST ACTION at a new company — guard this stack from the company git
+
+**This is the #1 priority and runs BEFORE anything else.** The stack files (rules, `.md`, `skills/`, `agent-factory/`, `knowledge-base/`) must NEVER reach the company's git.
+
+**Trigger — fire on your VERY FIRST action in this repo, whatever the request.** Do NOT wait for a magic phrase. ANY of these = check the guard first:
+- The user says *"set up the guard"*, *"guard this repo"*, *"protect the stack"*, *"new company setup"* — OR
+- The user asks you to **analyze / explore / read / explain / run / test / "what is this repo"** — OR
+- You are about to do **anything with git** (commit, push, add, status) — OR
+- You simply notice this stack lives inside a git repo and have not yet confirmed a guard exists.
+
+**Guard pre-check (run before honoring the request):**
+
+1. `git remote -v`. If origin IS the stack repo (`AI_E2E_QA_Automation_Playwright_Master_Framework`), STOP — never guard the stack repo itself (files belong tracked there). Proceed with the user's request normally.
+2. Else (origin is a company/other repo): check if a guard is already installed — does `.git/hooks/pre-commit` exist? If yes → guard is live, proceed with the request.
+3. If NO guard yet → **install it FIRST, before doing what the user asked:**
+   - Run `/guard` (the guard skill — `skills/guard/`). It bundles the script and does the full flow: pre-check, install hook + exclude, untrack if needed, self-test, scan.
+   - Or run the script directly: `sh setup-local-guard.sh` from the project root (idempotent; handles untracked + cloned-from-stack, self-tests the hook, scans for leaks). See `HOW-TO-USE-GUARD.md` for the manual plan.
+   - Report: which repo, what changed, final `CLEAN` / `LEAK`.
+   - Then continue with the user's original request.
+
+**HARD STOP — never commit or push without a guard.** If you are about to run `git commit` or `git push` in a company repo and step 2 shows no `.git/hooks/pre-commit`, STOP and install the guard first. Never `--no-verify`. Never `git add -A` / `git add .` — stage real work by name.
+
+The user should only ever have to say one line — or nothing at all. You guard on first contact, then do the rest.
+
 ## What This Stack Gives You
 
 | Capability | Skill / File |
 |---|---|
+| Keep stack OFF company git (pre-commit hook + exclude) | `/guard` (`skills/guard/`) |
 | Live DOM → TypeScript POM | `/explore` |
 | Epic AC → Jira test cases + spec file | `/test-case-creation` |
 | Run tests, auto-fix locators, file bugs, update Jira | `/test-case-execution` |
@@ -39,10 +64,12 @@
 7. **Confidence tiers** — REAL_BUG that violates a `BR-xx` rule = **Confirmed** (cite it); heuristic only = **Suspected** (AH Rule 25)
 8. **pressSequentially() not fill()** for constraint tests (maxlength/pattern) — `fill()` bypasses browser enforcement (AH Rule 18)
 9. **Never invent** — selectors, BR-xx rules, error text, URLs. Every assertion + rule traces to a real source (Epic AC, filed bug, observed+verified)
+10. **Stay in command scope** — produce only the command's defined deliverable; no bonus files/steps. Scope creep = scope hallucination (AH Rule 26)
+11. **URL scope** — `/explore` + `/test-case-creation` cover only the given URL. Same-URL states (dropdowns/modals/tabs) are IN; a click that changes the URL is OUT. For a link/button that navigates away, write ONE navigation test (assert destination) but never cover the destination page's contents — that's a separate run (AH Rule 27 / explore Lesson #6 / test-case-creation Lesson #2)
 
 ## Reference Files (load on demand)
 
-- `ANTI-HALLUCINATION-RULES.md` — 25 QA verification rules. Rule 25: KB bug-oracle + Confirmed/Suspected tiers · Rule 23: 4-category failure taxonomy · Rule 22: ai:rca before manual classification · Rule 17: headed mode first
+- `ANTI-HALLUCINATION-RULES.md` — 27 QA verification rules. Rule 27: URL scope (nav-test links, don't cover destinations) · Rule 26: stay in command scope (no scope creep) · Rule 25: KB bug-oracle + Confirmed/Suspected tiers · Rule 23: 4-category failure taxonomy · Rule 22: ai:rca before manual classification · Rule 17: headed mode first
 - `AUTO-FIX-PROTOCOL.md` — 17-rule autonomous fix protocol (max 3 attempts; Rule 16 surgical changes; Rule 17 independent verify before DONE — maker≠checker, default-REJECT)
 - `QA-SKILLS-CHEATSHEET.md` — one-page reference for the 3-step flow
 - `knowledge-base/GUIDE.md` — how persistent product memory works + grow workflow

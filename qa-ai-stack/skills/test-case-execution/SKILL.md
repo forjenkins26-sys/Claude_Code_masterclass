@@ -188,10 +188,19 @@ Note: Use transition API if direct status update fails. Check available transiti
 
 ```bash
 cd "Playwright Automation Framework"
-npm test -- tests/ui/login.spec.ts --grep "TC-001" --project=chromium --headed --screenshot=on --reporter=json 2>&1
+npm test -- tests/ui/login.spec.ts --grep "TC-001" --project=chromium --headed --reporter=json 2>&1
 ```
 
-**`--screenshot=on`** captures screenshots for BOTH pass and fail (not just failures). Screenshots saved to `test-results/{test-folder}/`.
+**Screenshots for BOTH pass and fail** are enabled via the config, NOT a CLI flag.
+⚠️ `--screenshot=on` is NOT a valid `playwright test` flag — it errors with `error: unknown option '--screenshot=on'` and aborts the run before any test executes. Set it in `playwright.config.ts` instead:
+```ts
+// playwright.config.ts
+export default defineConfig({
+  use: { screenshot: 'on' },   // capture for PASS and FAIL
+});
+```
+Screenshots are saved to `test-results/{test-folder}/` (pass = `test-finished-1.png`, fail = `test-failed-1.png`).
+*(Lesson — 2026-06-29: a run was aborted by `--screenshot=on` as a CLI flag; moved to config `use.screenshot`.)*
 
 **CRITICAL:** ALWAYS include `--headed` flag. Headed mode required for:
 - Proper selector verification (Rule 17)
@@ -581,7 +590,7 @@ mcp__atlassian__addCommentToJiraIssue({
 
 #### 1. Find screenshot file
 
-After test run with `--screenshot=on`:
+After a test run (with `screenshot: 'on'` set in `playwright.config.ts` — see Step 5, NOT a CLI flag):
 
 ```
 # Pass screenshot — Playwright saves here:

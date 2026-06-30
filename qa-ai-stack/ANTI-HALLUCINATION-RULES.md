@@ -349,6 +349,150 @@ npm run ai:rca
 
 ---
 
+## Rule 26: Stay within the command/request scope — never invent scope (Added 2026-06-29)
+
+**Producing output the user did not ask for is scope hallucination — same family as inventing a selector or URL.** A command has a defined deliverable. Produce exactly that, then stop.
+
+❌ DON'T: Add bonus files, extra steps, or "helpful" follow-on artifacts beyond the deliverable:
+```
+/explore <url>           # deliverable = live-DOM POM
+→ also wrote tests/<x>.spec.ts  # WRONG — nobody asked for a spec
+```
+
+✅ DO: Identify the deliverable before acting, produce only that, offer next steps in text (not as built artifacts):
+```
+/explore <url>           # deliverable = live-DOM POM
+→ wrote pages/<X>Page.ts  # stop. Then: "Want a spec too? Run /test-case-creation."
+```
+
+**Deliverable map (this stack):**
+
+| Command | Deliverable — nothing more |
+|---|---|
+| `/explore <url>` | One live-DOM-verified POM file |
+| `/test-case-creation <EPIC>` | Test cases (table or Jira) — spec file only if asked |
+| `/test-case-execution <EPIC>` | Run + classify + fix/bug + Jira update |
+| `/guard` | Hook + exclude install, self-test, scan |
+
+**Rules:**
+- Separate prompts = separate scope. A later `/test-case-creation` justifies test cases; an earlier `/explore` does not.
+- Suggesting a next step in text is fine. Building the artifact unasked is not.
+- When unsure if something is in scope → ask first. Do not build speculatively.
+
+**Lesson (2026-06-29):** During a `/explore` run (POM only), generated an unprompted `tests/greenkart.spec.ts`. User flagged it as out of scope; spec was deleted. Doing extra work is not "helpful" — it is unrequested output the user must now review and undo. Ties to the core principle: never produce what the source (here, the command's contract) does not define.
+
+---
+
+## Rule 27: URL scope — explore/test only the given URL; nav-test links, don't cover destinations (Added 2026-06-29)
+
+**The URL you are given is the scope boundary.** Producing locators or test cases for a *different* URL is scope hallucination (sibling of Rule 26), even when an Epic's ACs span multiple pages — the Epic over-reaching does NOT override the user's explicit URL scope.
+
+**IN scope (same URL):** elements in that URL's DOM, plus same-URL states reached without changing the route — dropdowns, modals, tabs, accordions, multi-step forms.
+
+**OUT of scope (URL change):** the moment a click changes the URL (full nav, SPA hash-route change like `#/` → `#/cart`, new tab), that destination is a DIFFERENT page → separate `/explore` + `/test-case-creation` run.
+
+❌ DON'T:
+```
+/test-case-creation <#/ URL> epic SCRUM-270   # Epic AC8-11 describe #/cart
+→ also wrote tests for the #/cart table / promo / Place Order  # WRONG — different URL
+```
+
+✅ DO — for an element on the scoped page that NAVIGATES away, write exactly ONE navigation test:
+```typescript
+// IN: the button is on #/, assert it reaches the destination
+await gk.proceedToCheckout();
+await expect(page).toHaveURL(/#\/cart$/);   // navigation only
+// OUT: do NOT then assert the #/cart table/promo/Place Order — separate run
+```
+
+**Rules:**
+- A link/button *element* to another page stays IN (the `<a>`/button lives in this DOM). The *destination page's contents* are OUT.
+- One navigation-assertion per such element. No destination-page coverage.
+- Epic ACs describing a different page → flag "out of scope for this URL; separate run", do not silently generate.
+
+**The nav-test TECHNIQUE depends on `target` — verify it first (don't assume):**
+| Element behaviour | How to assert the navigation |
+|---|---|
+| **Same-tab** (full nav, or SPA hash route `#/` → `#/cart`) | `await expect(page).toHaveURL(/dest/)` — current tab's URL changes |
+| **New-tab** (`target="_blank"`) | Capture the popup, assert ITS URL, close it. The **current tab's URL never changes**, so `page.url()` on it = false pass. |
+
+```typescript
+// target="_blank" — capture the new tab (Top Deals / Flight Booking / TechSmartHire all _blank)
+const [popup] = await Promise.all([
+  context.waitForEvent('page'),
+  gk.flightBookingLink.click(),
+]);
+await popup.waitForLoadState();
+await expect(popup).toHaveURL(/dropdownsPractise/);  // destination only — NO page-content assertions
+await popup.screenshot({ path: 'screenshots/<EPIC>/<ISSUE>_<TC>_destination.png' }); // ARRIVAL PROOF
+await popup.close();
+```
+- ⚠️ Pre-2026-06-29 this rule said "external/new-tab links: assert href + target, do not follow." That was WRONG — href presence is not a navigation test (a broken handler still has the right href). For a `_blank` link the real nav test IS allowed: capture the popup, assert its URL, close. Still no destination-page content (AH Rule 27 boundary holds).
+- 📸 **A nav test to a DIFFERENT URL MUST capture a destination screenshot as arrival proof** (in addition to the URL assertion). Same-tab nav → `page.screenshot()` after the URL changes; new-tab → `popup.screenshot()` BEFORE `popup.close()`. Playwright's auto-`screenshot:'on'` only captures the test's main `page`, never the popup — so the destination tab has NO evidence unless you take it explicitly. The shot is the page at first load = "the link landed here" proof; it is NOT destination-page **content coverage** (no assertions on it). Added 2026-06-29 per QA request: "validating the URL → also have a screenshot of that as proof."
+
+**Lesson (2026-06-29):** SCRUM-270 was scoped to `#/` but its ACs covered the `#/cart` checkout page; test cases (table/promo/Place Order) were generated for `#/cart` — outside scope. The boundary rule existed in `/explore` (Lesson #6) but not in `/test-case-creation`. Fixed: explore Lesson #6, test-case-creation Lesson #2, CLAUDE.md Hard Rule #11, and this rule.
+
+---
+
+## Rule 28: State-mutation tests capture before/after screenshots as evidence (Added 2026-06-29)
+
+**A test that asserts a STATE TRANSITION must capture the page before AND after the action** — two shots that visually prove the mutation happened. This is the same evidence principle as Rule 27's destination-shot (📸 arrival proof), specialized for in-page state changes instead of navigation.
+
+**TRIGGER (do not apply blanket — only when this is true):** the test's point is that an action *changes* observable state. Examples: search filters the grid (30→1), quantity stepper (1→3→2), ADD TO CART (count 0→1), remove (1→0), filter/sort, modal open/close, total recalculation.
+
+**DON'T apply to** (the single auto-`screenshot:'on'` end-shot, or Rule 27's destination shot, already suffices):
+- Presence / DOM-existence tests (nothing changes → two identical shots = noise)
+- Navigation tests (already have home + destination shots per Rule 27 — that IS before/after)
+- Pure assertion-on-load tests (no action)
+- Security inertness tests (asserting *nothing* happened)
+
+```typescript
+// before/after helper — paths must be unique per test+phase
+const shot = (page, scrum, gk, phase: 'before' | 'after') =>
+  page.screenshot({ path: `screenshots/<EPIC>/${scrum}_${gk}_${phase}.png` });
+
+test('GK-002 search filters products', async ({ page }) => {
+  await expect(gk.products).toHaveCount(30);          // before-state asserted
+  await shot(page, 'SCRUM-272', 'GK-002', 'before');
+  await gk.searchProduct('Brocolli');
+  await expect(gk.products).toHaveCount(1);           // after-state asserted
+  await shot(page, 'SCRUM-272', 'GK-002', 'after');
+});
+```
+
+**Rules:**
+- The shots are EVIDENCE, never the oracle. The `expect()` on before-state and after-state is the validation; the screenshots are human-readable proof for review/reports. Never let a screenshot stand in for an assertion (that's the Rule 15 / AFP-15 trap — `toBeTruthy()` mechanics, not outcomes).
+- Assert the before-state too, not just after. A clean before-assert + before-shot is what makes the pair meaningful (proves it started where you claim).
+- Unique paths per phase (`_before` / `_after`) so they don't overwrite.
+
+**Why not blanket (the honest cost):** `screenshot:'on'` already auto-captures the end-state, and `trace:'on-first-retry'` captures the full before/after timeline on failure. Adding two explicit shots to *every* test doubles screenshot clutter and maintenance for tests where nothing visibly changes, and creates false "looks like coverage" confidence. Gate on the state-mutation trigger to keep the signal high.
+
+**Lesson (2026-06-29):** Added per QA request — "screenshot before doing any action and after doing action for each test case." Adopted TARGETED (state-mutation only), not blanket, after weighing cost vs. evidence value. Applied to GreenKart GK-002/003/004/005/007 (the mutation tests); presence/nav/security tests deliberately excluded.
+
+---
+
+## Rule 29: Walk the Edge-Case Coverage Matrix per control — tag by formal technique (Added 2026-06-29)
+
+**Edge / negative / boundary coverage must come from a standing matrix walked per control, NOT from memory.** If which cases get written depends on whoever remembers to ask "did you check max? empty submit? min−1? manual entry?", coverage is a lottery. Replace memory with a checklist.
+
+**Procedure:** for EVERY interactive control discovered in the DOM, walk its row in the matrix (defined in `test-case-creation` Step 3A) and emit a verdict for every applicable cell — **Added** (Epic gives the oracle → real test), **Fixme** (valid case, Epic silent → `test.fixme` + `[REQUIREMENT NEEDED]`, record the observed behaviour), or **N/A** (one-line reason). Never skip a cell silently (Lesson #7). Output a per-control verdict table.
+
+**Tag every case with its formal technique** (industry framing + self-documenting):
+| Technique | Cases it generates |
+|---|---|
+| **BVA** (Boundary Value Analysis) | min, min−1, max, max+1, empty (lower length boundary) |
+| **ECP** (Equivalence Class Partitioning) | one representative per valid + invalid partition (valid / negative / non-numeric / oversized) |
+| **Negative** | the failure / rejection path (empty submit, no-match) |
+| **State transition** | actions that change state (add, remove-one-of-N, re-add merge/dup) |
+| **Security** | SQLi / XSS / fuzz — always, regardless of Epic |
+| **Exploratory / out-of-the-box** | undocumented behaviour found by probing the live app, not derivable from the spec (is the qty field editable? is there a max cap?) — almost always an Epic-gap → fixme |
+
+**The Epic still owns the expected result (Rule 19).** This rule decides WHICH cases to raise; the Epic decides what they assert. A cell with no Epic oracle is never invented — it becomes a fixme requirement-gap subtask carrying the observed behaviour for a future AC.
+
+**Lesson (2026-06-29):** the QA repeatedly had to ask "did we cover empty-search / decrement-floor / max-qty / manual-entry?" — because the skill said only "write edge case variants" with no concrete list. Three rounds of gaps were caught by the user, not the process. Fixed by adding the per-control matrix (Step 3A), technique tags (BVA/ECP/Negative/State/Security/Exploratory), and `test-case-creation` Lesson #8 — so the QA never has to enumerate edge cases for the agent again. GreenKart gaps GK-022/025/026/027/028 (SCRUM-292/295/296/297/298) were the fixme requirement-gaps this produced.
+
+---
+
 ## Rule 17: Run headed mode FIRST for UI testing (Added 2026-06-11)
 
 **When test fails "element not found":**

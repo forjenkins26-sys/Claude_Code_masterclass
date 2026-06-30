@@ -28,14 +28,15 @@ Please install everything:
 11. Add .env + .vercel/ to .gitignore (secrets policy — see CLAUDE.md). Verify: git check-ignore .env
 12. Merge scripts from qa-ai-stack/package-scripts.json into this project's package.json
     - Update agent-factory path if folder structure differs
-13. If this is a COMPANY repo (stack must stay private, never pushed): open qa-ai-stack/LOCAL-GUARD-SETUP.md
-    and run its two prompts. They add a local-only ignore (.git/info/exclude) + a pre-commit hook
-    (.git/hooks/pre-commit) so the stack files are invisible to the company's git and cannot be pushed.
-    These are NOT cloned and NOT pushed — re-run once per machine / per clone.
+13. If this is a COMPANY repo (stack must stay private, never pushed): run `/guard` (the guard skill).
+    It adds a local-only ignore (.git/info/exclude) + a pre-commit hook (.git/hooks/pre-commit) so the
+    stack files are invisible to the company's git and cannot be pushed, then self-tests + scans for leaks.
+    (Manual fallback: qa-ai-stack/LOCAL-GUARD-SETUP.md / setup-local-guard.sh.)
+    The hook + exclude live in .git/ — NOT cloned and NOT pushed — re-run `/guard` once per machine / per clone.
 
 After install verify:
 - Run: npm run rules:check → should scan .ts files
-- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug, karpathy-guidelines
+- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug, karpathy-guidelines, guard
 - Confirm CLAUDE.md, ANTI-HALLUCINATION-RULES.md (25 rules), AUTO-FIX-PROTOCOL.md (17 rules), knowledge-base/ in project root
 - Confirm hooks in ~/.claude/settings.json: Bash matcher (ai:rca reminder) + Write|Edit matcher (rules:check)
 
@@ -48,6 +49,7 @@ Then show me the 3-step QA flow for this project.
 
 | Component | What it does |
 |---|---|
+| `/guard` skill | One command to keep the stack OFF the company git — installs a `.git/hooks/pre-commit` + `.git/info/exclude` (both local-only). Self-tests + scans for leaks. Refuses on the stack repo. Re-run per machine/clone |
 | `/explore` skill | Live DOM → TypeScript POM, 95% accuracy |
 | `/test-case-creation` skill | Epic AC → Jira test cases + spec file |
 | `/test-case-execution` skill | Runs tests, auto-fixes locators, files bugs, updates Jira |

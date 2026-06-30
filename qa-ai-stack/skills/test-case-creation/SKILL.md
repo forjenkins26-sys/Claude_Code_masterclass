@@ -217,6 +217,40 @@ For each requirement statement:
 
 **IMPORTANT:** Expected result text comes from requirement, not UI. If requirement says `"Enter your first name"` but UI shows `"First name required"` → test asserts `"Enter your first name"` → FAILS → bug caught.
 
+#### Step 3A: Edge-Case Coverage Matrix — MANDATORY per control (AH Rule 29)
+
+**Why this exists:** "write edge case variants" is too vague — coverage ends up depending on whoever remembers to ask "did you check max? empty submit? manual entry?". This matrix removes the memory dependency. **For EVERY interactive control found in the DOM (Step 2), walk its row and emit a verdict for every applicable cell** — Added (Epic defines the oracle), Fixme (valid case, Epic silent → `test.fixme` + `[REQUIREMENT NEEDED]`, record observed behaviour), or N/A (control can't reach that state, one-line reason). Never skip a cell silently (Lesson #7).
+
+**Each probe maps to a named formal test-design technique** — tag the test/subtask with it (industry-standard framing, and it makes the coverage self-documenting):
+- **BVA** (Boundary Value Analysis): min, min−1, max, max+1, empty (= lower boundary of length).
+- **ECP** (Equivalence Class Partitioning): one representative per valid + invalid partition (valid number / negative / non-numeric / huge).
+- **Negative**: the failure/rejection path.
+- **State transition**: actions that change app state (add, remove-one-of-N, re-add merge/dup).
+- **Security**: SQLi / XSS / fuzz (always included regardless of Epic).
+- **Exploratory / "out of the box"**: undocumented behaviours found by probing the live app, not derivable from the spec (e.g. is the qty field editable? is there any max cap?). These are almost always Epic-gaps → fixme.
+
+| Control type | Probe every one of these (→ technique) |
+|---|---|
+| **Text / search input** | empty submit (Negative/BVA) · whitespace-only (ECP-invalid) · no-match result (Negative) · clear-restores (State transition) · case sensitivity (ECP) · max-length via `pressSequentially` (BVA, AH Rule 18) · special chars (ECP-invalid) · SQLi + XSS (Security, always) |
+| **Number / quantity stepper** | default value · increment · decrement (happy) · **decrement at/below the floor / min−1** (BVA) · **maximum / max+1 / upper bound — is there a cap?** (BVA + Exploratory) · **manual keyboard entry** — editable? typed value carries through? (Exploratory) · non-numeric / negative (ECP-invalid) |
+| **Add / submit button** | happy path · **submit with empty/no selection** (Negative) · double-click / rapid repeat (State transition) · disabled-state if any (Negative) |
+| **Cart / list / collection** | single item · **multiple items — remove one of N keeps the rest** (State transition) · **empty-state message, exact text** (Negative/BVA-empty) · re-add merge-vs-duplicate (State transition) · count integrity |
+| **Remove / delete link** | removes the correct item (State transition) · last-item-removed → empty state (BVA-empty) · count decrements |
+| **Link / nav element** | navigates to the right destination — same-tab vs `_blank` popup (AH Rule 27) + destination screenshot |
+| **Promo / coupon / discount** | valid code (ECP-valid) · invalid code (ECP-invalid) · empty apply (Negative) · recalculation (usually Epic-gap → fixme) |
+
+**Output:** a per-control verdict table in the report, tagged with technique. Example (GreenKart quantity stepper):
+
+| Cell | Technique | Verdict | Note |
+|---|---|---|---|
+| default "1" / increment / decrement | Happy | Added (GK-003) | AC3 |
+| decrement floor (min−1) | BVA | Fixme (GK-022) | AC3 silent on floor; observed clamps at 1 |
+| maximum (max+1 / cap?) | BVA + Exploratory | Fixme (GK-027) | no cap observed (set 9999 freely) |
+| manual keyboard entry | Exploratory | Fixme (GK-028) | editable; typed "7" → cart "7 Nos." |
+| non-numeric / negative | ECP-invalid | Fixme | Epic silent |
+
+**The Epic still wins for assertions (AH Rule 19).** This matrix decides WHICH cases to raise; the Epic decides the expected result. A cell with no Epic oracle is NOT invented — it becomes a fixme requirement-gap subtask with the observed behaviour recorded.
+
 #### Mode B: UI-Observed (fallback)
 
 Generate standard scenario types but mark all behavioral assertions:
@@ -341,17 +375,26 @@ Parse existing issue summaries. Extract test IDs (e.g., `REG-001`, `BL-002`) fro
 **If existing issues found → ask user:**
 
 > "Found [N] test cases already under Epic SCRUM-XX. What should I do?
-> 1. **Skip** — don't create, use existing ones
-> 2. **Replace** — delete existing and create fresh
-> 3. **Add** — create new ones alongside existing"
+> 1. **Sync (recommended)** — reconcile to the Epic: skip IDs already present, create any missing, and update existing ones whose steps/expected-result no longer match the current AC
+> 2. **Skip** — don't create, use existing ones as-is
+> 3. **Replace** — delete existing and create fresh
+> 4. **Add** — create new ones alongside existing (never modifies existing)"
 
 Wait for user answer before proceeding.
 
+- **Sync (default)** → idempotent reconciliation against the Epic ACs:
+  1. Build the desired test set from current Epic ACs (the normal Step 3 mapping).
+  2. **Skip** any desired test whose ID already exists AND whose summary + steps + expected-result still match the AC (no change needed).
+  3. **Add** any desired test whose ID is NOT present.
+  4. **Modify** (via `editJiraIssue`) any existing test whose AC has changed — update summary/steps/expected-result to match the current AC. Note the diff in a comment.
+  5. **Never auto-delete.** An existing test with no matching AC anymore → report it as "orphan — AC removed?" and ask before deleting.
+  6. Report a per-test verdict table (Skipped / Added / Modified / Orphan) → then ask POM prompt (see below).
+  Re-running Sync on an unchanged Epic = no-op (0 created, 0 modified). That is the correct result, not a failure.
 - **Skip** → stop, report existing keys → ask POM prompt (see below)
 - **Replace** → delete all existing children first, then create all fresh → ask POM prompt (see below)
 - **Add** → only create test cases whose IDs are NOT already present (compare `REG-001` etc. in summaries) → ask POM prompt (see below)
 
-**⚠️ MANDATORY — After all 3 options complete, ALWAYS ask:**
+**⚠️ MANDATORY — After all options complete, ALWAYS ask:**
 
 > "Should I also create the POM and test files in the Playwright Automation Framework for these test cases?
 > Reply **yes** or **no**."
@@ -621,3 +664,69 @@ Do NOT overwrite — always append.
 - Use `[VERIFICATION REQUIRED]` tags honestly in Mode B
 - Security tests always apply regardless of mode
 - **Jira mode:** Confirm before creating, report all keys
+
+## Lessons
+
+❌ **Don't:** Treat re-running the skill on an Epic that already has test cases as a Skip-or-Replace-only choice. Forcing the user to pick "delete everything and recreate" or "do nothing" loses work or duplicates it. Reporting "0 created" as if the run failed is also wrong.
+✅ **Do:** Default to **Sync** — reconcile the children to the current Epic ACs: skip unchanged, add missing, modify changed (`editJiraIssue`), never auto-delete (flag orphans, ask). A no-op on an unchanged Epic is the correct, expected result. Idempotent: running it twice changes nothing the second time.
+*(Lesson #1 — 2026-06-29)*
+
+❌ **Don't:** Generate test cases for a different URL than the one given, even when the Epic's ACs span multiple pages. SCRUM-270 (#/) had ACs covering the #/cart checkout page; tests were written for #/cart table/promo/place-order — outside the requested #/ scope. The Epic over-reaching does not override the user's explicit URL scope.
+✅ **Do:** Scope test generation to the URL given (matches `/explore` Lesson #6). For an element on the scoped page that NAVIGATES away (link/button to another URL), write exactly ONE navigation test — click it, assert the correct destination (URL/title/new-tab href). Do NOT then cover the destination page's own contents (its forms, tables, buttons) — that's a separate `/test-case-creation` run on that URL. ACs that describe a different page → flag them as "out of scope for this URL; covered by a separate run", do not silently generate them. (e.g. GreenKart: PROCEED→#/cart navigation = IN; the #/cart table/promo/Place Order = OUT.)
+*(Lesson #2 — 2026-06-29)*
+
+❌ **Don't:** Write a navigation test as an href-presence check (`toHaveAttribute('href', ...)`), and don't assert `page.url()` on the current tab for a `target="_blank"` link. An href is static markup — a broken handler still has the right href, so href presence is NOT proof of navigation. For a `_blank` link the current tab's URL never changes, so a `page.url()` check on it is a false pass.
+✅ **Do:** Pick the nav-test technique by the element's `target` (verify it live first — AH Rule 17, don't assume):
+- **same-tab** (full nav or SPA hash route): `await expect(page).toHaveURL(/dest/)`.
+- **new-tab** (`target="_blank"`): capture the popup, assert ITS URL, close it:
+```typescript
+const [popup] = await Promise.all([
+  context.waitForEvent('page'),
+  gk.flightBookingLink.click(),
+]);
+await popup.waitForLoadState();
+await expect(popup).toHaveURL(/dropdownsPractise/);  // destination only
+await popup.screenshot({ path: 'screenshots/<EPIC>/<ISSUE>_<TC>_destination.png' }); // arrival proof
+await popup.close();
+```
+GreenKart: Top Deals, Flight Booking, TechSmartHire are ALL `target="_blank"` → popup-capture nav test (GK-017/018/019). Still no destination-page content (AH Rule 27 holds). This corrects the earlier "_blank → assert href only, do not follow" guidance, which let broken navigation pass.
+*(Lesson #3 — 2026-06-29)*
+
+✅ **Do (nav destination proof):** A nav test to a DIFFERENT URL must capture a **destination screenshot** as arrival proof, alongside the URL assertion. New-tab → `popup.screenshot()` BEFORE `popup.close()`; same-tab → `page.screenshot()` after the URL changes. Playwright's config `screenshot: 'on'` only auto-captures the test's main `page`, NOT the popup — so without an explicit shot the destination tab has zero evidence. The screenshot is the destination at first load ("the link landed here"), NOT content coverage — make no assertions on it (AH Rule 27 holds). GreenKart GK-017/018/019 save `SCRUM-287/288/289_GK-0xx_destination.png`.
+*(Lesson #4 — 2026-06-29: QA asked "we validate the URL → we should also screenshot that page as proof.")*
+
+❌ **Don't:** Add before/after screenshots to EVERY test as blanket "coverage." For presence/load-assertion tests nothing changes, so two near-identical shots are noise; `screenshot: 'on'` already auto-captures the end-state, and a screenshot is never the oracle (the `expect()` is). Blanket shots create false "looks like coverage" confidence and double maintenance.
+✅ **Do (state-mutation evidence — AH Rule 28):** Capture before AND after screenshots ONLY for tests whose point is a STATE TRANSITION (search filter 30→1, qty stepper 1→3→2, add-to-cart 0→1, remove 1→0, filter/sort, modal toggle, total recalc). Assert the before-state too (not just after) so the pair is meaningful. Skip for: presence/DOM-existence, navigation (already has home+destination per Lesson #4), pure load-assertion, security-inertness tests. GreenKart applied to GK-002/003/004/005/007 only.
+```typescript
+const shot = (page, scrum, gk, phase: 'before' | 'after') =>
+  page.screenshot({ path: `screenshots/<EPIC>/${scrum}_${gk}_${phase}.png` });
+// in a mutation test:
+await expect(gk.products).toHaveCount(30);           // before-state
+await shot(page, 'SCRUM-272', 'GK-002', 'before');
+await gk.searchProduct('Brocolli');
+await expect(gk.products).toHaveCount(1);            // after-state
+await shot(page, 'SCRUM-272', 'GK-002', 'after');
+```
+*(Lesson #5 — 2026-06-29: QA asked "screenshot before and after each action." Adopted TARGETED, not blanket, after weighing cost vs evidence.)*
+
+❌ **Don't:** Put internal reasoning in spec-file comments — rule citations (`AH Rule 27`), dated verification notes (`VERIFIED 2026-06-29`), scope-decision essays, "this was WRONG before" history, requirement-discrepancy paragraphs. The spec is a CLIENT-FACING deliverable; multi-line reasoning comments make it look like the team is arguing with itself / making a mess.
+✅ **Do:** One short comment per test — `GK-ID + SCRUM key + what it checks`. The test title already carries traceability for `--grep`. Inline mechanics comments (`// before`, `// after`) are fine. Move ALL reasoning to where it belongs: Jira issue descriptions, `DECISIONS.md`, the KB, and these stack rules — NOT the spec.
+```typescript
+// ❌ messy (5 lines of rule-citing essay in the spec)
+// GK-017 SCRUM-287 — Top Deals ... VERIFIED 2026-06-29 ... Scope rule (AH Rule 27) ...
+// ✅ clean
+// GK-017 SCRUM-287 — Top Deals opens #/offers in a new tab
+```
+*(Lesson #6 — 2026-06-29: QA — "don't add comments with rules/lots of things; the client will think they're making a mess.")*
+
+❌ **Don't:** Enumerate a list of N candidate test cases (e.g. a coverage-gap audit) and then act on only a subset — especially after funneling them into an AskUserQuestion that offered fewer options than you listed. The un-offered candidates silently vanish from the list and never get a decision. (Happened 2026-06-29: 7 gaps listed, 4 acted on, 3 dropped without a verdict until the user asked "did you add them, if not why?")
+✅ **Do:** Treat the enumerated list as a CHECKLIST and reconcile against it — every candidate gets an explicit verdict before the task is "done":
+- **Added** (real test, has an Epic/self-evident oracle), or
+- **Fixme** (valid case but behaviour undefined in the Epic → `test.fixme` + `[REQUIREMENT NEEDED]`, AH Rule 19), or
+- **Dropped** with a one-line reason (duplicate of an existing test / marginal value / out of scope).
+If a follow-up question only offers a subset, still report a verdict for the omitted ones — a menu narrowing the choices does not delete the candidates. Restate the full N-row table at the end.
+*(Lesson #7 — 2026-06-29: QA caught 3 enumerated gap-cases dropped without a verdict. Reconcile every candidate; never let a subset menu silently discard list items.)*
+
+❌ **Don't:** Rely on memory / ad-hoc judgement to decide which edge, boundary, and negative cases to write. That makes the QA keep asking "did you check max? empty submit? manual entry? min−1?" — coverage becomes a function of who remembers what, not a system.
+✅ **Do:** Walk the **Step 3A Edge-Case Coverage Matrix (AH Rule 29)** for EVERY control found in the DOM, and tag each case with its formal technique — **BVA** (min/min−1/max/max+1/empty), **ECP** (one rep per valid+invalid partition), **Negative**, **State transition**, **Security**, **Exploratory/out-of-the-box** (undocumented behaviour found by probing, e.g. "is the qty field editable?", "is there any max cap?"). Emit a verdict per cell (Added / Fixme-gap / N/A) — never skip one silently (Lesson #7). The matrix decides WHICH cases; the Epic still decides the expected result (AH Rule 19). A cell with no Epic oracle → fixme requirement-gap subtask with the observed behaviour recorded.
+*(Lesson #8 — 2026-06-29: QA asked "why no rule for these case types? how do I stop having to ask?" and "can we frame them as BVA/ECP/out-of-the-box?". Answer: a standing technique-tagged matrix walked per control, so coverage no longer depends on the QA enumerating cases.)*
