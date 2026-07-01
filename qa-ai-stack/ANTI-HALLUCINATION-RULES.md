@@ -53,7 +53,7 @@ You may ONLY use information explicitly provided in:
 8. **Selector verification:** ALWAYS verify in headed mode before using. DOM inspection ≠ verification
 9. **Visibility check:** locator.count() > 0 only proves existence. Use locator.isVisible() for visibility
 10. **First match trap:** .first() returns first in DOM order (may be hidden). Verify it's the intended element
-11. **Language-agnostic:** Use attributes (name, type, role) not text content (changes with locale)
+11. **Language-agnostic:** Use attributes (name, type, role) not text content (changes with locale). **Now ENFORCED in code** — `rules:check` (rule-engine.js) hard-fails any `src/pages/*Page.ts` using XPath, CSS-class (`.class`), positional (`nth-child`/`nth-of-type`/`.nth(n)`), or dynamic-ID (`#id-23948`) locators. Priority order: `getByRole`/`getByLabel` → `getByTestId`/`data-*` → stable `#id`. Selector policy is a gate, not a guideline (adapted from mvsaran Agent-Driven-E2E base-page gatekeeper).
 12. **Document verification:** Add comment with verification date and method (e.g., "VERIFIED VISIBLE: 2026-06-09 headed mode")
 13. **URLs and navigation:** NEVER assume page paths. Verify actual URL in browser. Registration ≠ main page, login ≠ /auth, etc.
 14. **Setup/teardown:** Apply verification rules to beforeEach/afterEach/fixtures, not just test body

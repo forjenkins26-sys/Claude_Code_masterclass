@@ -1,8 +1,8 @@
 ---
 name: explore
 description: Explore any URL using Playwright MCP browser — finds all interactive elements (inputs, buttons, links, dropdowns, checkboxes, forms) from live DOM and generates a ready-to-use Playwright TypeScript Page Object Model (POM). Use when user says "/explore [URL]", "explore this page", "find locators for [URL]", or "create POM for [URL]".
-improvements: 6
-last-improved: 2026-06-29
+improvements: 4
+last-improved: 2026-06-27
 ---
 
 # Explore — Live DOM Locator Discovery & POM Generator
@@ -173,11 +173,17 @@ export class PageNamePage {
 2. `getByRole('textbox', { name: 'Email Address' })` — role + label
 3. `getByPlaceholder('Enter email')` — placeholder
 4. `getByLabel('Email')` — label association
-5. `page.locator('#email')` — ID (only if stable)
-6. `page.locator('[name="email"]')` — name attribute
-7. `page.locator('.btn-primary')` — class (last resort, fragile)
+5. `getByTestId('submit')` — `data-testid`/`data-*` if present in snapshot
+6. `page.locator('#email')` — ID (ONLY if stable — never a generated/dynamic id like `#id-23948`)
+7. `page.locator('[name="email"]')` — name attribute
 
-**Never use:** `page.locator('div > span:nth-child(3)')` — fragile, breaks on DOM change.
+**FORBIDDEN — `rules:check` hard-fails these in `src/pages/*Page.ts` (AH Rule 11 gate):**
+- ❌ CSS class: `page.locator('.btn-primary')` — styling changes break it
+- ❌ XPath: `page.locator('//div/span[1]')`
+- ❌ Positional: `nth-child`, `nth-of-type`, `.nth(3)` — `page.locator('div > span:nth-child(3)')`
+- ❌ Dynamic ID: `page.locator('#email-input-2847')`
+
+If the snapshot offers ONLY a fragile hook, emit `getByRole` + `// VERIFICATION REQUIRED` instead — never a forbidden locator. The gate will reject the POM otherwise (adapted from mvsaran Agent-Driven-E2E selector gatekeeper).
 
 **Annotate known-defect locators (from Step 1.5):** if a generated locator maps to an element named in `known-defects.md` (by area/symptom — e.g. a Cancel button on a page with an open status-gating defect), add a comment above that property:
 
