@@ -63,6 +63,44 @@
         "@smoke|@regression|@P0|@P1|@P2"
       ],
       "message": "Add tags (@smoke/@regression/@P0/@P1/@P2) in describe titles"
+    },
+    {
+      "id": "no-xpath-locator",
+      "folder": "src/pages",
+      "fileRegex": "Page\\.ts$",
+      "forbidRegex": [
+        "locator\\(\\s*['\"`]\\s*(//|\\.\\.?/|xpath=)"
+      ],
+      "message": "Selector policy: XPath is forbidden (AH Rule 11). Use getByRole/getByLabel/getByTestId or a stable id."
+    },
+    {
+      "id": "no-positional-locator",
+      "folder": "src/pages",
+      "fileRegex": "Page\\.ts$",
+      "forbidRegex": [
+        "locator\\([^)]*nth-child",
+        "locator\\([^)]*nth-of-type",
+        "\\.nth\\(\\s*\\d+\\s*\\)"
+      ],
+      "message": "Selector policy: positional selectors (nth-child/nth-of-type/.nth(n)) are forbidden — brittle, break on DOM change. Use an accessible-name locator."
+    },
+    {
+      "id": "no-class-locator",
+      "folder": "src/pages",
+      "fileRegex": "Page\\.ts$",
+      "forbidRegex": [
+        "locator\\(\\s*['\"`]\\s*\\.[A-Za-z]"
+      ],
+      "message": "Selector policy: CSS class locators (.class) are forbidden — styling changes break them. Use getByRole/getByLabel/getByTestId."
+    },
+    {
+      "id": "no-dynamic-id-locator",
+      "folder": "src/pages",
+      "fileRegex": "Page\\.ts$",
+      "forbidRegex": [
+        "locator\\(\\s*['\"`]\\s*#[A-Za-z-]*\\d{3,}"
+      ],
+      "message": "Selector policy: generated/dynamic IDs (e.g. #id-23948) are forbidden — non-deterministic. Use a stable accessible locator."
     }
   ],
   "warningRules": [
