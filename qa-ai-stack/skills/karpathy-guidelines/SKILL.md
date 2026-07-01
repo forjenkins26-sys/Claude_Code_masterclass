@@ -65,3 +65,14 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## 5. Adopt for Our Pain, Not to Match Others
+
+**An external repo having a feature we lack is NOT a gap. A gap is OUR pain.**
+
+When evaluating another project's tool, agent, rule, or pattern for adoption:
+- First ask: **do we actually have this problem?** If we don't feel the pain, it's not a gap — skip it.
+- "Their framework does X, we don't" ≠ a reason to build X. Convergent-but-unneeded features are over-engineering.
+- Adopt only what solves a problem you can name from your own work. Otherwise: note it, move on.
+
+The test: "If this repo didn't exist, would I still want this?" If no, you're matching others, not solving a need.
