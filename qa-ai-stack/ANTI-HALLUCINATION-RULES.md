@@ -1,7 +1,7 @@
 # Anti-Hallucination Rules
 
 **Author:** Anand Soni  
-**Updated:** 2026-06-09
+**Updated:** 2026-07-08 · 30 rules (numbered by creation order, not sequence)
 
 ---
 
@@ -515,4 +515,44 @@ test('GK-002 search filters products', async ({ page }) => {
 - Hallucinated: `input[name="firstname"]`, `select[name="day"]`, radio buttons
 - Actual: `getByLabel('First name')`, `role="combobox"`, dropdown
 - Headed investigation: 30 seconds. Guessing: 1 hour wasted.
+
+---
+
+## Rule 30: Recalled memory is a claim, not a fact — re-verify before use (Added 2026-07-08)
+
+**A fact pulled from persistent memory — the Knowledge Base, `CLAUDE.md`, a prior run's `progress.md`, a `BR-xx` rule, a remembered file path or selector — reflects the moment it was written, not the current state.** Memory is a *claim to check*, never ground truth. Acting on a stale recall propagates an old error into a new run — the same failure family as inventing a selector, except the wrong value came from your own past instead of thin air.
+
+This is the counterweight to the KB's strength: `test-case-execution` Step 7C makes memory **compound** each run (AH Rule 25). Compounding is powerful and dangerous — one wrong entry, once written, becomes "truth" every future run reads. This rule is the gate that stops a bad memory from poisoning the well.
+
+**Before acting on ANY recalled item, re-verify it against the CURRENT source:**
+
+| Recalled item | Re-verify against |
+|---|---|
+| A file path / POM name (e.g. "`TTALoginPage.ts`") | `Glob`/`ls` — does it still exist at that path? |
+| A selector / locator | Live DOM in headed mode (Rule 17) — still resolves? |
+| A `BR-xx` business rule | Its cited source (Epic AC / filed bug) — still holds? |
+| A `known-defects.md` `Ref` | The bug's current Jira status — fixed? regressed? |
+| A CLI flag / command / config | The tool's actual current help/config — still valid? |
+| A "known" app behaviour | Re-observe — apps change between runs |
+
+❌ DON'T: State a remembered fact flat, as if current:
+```
+"The login POM is TTALoginPage.ts"        # recalled — but was it renamed/moved?
+"Cancel-in-Dispatched is SCRUM-269"       # recalled — but is SCRUM-269 still Open?
+```
+
+✅ DO: Treat the recall as a lead, confirm, THEN act:
+```
+Recall says login POM = TTALoginPage.ts → Glob confirms it exists → use it.
+Recall says defect = SCRUM-269 → getJiraIssue confirms status=Open → dedup against it.
+```
+
+**Rules:**
+- A recall you CAN'T re-verify (source gone, can't reach it) → flag it `[UNVERIFIED — recalled]`, do not build on it.
+- Re-verification is cheap; a poisoned KB entry silently corrupts every downstream run. Pay the cheap cost.
+- This does NOT forbid memory — it forbids *trusting* memory without a current check. The KB stays the fast index; the check keeps it honest.
+
+**Anti-hallucination guard:** never "confirm" a recall by re-stating it from memory (that's circular). Confirmation must come from a live, current source (file system, DOM, Jira, tool output).
+
+**Lesson (2026-07-08):** Recalled facts appear inside `<system-reminder>` memory blocks as background context — true *when written*, not necessarily now. Reviewing the anti-hallucination ruleset surfaced the one gap the set didn't cover: it guarded against inventing facts from nothing, but not against trusting a stale fact from its own memory. Rule 30 closes the KB feedback-loop risk (identified while mapping the stack against Himanshu Agarwal's "AI Hallucination Architecture" — the "Feedback Loop Risk: hallucinated outputs get logged, retrieved, and fed back into the system").
 

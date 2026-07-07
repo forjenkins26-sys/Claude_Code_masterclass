@@ -185,4 +185,4 @@ npm run ai:triage    # all 3 + Jira bug draft
 ---
 
 *Last updated: 2026-06-27*  
-*Rules: ANTI-HALLUCINATION-RULES.md (25 rules) | AUTO-FIX-PROTOCOL.md (17 rules)*
+*Rules: ANTI-HALLUCINATION-RULES.md (30 rules) | AUTO-FIX-PROTOCOL.md (17 rules)*

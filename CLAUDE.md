@@ -14,7 +14,7 @@ Git remote: `https://github.com/forjenkins26-sys/Claude_Code_masterclass.git`
 | `Playwright_8_Layer/` | 8-layer POM architecture (Config→Utils→Data→API→Components→Pages→Services→Tests) | npm + `@playwright/test` |
 | `Advance-Playwright-Framework/` | Pramod Dutta's advanced POM+Module pattern — API/UI/Mobile, rule-engine, AI MCP tutor skill | npm + `@playwright/test` |
 | `agent-factory-cli/` | 4 AI agents (RCA, Flaky, Self-Healing, Triage) — pluggable LLM (GROQ/DeepSeek/Ollama) | npm + ts-node |
-| `qa-ai-stack/` | Portable bootstrap — drop into any Playwright project to install skills + hooks + agent-factory | npm scripts |
+| `qa-ai-stack/` | Portable bootstrap — drop into any Playwright project to install skills + hooks + agent-factory. Also pushed as a standalone clone-able repo (`AI_E2E_QA_Automation_Playwright_Master_Framework.git`) with its own `CLAUDE.md` + `INSTALL.md` + `/guard` local-privacy tooling | npm scripts |
 | `qabuddy/` | QA Buddy v2.0 — 5-tab React+Express: Plan/Strategy/TestCases/Pipeline/NexQAMode + LLM-as-Judge | npm (client + server) |
 | `testplanbuddy/` | TestPlanBuddy — React+Express, Jira→GROQ→13-section test plan | npm (client + server) |
 | `teststrategbuddy/` | TestStrategyBuddy — React+Express, Jira→GROQ→10-section QA strategy | npm (client + server) |
@@ -319,11 +319,12 @@ scripts/
 - `CLAUDE-skills.md` — all skill docs, MCP setup, trigger patterns
 - `CLAUDE-schema.md` — JSON contracts, A.N.T. layer map, secrets policy
 - `BLAST.md` — full 5-phase BLAST framework reference
-- `ANTI-HALLUCINATION-RULES.md` — 25 QA verification rules (Rule 25: KB bug-oracle + Confirmed/Suspected tiers; Rule 24: getByText scope to parent + exact; Rule 23: 4-category failure taxonomy; Rule 22: ai:rca before manual classification)
+- `ANTI-HALLUCINATION-RULES.md` — 30 QA verification rules (Rule 30: recalled memory is a claim not a fact — re-verify before use, closes KB feedback-loop risk; Rule 29: edge-case coverage matrix; Rule 27: URL scope / nav-tests; Rule 26: stay in command scope; Rule 25: KB bug-oracle + Confirmed/Suspected tiers; Rule 23: 4-category failure taxonomy)
 - `AUTO-FIX-PROTOCOL.md` — autonomous fix protocol, 17 rules (max 3 attempts; Rule 16: surgical changes — minimality counterweight to Rule 13 consistency; Rule 17: independent verify before DONE — maker≠checker, default-REJECT, adapted from loop-engineering)
 - `RICEPOT.md` — RICEPOT prompt methodology reference
-- `karpathy-guidelines` skill — coding-discipline guardrail (Surgical Changes / Simplicity First / Think Before Coding / Goal-Driven Execution). Wired into `test-case-execution` Step 5B + AUTO-FIX Rule 16
+- `karpathy-guidelines` skill — coding-discipline guardrail, 5 guidelines (Think Before Coding / Simplicity First / Surgical Changes / Goal-Driven Execution / **Adopt for Our Pain not to Match Others**). Wired into `test-case-execution` Step 5B + AUTO-FIX Rules 16 & 17. Guideline 5 = decision-level over-engineering check (don't adopt an external repo's feature unless it's OUR pain)
 - `knowledge-base/<PROJECT>/` — persistent product memory (adapted from imransdet/qa-assistant): `business-rules.md` (bug-vs-intended oracle, `BR-xx`), `known-defects.md` (dedup), `feature-map.md` (regression blast radius), `product-flows.md`. Loaded by `test-case-creation` Step 1A + `test-case-execution` Step 0. Drives AH Rule 25 Confirmed/Suspected bug tiers. See `knowledge-base/GUIDE.md`
+- **New qa-ai-stack skills (this session):** `/qa-run` (one-command orchestrator — chains explore→creation→execution, checkpoints between; conductor only, modifies no core skill) · `/spec-quality` (static 0–100 spec scorer — flaky/secrets/missing-expect/unawaited/empty; read-only, pure regex; from vperambu ReviewerAgent) · `/guard` (installs local `.git/info/exclude` + pre-commit hook so private stack files never push to a company repo; refuses on the stack repo itself). The qa-ai-stack `rules/framework-rule-engine.json` also carries an optional **selector gatekeeper** (forbid XPath/class/positional/dynamic-id in `*Page.ts` — from mvsaran Agent-Driven-E2E) — NOT applied to this workspace's frameworks (no locator pain here; karpathy Guideline 5)
 
 ## Knowledge Base (persistent product memory)
 
@@ -385,3 +386,10 @@ knowledge-base/
 | 2026-06-27 | Playwright framework package.json — ai:rca/heal/flaky/triage/dashboard + rules:check/changed/staged scripts wired to agent-factory-cli | `Playwright Automation Framework/package.json` |
 | 2026-06-27 | .gitignore hardened — `.env` + `.vercel/` locked out (secrets never commit) | `.gitignore` |
 | 2026-06-27 | Knowledge Base added (gap-fill vs imransdet/qa-assistant) — 4-file per-product memory, seeded SCRUM/ from real ACs+bugs; AH Rule 25 Confirmed/Suspected bug tiers; wired into test-case-creation Step 1A + test-case-execution Step 0/5C/7C; synced _TEMPLATE to qa-ai-stack | `knowledge-base/`, `ANTI-HALLUCINATION-RULES.md`, 2 skills, `qa-ai-stack/` |
+| 2026-07-01 | qa-ai-stack pushed as standalone clone-able repo `AI_E2E_QA_Automation_Playwright_Master_Framework.git` (subtree) — own CLAUDE.md + INSTALL.md; complete portable QA brain (our engine + imransdet KB + karpathy) | `qa-ai-stack/`, standalone repo |
+| 2026-07-01 | Company-repo privacy — `/guard` skill + `setup-local-guard.sh` + `HOW-TO-USE-GUARD.md` + `LOCAL-GUARD-SETUP.md`: local-only `.git/info/exclude` + pre-commit hook keep stack files off company GitHub. CLAUDE.md FIRST-ACTION auto-trigger (fires on any first repo action). Re-run per machine/clone (`.git/` never travels) | `qa-ai-stack/skills/guard/`, `qa-ai-stack/*.md/*.sh` |
+| 2026-07-01 | AUTO-FIX Rule 17 added (independent verify before DONE, maker≠checker, default-REJECT — from cobusgreyling/loop-engineering); counts synced 16→17 | `AUTO-FIX-PROTOCOL.md`, `qa-ai-stack/*` |
+| 2026-07-01 | `/qa-run` orchestrator skill — one command chains explore→creation→execution with checkpoints (conductor only, no core-skill logic changed); parity with Vara Prasad run-orchestration.js | `qa-ai-stack/skills/qa-run/` |
+| 2026-07-01 | `/spec-quality` skill — static 0–100 spec scorer (flaky/secrets/missing-expect/unawaited/empty), pure regex, CI-gate exit code; from vperambu ReviewerAgent | `qa-ai-stack/skills/spec-quality/` |
+| 2026-07-01 | Selector gatekeeper (optional) added to qa-ai-stack rule-engine config (forbid XPath/class/positional/dynamic-id in `*Page.ts`, from mvsaran) — NOT applied to workspace frameworks (no locator pain; reverted after Guideline-5 review) | `qa-ai-stack/rules/framework-rule-engine.json` |
+| 2026-07-01 | karpathy Guideline 5 added — "Adopt for Our Pain, Not to Match Others" (decision-level over-engineering check). Wired reference in CLAUDE.md | `~/.claude/skills/karpathy-guidelines/`, `qa-ai-stack/skills/`, `CLAUDE.md` |
