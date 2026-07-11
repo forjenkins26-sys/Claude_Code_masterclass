@@ -1,6 +1,7 @@
 // Self-Healing Locator agent · patches Page Objects only when confidence >= 0.7.
 
 import * as fs from 'fs';
+import { execSync } from 'child_process';
 import { askJson } from '../core/llm';
 import {
   loadReport,
@@ -71,7 +72,15 @@ export async function runHeal(
       )} · ${verdict.newLocator}`,
     );
     if (opts.apply && opts.pomFile) {
-      patchPom(opts.pomFile, broken, verdict.newLocator);
+      const patched = patchPom(opts.pomFile, broken, verdict.newLocator);
+      if (patched) {
+        verdict.verified = verifySpec(t.file, opts.pomFile);
+        if (!verdict.verified) {
+          log.err(`Re-run failed after patch · reverted ${opts.pomFile}`);
+        } else {
+          log.ok(`Re-run passed · patch verified.`);
+        }
+      }
     } else if (opts.apply) {
       log.warn(
         'No --pom file provided · cannot patch. (Inside Claude Code, the heal subagent finds the file automatically.)',
@@ -84,17 +93,17 @@ export async function runHeal(
   return out;
 }
 
-function patchPom(file: string, oldStr: string, newCall: string): void {
+function patchPom(file: string, oldStr: string, newCall: string): boolean {
   if (!fs.existsSync(file)) {
     log.err(`Page Object not found: ${file}`);
-    return;
+    return false;
   }
   const src = fs.readFileSync(file, 'utf8');
   if (!src.includes(oldStr)) {
     log.warn(
       `Old locator "${oldStr}" not found in ${file} · patch skipped.`,
     );
-    return;
+    return false;
   }
   // Replace the old locator string (within a locator(...) call) with the new full call.
   const patched = src.replace(
@@ -104,6 +113,22 @@ function patchPom(file: string, oldStr: string, newCall: string): void {
   fs.writeFileSync(file + '.bak', src);
   fs.writeFileSync(file, patched);
   log.ok(`Patched ${file} · backup at ${file}.bak`);
+  return true;
+}
+
+/** Re-run the spec that caught the break; on failure, restore the .bak. */
+function verifySpec(specFile: string, pomFile: string): boolean {
+  try {
+    execSync(`npx playwright test "${specFile}"`, { stdio: 'pipe' });
+    return true;
+  } catch {
+    const backup = pomFile + '.bak';
+    if (fs.existsSync(backup)) {
+      fs.writeFileSync(pomFile, fs.readFileSync(backup, 'utf8'));
+      log.warn(`Restored ${pomFile} from backup.`);
+    }
+    return false;
+  }
 }
 
 function escapeRegex(s: string): string {

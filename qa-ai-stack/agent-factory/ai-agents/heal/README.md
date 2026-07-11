@@ -23,3 +23,9 @@ agent-factory-cli heal --report ./test-results/results.json --apply --pom ./src/
 ```
 
 In Claude Code via `.claude/agents/heal.md`, the real Page Object is discovered automatically and the spec is re-run to verify.
+
+## Verify-after-patch (CLI path)
+
+`--apply` now re-runs the spec (`npx playwright test <file>`) right after patching.
+Red run ⇒ auto-revert from `.bak`, `verdict.verified = false`. Green ⇒ `verdict.verified = true`.
+Closes the gap where the standalone CLI used to write a patch with no check it actually fixed anything.

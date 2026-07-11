@@ -41,6 +41,8 @@ The user should only ever have to say one line — or nothing at all. You guard 
 | Coding discipline guardrail | `karpathy-guidelines` |
 | RCA / Self-Heal / Flaky AI agents | `agent-factory/` (`ai:rca`, `ai:heal`, `ai:flaky`, `ai:triage`) |
 | POM/spec placement + naming enforcement | `scripts/rule-engine.js` (`rules:check`) |
+| One-command orchestrator — chains explore→creation→execution with checkpoints | `/qa-run` (conductor only, doesn't modify the 3 skills it chains) |
+| Static 0–100 quality gate on generated specs (flaky/secrets/missing-expect/unawaited/empty) | `/spec-quality` (read-only, pure regex, optional gate before `/test-case-execution`) |
 
 ## The 3-Step E2E Flow
 
@@ -105,6 +107,8 @@ Run `ai:rca` before manual classification. Verdict drives action:
 | `PRODUCT_BUG` | Skip fix → file Jira bug (tier it) → mark test Blocked/In Review |
 | `ENV` | Check credentials / network / browser binaries |
 | `FLAKY` | `ai:flaky` → confirm → add `@flaky` tag |
+
+**`ai:heal` verify-after-patch (2026-07-11):** `--apply` re-runs the failing spec right after patching the Page Object. Red re-run ⇒ auto-revert from `.bak`, `HealVerdict.verified = false`. Green ⇒ `verified = true`. Closes the gap where a patch could ship without ever being checked (AUTO-FIX Rule 17, maker≠checker). Matches the Claude Code subagent path (`.claude/agents/heal.md`), which already re-ran the spec. See `agent-factory/ai-agents/heal/CHANGE-verify-after-patch.md`.
 
 ## Commands (after install — see package-scripts.json)
 

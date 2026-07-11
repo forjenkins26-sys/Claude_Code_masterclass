@@ -63,6 +63,8 @@ export interface HealVerdict {
   escalate: boolean;
   escalateReason?: string;
   pomFile?: string;
+  /** Set after --apply: did the re-run spec pass with the patch in place? */
+  verified?: boolean;
 }
 
 export interface AskOpts {
