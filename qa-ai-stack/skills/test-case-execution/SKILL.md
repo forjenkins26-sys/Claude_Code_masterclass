@@ -374,6 +374,14 @@ Based on investigation, apply fix:
 - Use attribute-based selector (name, role, type)
 - Verify .first() returns visible element
 
+**Optional: delegate Fix Type A to the heal agent.** If `agent-factory/` is present in the project (check for `agent-factory/ai-agents/heal/`), a locator-hallucination failure can be handed to it instead of a manual selector rewrite:
+
+```bash
+npx ts-node agent-factory/ai-agents/cli.ts heal --report test-results/results.json --apply --pom <path-to-POM-file>
+```
+
+The heal agent proposes a role/testid/text/css replacement from the captured DOM snapshot (confidence-gated at ≥0.7, escalates below that), patches the POM, then **re-runs the spec itself and reverts from `.bak` on a red re-run** (verify-after-patch, added 2026-07-11 — see `agent-factory/ai-agents/heal/CHANGE-verify-after-patch.md`). Treat its `verified: true` result as satisfying the Attempt 3 re-run below — don't re-run a 4th time. `verified: false` or `escalate: true` ⇒ fall through to the manual investigation steps above; do not retry the agent on the same failure.
+
 **Fix Type B: Timing issue**
 - Add proper wait: `await element.waitFor({ state: 'visible' })`
 - NOT workaround: `{ force: true }`

@@ -39,7 +39,7 @@ The user should only ever have to say one line — or nothing at all. You guard 
 | Manual bug investigation / creation fallback | `/bug-triage`, `/create-bug` |
 | 3-agent Planner/Generator/Healer | `playwright-ai-mcp-tutor` |
 | Coding discipline guardrail | `karpathy-guidelines` |
-| RCA / Self-Heal / Flaky AI agents | `agent-factory/` (`ai:rca`, `ai:heal`, `ai:flaky`, `ai:triage`) |
+| RCA / Self-Heal / Flaky AI agents | `agent-factory/` (`ai:rca`, `ai:heal`, `ai:flaky`, `ai:triage`) — `ai:heal` is now optionally callable from `/test-case-execution` Step 5B Fix Type A (2026-07-11), verify-after-patch built in |
 | POM/spec placement + naming enforcement | `scripts/rule-engine.js` (`rules:check`) |
 | One-command orchestrator — chains explore→creation→execution with checkpoints | `/qa-run` (conductor only, doesn't modify the 3 skills it chains) |
 | Static 0–100 quality gate on generated specs (flaky/secrets/missing-expect/unawaited/empty) | `/spec-quality` (read-only, pure regex, optional gate before `/test-case-execution`) |
