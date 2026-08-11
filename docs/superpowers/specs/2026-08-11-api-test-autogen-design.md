@@ -26,7 +26,7 @@ Lightweight React+Express app: paste a Jira Epic key + base URL → button trigg
 Browser (React)                Express server                  External
 ─────────────────              ───────────────                 ────────
 Epic key + baseUrl form
-  → POST /api/run  ─────────→  src/jiraFetch.ts        ──→  Atlassian MCP
+  → POST /api/run  ─────────→  src/jiraFetch.ts        ──→  Jira REST API v3
                                   (raw AC text)
                                 → src/collectionGen.ts  ──→  GROQ API
                                   (Postman Collection v2.1 JSON)
@@ -45,7 +45,7 @@ Server holds the same 3 pipeline functions as originally scoped; only the entry 
 
 | File | Responsibility | Depends on |
 |---|---|---|
-| `server/jiraFetch.ts` | Fetch Epic description text via Atlassian MCP `getJiraIssue` | Atlassian MCP (same connection existing skills use, no new auth) |
+| `server/jiraFetch.ts` | Fetch Epic description text via Jira REST API v3 (basic auth: email + API token), same pattern as `qabuddy/tools/jiraClient.js` (ADF description flattener reused as a pattern, not imported) | Jira Cloud base URL + email + API token (own `.env`) |
 | `server/collectionGen.ts` | Prompt GROQ to emit valid Postman Collection v2.1 JSON (requests + `pm.test()` assertions per AC) | GROQ API key (own `.env`, not shared with `agent-factory-cli`'s) |
 | `server/runner.ts` | Run the collection via `newman.run()` Node API, htmlextra reporter | `newman`, `newman-reporter-htmlextra` npm packages |
 | `server/index.ts` | Express app — `POST /api/run` orchestrates the 3 steps, `GET /reports/*` static-serves report HTML | the above 3, `express` |
@@ -79,4 +79,4 @@ Manual smoke test first: hand-written fake Epic description text against a publi
 
 ## Open Questions
 
-None — all resolved during brainstorming (input source: Jira Epic only; AI provider: GROQ; runner: Newman; defect filing: none; interface: minimal React+Express UI, superseding the initial CLI-only decision).
+None — all resolved during brainstorming (input source: Jira Epic only; AI provider: GROQ; runner: Newman; defect filing: none; interface: minimal React+Express UI, superseding the initial CLI-only decision). **Corrected during plan-writing:** initial draft said "Atlassian MCP" for Jira access — wrong, MCP tools only exist inside a Claude Code session and can't be called from a standalone Express server. Fixed to Jira REST API v3 direct call (same pattern as `qabuddy`/`testplanbuddy`), needs its own email+token in `.env`.
