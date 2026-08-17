@@ -20,6 +20,7 @@ Git remote: `https://github.com/forjenkins26-sys/Claude_Code_masterclass.git`
 | `teststrategbuddy/` | TestStrategyBuddy — React+Express, Jira→GROQ→10-section QA strategy | npm (client + server) |
 | `AI Agents_N8n/` | n8n workflow JSON exports — 5 AI agent workflows (ChitChat, Jira Bug, PRD→Excel x2, E2E) | n8n import |
 | `QA Portfolio/` | Portfolio site — Vercel deploy, own `CLAUDE.md`, live at `anand-soni-qa-portfolio.vercel.app` | static + Vercel |
+| `RAG/Basic_Rag/app/` | RAG Explorer — visual RAG pipeline demo (PDF→chunk→Nomic embed→ChromaDB→retrieve top-4→Groq answer), FastAPI + React/Vite/Tailwind | pip + npm |
 | `scripts/` | Workspace-level scripts — `fetch-local-page.js`, `generate_portfolio.py`, `testplan/` | node / python |
 | `blinkit-login.html` + `blinkit-products.html` + `blinkit-checkout.html` | Local demo app — served at `localhost:7000` | Python `http.server` |
 | `registration-demo.html` | Registration demo for SCRUM-142 | Python `http.server` |
@@ -94,6 +95,13 @@ vercel deploy --prod --yes     # deploy to production
 cd testplanbuddy
 node server.js
 cd client && npm run build && cd .. && vercel deploy --prod --yes
+
+# RAG Explorer (local dev)
+cd "RAG/Basic_Rag/app/backend"
+.venv\Scripts\activate
+uvicorn main:app --reload --port 8000   # auto-ingests data/pdf on startup + watches folder
+cd "RAG/Basic_Rag/app/frontend"
+npm run dev                             # Vite on :5173, proxies /api -> :8000
 ```
 
 ## Hard Rules (always active)
@@ -310,7 +318,7 @@ scripts/
 | File | Purpose | Updated by |
 |---|---|---|
 | `findings.md` | Environment discoveries, constraints, research | Manual + Blueprint phase |
-| `progress.md` | Execution run log — date+time, pass/fail, bugs | `/test-case-execution`, `/test-case-creation` |
+| `progress.md` | Execution run log — date+time, pass/fail, bugs | `/test-case-execution`, `/test-case-creation`, `/test-closure` |
 | `rca-log.md` | Per-bug RCA — severity, root cause, fix | `/bug-triage`, `/create-bug`, `/explore` |
 | `task_plan.md` | Project phases + checklists | Manual |
 
@@ -325,6 +333,7 @@ scripts/
 - `karpathy-guidelines` skill — coding-discipline guardrail, 5 guidelines (Think Before Coding / Simplicity First / Surgical Changes / Goal-Driven Execution / **Adopt for Our Pain not to Match Others**). Wired into `test-case-execution` Step 5B + AUTO-FIX Rules 16 & 17. Guideline 5 = decision-level over-engineering check (don't adopt an external repo's feature unless it's OUR pain)
 - `knowledge-base/<PROJECT>/` — persistent product memory (adapted from imransdet/qa-assistant): `business-rules.md` (bug-vs-intended oracle, `BR-xx`), `known-defects.md` (dedup), `feature-map.md` (regression blast radius), `product-flows.md`. Loaded by `test-case-creation` Step 1A + `test-case-execution` Step 0. Drives AH Rule 25 Confirmed/Suspected bug tiers. See `knowledge-base/GUIDE.md`
 - **New qa-ai-stack skills (this session):** `/qa-run` (one-command orchestrator — chains explore→creation→execution, checkpoints between; conductor only, modifies no core skill) · `/spec-quality` (static 0–100 spec scorer — flaky/secrets/missing-expect/unawaited/empty; read-only, pure regex; from vperambu ReviewerAgent) · `/guard` (installs local `.git/info/exclude` + pre-commit hook so private stack files never push to a company repo; refuses on the stack repo itself). The qa-ai-stack `rules/framework-rule-engine.json` also carries an optional **selector gatekeeper** (forbid XPath/class/positional/dynamic-id in `*Page.ts` — from mvsaran Agent-Driven-E2E) — NOT applied to this workspace's frameworks (no locator pain here; karpathy Guideline 5)
+- `council` skill — 5-role adversarial council (Contrarian/First Principles/Expansionist/Outsider/Executor + chairman synthesis) for STRATEGY/BUSINESS decisions only (pricing, positioning, pivot-or-stay across QA Buddy/TestPlanBuddy/TestStrategyBuddy). Distinct from `devil` (single Contrarian voice, decision layer) and `doubt-driven-development` (adversarial review, code/technical layer) — neither does multi-role synthesis. Explicitly NOT for code review, factual lookups, or simple yes/no (karpathy Guideline 5: adopted for a real gap — no existing skill covered business-strategy decisions — not to match the external "LLM Council" pattern feature-for-feature)
 
 ## Knowledge Base (persistent product memory)
 
@@ -338,6 +347,8 @@ knowledge-base/
     feature-map.md      ← Login→Products→Checkout→Order Details deps + blast radius
     product-flows.md    ← Blinkit purchase flow, Order Details status states
 ```
+
+**Closure flow (STLC phase 7):** `/test-closure {EPIC}` reads the latest `/test-case-execution` block in `progress.md` (join key = Test ID) + Epic ACs from Jira + KB → traceability matrix → counted coverage → defect tiering via `BR-xx` → go/no-go verdict → `output/closure-{EPIC}-{date}.md`. Hard-stops if no execution block exists. Never auto-transitions the Epic — human owns sign-off.
 
 **Bug oracle flow:** `test-case-execution` loads KB first → on REAL_BUG checks `business-rules.md` → **Confirmed** (violates `BR-xx`, cite it) or **Suspected** (`[SUSPECTED]` prefix) → checks `known-defects.md` for dedup before JQL/filing → after filing proposes new defect row (Step 7C compounding memory).
 
@@ -393,3 +404,10 @@ knowledge-base/
 | 2026-07-01 | `/spec-quality` skill — static 0–100 spec scorer (flaky/secrets/missing-expect/unawaited/empty), pure regex, CI-gate exit code; from vperambu ReviewerAgent | `qa-ai-stack/skills/spec-quality/` |
 | 2026-07-01 | Selector gatekeeper (optional) added to qa-ai-stack rule-engine config (forbid XPath/class/positional/dynamic-id in `*Page.ts`, from mvsaran) — NOT applied to workspace frameworks (no locator pain; reverted after Guideline-5 review) | `qa-ai-stack/rules/framework-rule-engine.json` |
 | 2026-07-01 | karpathy Guideline 5 added — "Adopt for Our Pain, Not to Match Others" (decision-level over-engineering check). Wired reference in CLAUDE.md | `~/.claude/skills/karpathy-guidelines/`, `qa-ai-stack/skills/`, `CLAUDE.md` |
+| 2026-07-11 | Heal agent verify-after-patch — CLI `--apply` path (`heal.agent.ts`) now re-runs the spec post-patch and auto-reverts from `.bak` on red, matching the Claude Code subagent's existing verify step (AUTO-FIX Rule 17, maker≠checker). New `HealVerdict.verified` field. Synced to `qa-ai-stack` portable copy | `agent-factory-cli/ai-agents/heal/`, `agent-factory-cli/ai-agents/core/types.ts`, `qa-ai-stack/agent-factory/ai-agents/heal/`, `qa-ai-stack/agent-factory/ai-agents/core/types.ts` |
+| 2026-07-16 | `test-case-creation` Step 1B added — spec-level dedup scan (glob+grep existing `.spec.ts` for feature overlap) before scenario generation, additive to Step 6's Jira-level dedup. Gap found comparing against alan-Khadir/jira-to-playwright-agent (Guideline 5: adopted for real observed pain, not to match) | `~/.claude/skills/test-case-creation/SKILL.md` |
+| 2026-07-16 | `council` skill added — 5-role adversarial council (Contrarian/First Principles/Expansionist/Outsider/Executor + chairman synthesis) scoped to strategy/business decisions only (pricing, positioning, pivot-or-stay across QA Buddy/TestPlanBuddy/TestStrategyBuddy). Distinct from `devil` (single voice) and `doubt-driven-development` (code layer) — adapted from the public "LLM Council" pattern for a real gap, not feature parity | `~/.claude/skills/council/SKILL.md`, `CLAUDE.md` |
+| 2026-07-20 | RAG Explorer built — full-stack RAG pipeline demo. FastAPI backend (folder-watch + manual upload ingestion, pypdf extraction, local `nomic-embed-text-v1.5` via sentence-transformers, ChromaDB persistent store, Groq `llama-3.3-70b-versatile` grounded answers) + React/Vite/Tailwind dark-theme UI (6-step pipeline tracker, ingestion panel with embedding preview + chunk browser, query panel with example pills + augmented-prompt inspector + match% badges) | `RAG/Basic_Rag/app/` |
+| 2026-08-10 | `test-case-creation` Mode C added — doc-driven test generation via existing RAG Explorer backend (upload spec PDF/txt/md/xlsx → chunk+embed+retrieve → same Step 2-8 pipeline as Mode A, Source column cites `Doc {file} p.{page} chunk#{N}`). Gap: no path existed for requirements living in an uploaded doc instead of a Jira Epic. Idea sourced from GurleenKor/RAGTestCaseGenerator (repo was README-only, no code — reused our own `RAG/Basic_Rag/app/backend` instead of building fresh, Guideline 5) | `~/.claude/skills/test-case-creation/SKILL.md` |
+| 2026-08-17 | `test-case-creation` Step 1C added — requirement gap scan against 5-dimension checklist (Functional / Data+Env / Non-functional / Cross-cutting / Clarity), scored ✅present ⚠️ambiguous ❌missing, mode-aware (A+C run, B skips), KB-cross-checked (a ❌ answered by a `BR-xx` is not a gap). ⚠️/❌ rows merge into Step 7 gap report on the requirement-completeness axis (Step 7's own axis = requirement-vs-UI). New rule: **a missing AC is a finding, not a blank to fill** — never close a ❌ by invention. Gap: nothing checked whether the requirement source was complete enough to test from; non-functional ACs (perf/authz/a11y/i18n/audit) were silently dropped and invisible. Checklist adapted from govardhanrekha/QA-Skill.md-files (their strongest artifact; their mandatory-human-gate-per-skill deliberately NOT adopted — exists because their pack has no runner, ours has AUTO-FIX Rule 17 verify, Guideline 5) | `~/.claude/skills/test-case-creation/SKILL.md`, `~/.claude/skills/test-case-creation/assets/requirement-gap-checklist.md` |
+| 2026-08-17 | `/test-closure` skill added — STLC closure phase (previously absent). Builds AC→test traceability matrix joined on Test ID from `progress.md` execution rows, computes **counted** coverage (`n/m`, never estimated), tiers defects Confirmed/`[SUSPECTED]` via KB `BR-xx` oracle, issues 🟢GO/🟡GO-WITH-RISK/🔴NO-GO with trigger rule + what-would-change-it. Hard stop if no execution block exists (unrun suite = 0% coverage, not 100%). Non-functional coverage reported in a separate table so perf/authz/a11y can't silently read 100%. Never auto-transitions Epic to Done — human owns release sign-off. Verified by parsing real SCRUM-255 data: 13 rows / 12 PASS / 1 FAIL / `Bug: SCRUM-269` extracted / BR-01..BR-12 oracle present | `~/.claude/skills/test-closure/SKILL.md`, `progress.md` |

@@ -1,6 +1,6 @@
 ---
 name: test-case-creation
-description: Generate requirements-driven test cases from Jira Epic + UI locator analysis. Epic/requirements = source of truth for expected behavior (assertions). UI analysis = locator discovery only. Outputs markdown table or creates directly in Jira via MCP. Use when user says "create test cases", "generate test scenarios", "/test-case-creation [URL]", or provides Epic + URL for testing.
+description: Generate requirements-driven test cases from Jira Epic, uploaded spec doc (RAG), or UI locator analysis. Epic/doc/requirements = source of truth for expected behavior (assertions). UI analysis = locator discovery only. Outputs markdown table or creates directly in Jira via MCP. Use when user says "create test cases", "generate test scenarios", "/test-case-creation [URL]", provides Epic + URL for testing, or hands over a spec/requirements document (PDF/txt/md/xlsx) instead of a Jira Epic.
 ---
 
 # Test Case Creation
@@ -108,6 +108,22 @@ Wait for user answer before proceeding to Step 2.
 
 ⚠️ **Mode B limitation:** Without requirements, behavioral assertions cannot be verified. All expected results tagged `[VERIFICATION REQUIRED — no requirements provided]`. Locators will be accurate; assertions will be best-effort inferences from UI observation only.
 
+#### Mode C: Doc-Driven (spec/requirements document, no Jira Epic)
+
+```
+/test-case-creation https://example.com/login spec ./requirements.pdf
+/test-case-creation http://localhost:7000/blinkit-login.html spec ./login-spec.md output jira SCRUM
+```
+
+**When to use:** Requirements exist as an uploaded document (PDF/txt/md/xlsx) instead of a Jira Epic — e.g. a PRD, spec sheet, or requirements doc that was never entered into Jira.
+
+**Inputs:**
+- Path to spec document (PDF/txt/md/xlsx — same types `RAG/Basic_Rag/app/backend/extractors.py` supports)
+- URL of feature under test
+- Output format + project key (if Jira)
+
+Same output pipeline as Mode A from Step 2 onward (locators, scenario mapping, dedup, Jira/markdown output, POM). Only Step 1A differs — see below.
+
 ---
 
 ### Step 1A: Fetch Requirements (Mode A only — MANDATORY)
@@ -148,6 +164,93 @@ Look for patterns in description:
 - "Button labeled..." → exact UI text requirement
 
 **CRITICAL:** If Epic says "button labeled 'Sign Up'" and UI shows "Sinup" — write test asserting `'Sign Up'`. Test WILL FAIL. That is CORRECT — it caught a bug.
+
+---
+
+### Step 1A-RAG: Fetch Requirements via RAG (Mode C only — replaces Step 1A)
+
+**Backend:** `RAG/Basic_Rag/app/backend` (FastAPI, already built — do not rebuild). Must be running:
+```bash
+cd "RAG/Basic_Rag/app/backend"
+.venv\Scripts\activate
+uvicorn main:app --reload --port 8000
+```
+If not running, start it first (or ask user to).
+
+**1. Upload the spec doc:**
+```bash
+curl -F "file=@./requirements.pdf" http://localhost:8000/api/upload
+```
+This chunks (800 chars, 120 overlap) + embeds (Nomic `nomic-embed-text-v1.5`) + stores in ChromaDB. Response gives `{source, pages, chunks}` — confirm `chunks > 0` before proceeding.
+
+**2. Retrieve requirement chunks relevant to the feature under test.** Query per functional area (not one giant query — narrower queries retrieve more precisely):
+```bash
+curl -X POST http://localhost:8000/api/query -H "Content-Type: application/json" \
+  -d '{"question": "What are the validation rules and error messages for the login form?", "top_k": 6}'
+```
+Repeat with 2-4 targeted questions covering: field validation rules, error message text, success/navigation behavior, security/access rules — whatever the feature under test needs. Each response returns `chunks[]` (with `source`, `page`, `content`, `similarity`) and a synthesized `answer`.
+
+**3. Extract acceptance-criteria-equivalent statements from retrieved chunks** — same parsing patterns as Step 1A (Mode A): "must", "should", "error message shows...", "navigates to...", exact UI text requirements. Use the raw `chunk.content` text, not the synthesized `answer` field, as the assertion source — the answer is a paraphrase; the chunk is the traceable original.
+
+**Source citation format (replaces "Epic SCRUM-XX AC line N"):**
+`Doc {filename} p.{page} chunk#{chunk_number}` — e.g. `Doc requirements.pdf p.3 chunk#7`.
+
+**Low-confidence retrieval:** if `similarity < 0.5` for the top chunk on a query, the doc likely doesn't cover that functional area — treat as a requirement gap (Step 7), don't force an assertion from a weak match.
+
+**CRITICAL (same rule as Mode A):** if the doc says the button is labeled "Sign Up" and the UI shows "Sinup" — write the test asserting `"Sign Up"`. Test WILL FAIL. That is correct — it caught a bug.
+
+Then continue to Step 1B (dedup scan) and Step 2 exactly as Mode A does.
+
+---
+
+### Step 1C: Requirement Gap Scan (MANDATORY, Mode A and Mode C, before scenario generation)
+
+**Why:** Step 7 catches requirement-vs-UI mismatches, but only AFTER test cases exist. Nothing currently checks whether the requirement source is *complete enough to test from* in the first place. Non-functional ACs (perf, authz, a11y, i18n, audit) are the ones silently dropped — the Epic never mentions them, so no scenario is ever generated, and the gap is invisible.
+
+**Run the checklist:** `assets/requirement-gap-checklist.md` — 5 dimensions (Functional / Data & Environment / Non-functional / Cross-cutting / Clarity), each row scored ✅ present · ⚠️ ambiguous · ❌ missing.
+
+Score against whatever the requirement source is for this mode:
+- **Mode A** — the Epic ACs fetched in Step 1A
+- **Mode C** — the retrieved doc chunks from Step 1A-RAG (score the `chunk.content` text, not the synthesized answer)
+- **Mode B** — skip entirely. No requirement source exists; everything is already `VERIFICATION REQUIRED`.
+
+**Cross-check against the KB before calling anything a gap:** a ❌ that `knowledge-base/<PROJECT>/business-rules.md` already answers with a `BR-xx` rule is NOT a gap — cite the `BR-xx` as the assertion baseline and score it ✅ (KB-sourced). Only genuinely unanswered rows are real gaps.
+
+**What each score produces:**
+
+| Score | Action |
+|---|---|
+| ✅ | Normal scenario generation (Step 3), assertion cites the AC / chunk / `BR-xx` |
+| ⚠️ | Generate the scenario, flag it `AMBIGUOUS`, add a question for the ticket author to Step 7 |
+| ❌ | **Generate nothing.** Add a gap row + question for the ticket author to Step 7 |
+
+**CRITICAL — a missing AC is a finding, not a blank to fill.** Never invent a requirement to close a ❌, and never write an assertion whose expected value came from your own inference. If the requirement source doesn't state the expected behavior, the gap IS the deliverable. This is AH Rule 4 territory — where a test is still warranted despite the gap, mark it `// VERIFICATION REQUIRED`.
+
+Carry the scored rows forward to Step 7 — they merge into the same Requirement Gap Report, on a different axis (requirement completeness) from Step 7's own (requirement vs UI).
+
+---
+
+### Step 1B: Spec-Level Dedup Scan (MANDATORY, Mode A and Mode C, before scenario generation)
+
+**Why:** Step 6's Jira JQL dedup only catches duplicate Jira issues under the same Epic, and only runs AFTER test cases are already generated. It's blind to overlapping coverage already sitting in `.spec.ts` files — e.g. a shared control like login or cart, tested once under SCRUM-121, hit again by a later Epic touching the same page.
+
+**Scan existing specs for the same feature area:**
+
+```
+Glob: Playwright Automation Framework/tests/ui/*.spec.ts
+Grep: test\(|describe\(  → list existing test titles in any file matching this Epic's feature/page name
+```
+
+Match by **page/feature name** (e.g. Epic targets `blinkit-login.html` → check `blinkit-login.spec.ts`), not exact title wording.
+
+**If overlapping coverage found:**
+- List existing test IDs + titles already covering the same control/scenario.
+- Do NOT regenerate those scenarios — note them in the Coverage Summary as `Already covered by {ID} in {spec file}`.
+- Only generate NEW scenarios: controls/ACs this Epic adds that the existing spec doesn't cover, or edge cases missing per the Step 3A matrix.
+
+**If no existing spec matches the feature** → continue normally, no overlap.
+
+Additive to Step 6's Jira-level dedup, not a replacement — Step 6 still runs at Jira-creation time.
 
 ---
 
@@ -289,6 +392,7 @@ All behavioral expected results tagged: `[VERIFICATION REQUIRED — verify again
 **New column: Source** — MUST be traceable to exact Epic section, not just Epic key:
 - `Epic SCRUM-XX AC line N` — expected result traced to specific AC line (RICEPOT Context — C)
 - `Epic SCRUM-XX — description para N` — traced to Epic description paragraph
+- `Doc {filename} p.{page} chunk#{N}` — traced to spec doc chunk (Mode C)
 - `UI Observed` — expected result inferred from UI only (needs verification, Mode B)
 - `Security Standard` — standard security test (always applicable regardless of Epic)
 
@@ -296,6 +400,7 @@ All behavioral expected results tagged: `[VERIFICATION REQUIRED — verify again
 
 - **Mode A:** Quote exact text from Epic requirement. e.g., `"✅ OTP sent to +91 [mobile]"` not `"success toast appears"`
 - **Mode B:** Describe observed behavior + tag: `Toast appears [VERIFICATION REQUIRED]`
+- **Mode C:** Quote exact text from the retrieved chunk, same as Mode A. Low-similarity retrieval (`<0.5`) → treat as requirement gap, not a forced assertion.
 
 **If requirement is ambiguous:** Write test with placeholder: `[REQUIREMENT NEEDED: what should happen?]` — forces requirement gap to surface.
 
@@ -568,6 +673,21 @@ Compare:
 | UI element exists, no requirement | Button in UI not mentioned in Epic | Flag: undocumented feature, test with "VERIFICATION REQUIRED" |
 | Requirement text ≠ UI label | Epic: "Sign Up" button, UI: "Sinup" | Write test against requirement text — WILL FAIL — correct |
 
+**Merge in the Step 1C gap scan (requirement-completeness axis):**
+
+Every ⚠️ and ❌ scored in Step 1C becomes a row here. Same report, second axis — Step 1C asks *"is the requirement complete enough to test from"*, the table above asks *"does the requirement match the UI"*.
+
+```markdown
+### Requirement Completeness Gaps (Step 1C)
+
+| Dimension | Row | Score | Question for ticket author |
+|---|---|---|---|
+| Non-functional | Security / authorization | ❌ | Which roles can cancel an order? AC doesn't say. |
+| Clarity | No ambiguous wording | ⚠️ | AC line 4 says "handle gracefully" — what is the observable pass/fail? |
+```
+
+Report ❌ rows even when no test case was generated for them — an untested dimension nobody flagged is the failure mode this step exists to prevent.
+
 ---
 
 ### Step 8: Add Notes Section (Markdown output only)
@@ -590,6 +710,8 @@ Before finishing:
 - ✅ **RICEPOT P enforced:** AH Rules 17/18/19/20 applied — can cite which rule prevented which mistake
 - ✅ **RICEPOT O enforced:** Source column has Epic line reference (not just Epic key) for every assertion
 - ✅ **RICEPOT T enforced:** Jira descriptions follow strict template — no prose, no filler
+- ✅ Mode A: Step 1B spec-level dedup scan run before scenario generation — overlaps noted, not regenerated
+- ✅ Mode A/C: Step 1C requirement gap scan run — 5 dimensions scored, ⚠️/❌ carried into Step 7, no ❌ closed by invention
 - ✅ Mode A: Every behavioral expected result traced to exact Epic AC line (Source column)
 - ✅ Mode B: All behavioral assertions tagged `[VERIFICATION REQUIRED]`
 - ✅ UI analysis used ONLY for locators, not for expected behavior (Mode A)
@@ -636,6 +758,12 @@ Do NOT overwrite — always append.
 ```
 /test-case-creation https://example.com/login
 /test-case-creation app.vwo.com create in jira project VWO
+```
+
+**Doc-driven via RAG (Mode C — spec doc instead of Jira Epic):**
+```
+/test-case-creation https://example.com/login spec ./requirements.pdf
+/test-case-creation http://localhost:7000/blinkit-login.html spec ./login-spec.md output jira SCRUM
 ```
 
 **Full pipeline:**
@@ -730,3 +858,7 @@ If a follow-up question only offers a subset, still report a verdict for the omi
 ❌ **Don't:** Rely on memory / ad-hoc judgement to decide which edge, boundary, and negative cases to write. That makes the QA keep asking "did you check max? empty submit? manual entry? min−1?" — coverage becomes a function of who remembers what, not a system.
 ✅ **Do:** Walk the **Step 3A Edge-Case Coverage Matrix (AH Rule 29)** for EVERY control found in the DOM, and tag each case with its formal technique — **BVA** (min/min−1/max/max+1/empty), **ECP** (one rep per valid+invalid partition), **Negative**, **State transition**, **Security**, **Exploratory/out-of-the-box** (undocumented behaviour found by probing, e.g. "is the qty field editable?", "is there any max cap?"). Emit a verdict per cell (Added / Fixme-gap / N/A) — never skip one silently (Lesson #7). The matrix decides WHICH cases; the Epic still decides the expected result (AH Rule 19). A cell with no Epic oracle → fixme requirement-gap subtask with the observed behaviour recorded.
 *(Lesson #8 — 2026-06-29: QA asked "why no rule for these case types? how do I stop having to ask?" and "can we frame them as BVA/ECP/out-of-the-box?". Answer: a standing technique-tagged matrix walked per control, so coverage no longer depends on the QA enumerating cases.)*
+
+❌ **Don't:** Only dedup at the Jira-issue level (Step 6, JQL on the parent Epic) — that check fires AFTER scenarios are already generated, and misses overlap with existing `.spec.ts` coverage from an EARLIER Epic touching the same page/control (e.g. login re-tested under two different Epics because Step 6 only looks at siblings under the SAME parent).
+✅ **Do:** Run **Step 1B — Spec-Level Dedup Scan** right after the Epic is fetched (Step 1A), before scenario generation (Step 3): glob+grep existing `tests/ui/*.spec.ts` for the feature/page name, list what's already covered, generate only the delta. Additive to Step 6, not a replacement — Step 6 still guards Jira-issue idempotency at creation time.
+*(Lesson #9 — 2026-07-16: gap found comparing against an external Jira-to-Playwright agent that scans `tests/features/` before generating, to avoid duplicate feature logic. Adopted because it closes a real observed pain — near-duplicate TCs across SCRUM-68/85/86/121/255 — not to match the external tool feature-for-feature.)*
