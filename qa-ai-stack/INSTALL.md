@@ -132,3 +132,63 @@ Edit `settings-hooks.json`:
 - Replace `<YOUR_PROJECT_PATH>` with absolute path to Playwright project
 
 That's it. Full AI QA automation live in 10 minutes.
+
+
+## New E2E project from scratch (copy-paste)
+
+Everything a project needs so the 4-step flow works identically every time.
+
+```bash
+PROJ=my-e2e-project
+JIRA=SCRUM                      # your Jira project key
+STACK=/path/to/qa-ai-stack
+
+mkdir -p $PROJ/src/pages $PROJ/src/fixtures $PROJ/tests/ui $PROJ/scripts $PROJ/knowledge-base
+cd $PROJ
+
+# REQUIRED - loaded by path, fails SILENTLY if absent
+cp -r $STACK/knowledge-base/_TEMPLATE knowledge-base/$JIRA
+cp $STACK/knowledge-base/GUIDE.md knowledge-base/
+
+# REQUIRED - localhost DOM fetcher (WebFetch cannot reach localhost)
+cp $STACK/scripts/fetch-local-page.js scripts/
+
+# REQUIRED - per-run outputDir + Allure (AH Rule 31)
+cp $STACK/playwright.config.template.ts playwright.config.ts
+cp $STACK/tsconfig.template.json tsconfig.json
+cp $STACK/gitignore.template .gitignore
+
+# REQUIRED - project constitution; replace every {PLACEHOLDER}
+cp $STACK/CLAUDE.template.md CLAUDE.md
+
+# OPTIONAL - long-form reference (rules are already inlined in the skills)
+cp $STACK/ANTI-HALLUCINATION-RULES.md $STACK/AUTO-FIX-PROTOCOL.md .
+
+npm init -y
+npm i -D @playwright/test @types/node typescript
+npm i -D allure-playwright          # optional, for /test-closure Step 4B
+npx playwright install chromium
+```
+
+Then merge the scripts from `package-scripts.json` into `package.json`, and edit `CLAUDE.md`: app URL, Jira project + Epic key, and the hard rules.
+
+**Verify before the first run:**
+
+```bash
+ls knowledge-base/$JIRA/          # 4 files - REQUIRED
+grep headless playwright.config.ts # must be false (AH Rule 17)
+node scripts/fetch-local-page.js <your-url>   # must return real element ids
+```
+
+**What is REQUIRED vs OPTIONAL**
+
+| Item | Required? | Why |
+|---|---|---|
+| `knowledge-base/<JIRA_PROJECT>/` | **YES** | Loaded by path; missing = silent loss of bug tiers + dedup |
+| `CLAUDE.md` | **YES** | App URL, Jira key, hard rules |
+| `playwright.config.ts` (from template) | **YES** | Headed mode + per-run `outputDir` (AH Rule 31) |
+| `scripts/fetch-local-page.js` | Only for localhost | WebFetch cannot reach localhost |
+| `ANTI-HALLUCINATION-RULES.md` / `AUTO-FIX-PROTOCOL.md` | No | Rules are inlined in each SKILL.md; these are reference |
+| Skills | Never copy | Global at `~/.claude/skills/`, travel to every project |
+
+---
