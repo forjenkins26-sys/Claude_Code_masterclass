@@ -1,7 +1,7 @@
 # Anti-Hallucination Rules
 
 **Author:** Anand Soni  
-**Updated:** 2026-07-08 · 30 rules (numbered by creation order, not sequence)
+**Updated:** 2026-08-18 · 32 rules (numbered by creation order, not sequence)
 
 ---
 
@@ -556,3 +556,67 @@ Recall says defect = SCRUM-269 → getJiraIssue confirms status=Open → dedup a
 
 **Lesson (2026-07-08):** Recalled facts appear inside `<system-reminder>` memory blocks as background context — true *when written*, not necessarily now. Reviewing the anti-hallucination ruleset surfaced the one gap the set didn't cover: it guarded against inventing facts from nothing, but not against trusting a stale fact from its own memory. Rule 30 closes the KB feedback-loop risk (identified while mapping the stack against Himanshu Agarwal's "AI Hallucination Architecture" — the "Feedback Loop Risk: hallucinated outputs get logged, retrieved, and fed back into the system").
 
+
+---
+
+## Rule 31 — Harvest evidence BEFORE any second run (execution artefacts are destroyed on re-run)
+
+**Applies to:** `/test-case-execution`, any skill that runs Playwright more than once in a session.
+
+Playwright **wipes `test-results/` at the start of every run**. Any targeted follow-up run — `--grep "BL-010"`, `--repeat-each=3`, a single-test debug — destroys the screenshots, videos, and traces of every test that is not part of that run.
+
+The failure mode: run the suite → 15 pass with screenshots → run one test to debug → the 15 screenshots are gone → no evidence for 15 green Jira tickets → forced to re-run the whole suite to regenerate them. Client sees the suite execute twice and reads it as instability.
+
+❌ DON'T:
+```
+npx playwright test <spec> --headed              # 18 results, screenshots in test-results/
+npx playwright test <spec> --grep "BL-010"       # ← just destroyed 17 of them
+```
+
+✅ DO — copy artefacts out of `test-results/` immediately after the first full run, before any targeted run:
+```bash
+npx playwright test <spec> --headed --reporter=list
+# HARVEST FIRST — before any other playwright invocation
+mkdir -p screenshots/<EPIC>
+# copy + rename each test's png to screenshots/<EPIC>/<ISSUE>_<TID>_<slug>_<PASS|FAIL>.png
+# only now run targeted debug / repeat-each runs
+```
+
+**Rules:**
+- The first full run is the **evidence run**. Harvest before touching Playwright again.
+- Targeted runs (`--grep`, `--repeat-each`) are diagnostic only — never the source of record.
+- If a spec changed after the evidence run, ONE final full run re-establishes the record. That is legitimate; state why in the summary so it never reads as flakiness.
+- **Demo discipline:** a client-facing run should execute the suite ONCE. Budget one clean full run, harvest, then do all analysis from the harvested artefacts.
+
+**Lesson (2026-08-18):** SCRUM-318 execution ran the full 18-test suite twice. The second run was needed only because two targeted diagnostic runs had wiped the first run's 15 passing screenshots. Results were byte-identical both times — the re-run added zero information and cost demo credibility.
+
+---
+
+## Rule 32 — Verify your own expected value before classifying an app as buggy
+
+**Applies to:** failure classification in `/test-case-execution` (Step 5A), before REAL_BUG is assigned.
+
+AH Rule 19 says "test failing ≠ wrong test — investigate before modifying". The inverse trap is just as real: **test failing ≠ app broken.** A test can fail because the expected value was computed wrong when the test was written.
+
+Before classifying any assertion failure as REAL_BUG, re-derive the expected value from first principles and check it against the constraint the DOM actually imposes.
+
+❌ DON'T: See `expected "9876543210" / received "987654321"` → conclude the app dropped a digit → open a bug.
+
+✅ DO: Re-derive. Input `98-765@43#21` under `maxlength="10"`: the cap counts every typed character including symbols, so only the first 9 digits land. `987654321` is CORRECT app behaviour; the test's expected value was wrong.
+
+**Cheap disproof — run controls that isolate the variable:**
+| Input | Result | What it isolates |
+|---|---|---|
+| pure digits, over-length | `9876543210` | cap works on digits alone |
+| letters mixed in | `9876543` | stripping works |
+| symbols mixed in | `987654321` | symbols consume cap budget |
+
+If the controls show the app behaving consistently, the defect is in the expectation, not the app.
+
+**Rules:**
+- REAL_BUG requires the app to contradict the **requirement**, not merely the test's arithmetic.
+- Expected-value errors are TEST issues → auto-fix path (AFP), not the bug-filing path.
+- When you correct an expected value that also appears in a Jira description, **flag it for the ticket author — never silently edit the requirement** (AH Rule 19 / two-source model).
+- A wrongly-filed bug is more expensive than a wrongly-passing test: it burns dev time and damages trust in the automation.
+
+**Lesson (2026-08-18):** BL-013 (SCRUM-331) was initially triaged toward REAL_BUG. Headed controls proved the app stripped symbols correctly and the 10-char cap was doing its job — the test's expected value had not accounted for symbols consuming maxlength budget. Correct classification: TEST issue, auto-fixed.
