@@ -36,7 +36,7 @@ Please install everything:
 
 After install verify:
 - Run: npm run rules:check → should scan .ts files
-- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, bug-triage, create-bug, karpathy-guidelines, guard
+- Confirm skills exist: ~/.claude/skills/explore, test-case-creation, test-case-execution, test-closure, bug-triage, create-bug, karpathy-guidelines, guard
 - Confirm CLAUDE.md, ANTI-HALLUCINATION-RULES.md (32 rules), AUTO-FIX-PROTOCOL.md (17 rules), knowledge-base/ in project root
 - Confirm hooks in ~/.claude/settings.json: Bash matcher (ai:rca reminder) + Write|Edit matcher (rules:check)
 
@@ -53,6 +53,7 @@ Then show me the 3-step QA flow for this project.
 | `/explore` skill | Live DOM → TypeScript POM, 95% accuracy |
 | `/test-case-creation` skill | Epic AC → Jira test cases + spec file |
 | `/test-case-execution` skill | Runs tests, auto-fixes locators, files bugs, updates Jira |
+| `/test-closure` skill | AC→test traceability matrix, counted coverage, defect tiering, go/no-go verdict |
 | `/bug-triage` skill | Manual bug investigation fallback |
 | `/create-bug` skill | Manual Jira bug creation fallback |
 | `playwright-ai-mcp-tutor` skill | 3-agent Planner/Generator/Healer workflow |
@@ -80,6 +81,7 @@ User Story assigned
 2. /test-case-creation EPIC-XX ← test cases from Epic AC → Jira + spec
       ↓
 3. /test-case-execution EPIC-XX ← runs tests, auto-fixes, files bugs
+4. /test-closure EPIC-XX        ← coverage matrix + go/no-go verdict
       ↓
    ALL PASS → DONE ✅
       ↓
@@ -109,6 +111,7 @@ your-company-project/
     explore/
     test-case-creation/
     test-case-execution/
+    test-closure/
     bug-triage/
     create-bug/
     playwright-ai-mcp-tutor/

@@ -1,6 +1,6 @@
 # QA Skills Cheat Sheet
 
-> `/explore` → `/test-case-creation` → `/test-case-execution`  
+> `/explore` → `/test-case-creation` → `/test-case-execution` → `/test-closure`  
 > Full AI QA flow: POM from DOM → Test cases from Epic → Run + update Jira
 
 ---
@@ -130,6 +130,34 @@ Expected:   "#BLK-20240625-8842" visible (exact Epic text)
 
 ---
 
+## /test-closure
+
+**Trigger:** `/test-closure <EPIC-KEY>` — or "close out this epic", "are we ready to ship", "coverage report", "go/no-go", "traceability matrix"
+
+```
+/test-closure SCRUM-255
+```
+
+**What it does**
+
+| Step | Output |
+|---|---|
+| Reads latest execution block in `progress.md` | join key = Test ID |
+| Fetches Epic ACs from Jira + loads KB | requirement baseline |
+| Builds AC→test traceability matrix | which AC each test covers |
+| Computes **counted** coverage | `n/m` — never estimated |
+| Tiers open defects via `BR-xx` oracle | Confirmed / `[SUSPECTED]` |
+| Issues verdict | 🟢 GO / 🟡 GO-WITH-RISK / 🔴 NO-GO + trigger rule |
+| Writes report | `output/closure-{EPIC}-{date}.md` |
+
+**Hard stops**
+- No execution block in `progress.md` → refuses. An unrun suite is 0% coverage, not 100%.
+- Never auto-transitions the Epic to Done — a human owns release sign-off.
+
+**Non-functional coverage is reported in its own table** so perf / authz / a11y / i18n can't silently read as 100%.
+
+---
+
 ## Full E2E Flow
 
 ```
@@ -143,6 +171,12 @@ Expected:   "#BLK-20240625-8842" visible (exact Epic text)
    └─ Run tests (headed)
    └─ PASS → Done in Jira
    └─ FAIL → classify → auto-fix OR file bug → Blocked in Jira
+
+4. /test-closure <EPIC-KEY>
+   └─ AC→test traceability matrix
+   └─ Counted coverage (n/m)
+   └─ Defect tiering via BR-xx oracle
+   └─ 🟢GO / 🟡GO-WITH-RISK / 🔴NO-GO  (human signs off)
 ```
 
 ---

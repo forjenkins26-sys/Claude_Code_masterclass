@@ -43,8 +43,9 @@ The user should only ever have to say one line — or nothing at all. You guard 
 | POM/spec placement + naming enforcement | `scripts/rule-engine.js` (`rules:check`) |
 | One-command orchestrator — chains explore→creation→execution with checkpoints | `/qa-run` (conductor only, doesn't modify the 3 skills it chains) |
 | Static 0–100 quality gate on generated specs (flaky/secrets/missing-expect/unawaited/empty) | `/spec-quality` (read-only, pure regex, optional gate before `/test-case-execution`) |
+| STLC closure — AC→test traceability matrix, counted coverage, defect tiering, go/no-go verdict | `/test-closure` (reads `progress.md` execution rows + Jira + KB; hard-stops if no execution block exists; never auto-transitions the Epic) |
 
-## The 3-Step E2E Flow
+## The 4-Step E2E Flow
 
 ```
 1. /explore <url>               → live DOM → POM (defect-aware: annotates known-defect locators)
@@ -53,7 +54,12 @@ The user should only ever have to say one line — or nothing at all. You guard 
         ↓
    PASS → Done in Jira
    FAIL → BROKEN_LOCATOR (ai:heal) | REAL_BUG (file bug, Confirmed/Suspected) | FLAKY (ai:flaky) | ENV_ISSUE
+        ↓
+4. /test-closure <EPIC>         → AC→test traceability matrix → counted coverage → defect tiering
+                                  → 🟢GO / 🟡GO-WITH-RISK / 🔴NO-GO (human owns the sign-off)
 ```
+
+Steps 1–3 are the build-and-run loop. Step 4 answers *"can we ship?"* rather than *"did tests pass?"* — it reads the execution rows Step 3 wrote to `progress.md` and hard-stops if none exist (an unrun suite is 0% coverage, not 100%).
 
 ## Hard Rules (always active)
 
