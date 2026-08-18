@@ -8,7 +8,11 @@
     "ai:dashboard": "ts-node ../agent-factory-cli/ai-agents/cli.ts dashboard",
     "rules:check": "node scripts/rule-engine.js",
     "rules:changed": "node scripts/rule-engine.js --changed",
-    "rules:staged": "node scripts/rule-engine.js --staged"
+    "rules:staged": "node scripts/rule-engine.js --staged",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results"
   },
-  "_note": "agent-factory-cli must be at same level as your Playwright project folder. Update path if different."
+  "_note": "agent-factory-cli must be at same level as your Playwright project folder. Update path if different.",
+  "_allure": "Allure is OPTIONAL. Install with: npm i -D allure-playwright (and the allure CLI for generate/open). Requires the per-run RUN_ID config from playwright.config.template.ts (AH Rule 31) so each run keeps its own allure-results/ folder - that retention is what makes the trend graph work. Consumed by /test-closure Step 4B as EVIDENCE only; progress.md stays the pass/fail oracle."
 }

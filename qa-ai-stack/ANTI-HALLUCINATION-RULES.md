@@ -559,36 +559,48 @@ Recall says defect = SCRUM-269 → getJiraIssue confirms status=Open → dedup a
 
 ---
 
-## Rule 31 — Harvest evidence BEFORE any second run (execution artefacts are destroyed on re-run)
+## Rule 31 — Give every run its own output dir (artefacts are destroyed on re-run)
 
-**Applies to:** `/test-case-execution`, any skill that runs Playwright more than once in a session.
+**Applies to:** any Playwright project. This is a CONFIG fix, not a discipline fix.
 
-Playwright **wipes `test-results/` at the start of every run**. Any targeted follow-up run — `--grep "BL-010"`, `--repeat-each=3`, a single-test debug — destroys the screenshots, videos, and traces of every test that is not part of that run.
+Playwright **clears `outputDir` at the start of every invocation** — including a run whose `--grep` matches zero tests. Any targeted follow-up run destroys the screenshots, videos and traces of every test not in that run.
 
-The failure mode: run the suite → 15 pass with screenshots → run one test to debug → the 15 screenshots are gone → no evidence for 15 green Jira tickets → forced to re-run the whole suite to regenerate them. Client sees the suite execute twice and reads it as instability.
+**A `globalSetup` archive hook does NOT work.** Verified empirically: the wipe happens BEFORE `globalSetup` executes, so a hook that copies `test-results/` sees `fs.existsSync(dir) === false`. Any "archive before each run" hook is a silent no-op.
 
-❌ DON'T:
-```
-npx playwright test <spec> --headed              # 18 results, screenshots in test-results/
-npx playwright test <spec> --grep "BL-010"       # ← just destroyed 17 of them
-```
+✅ THE FIX — per-run timestamped output dirs, so no run can overwrite another:
 
-✅ DO — copy artefacts out of `test-results/` immediately after the first full run, before any targeted run:
-```bash
-npx playwright test <spec> --headed --reporter=list
-# HARVEST FIRST — before any other playwright invocation
-mkdir -p screenshots/<EPIC>
-# copy + rename each test's png to screenshots/<EPIC>/<ISSUE>_<TID>_<slug>_<PASS|FAIL>.png
-# only now run targeted debug / repeat-each runs
+```typescript
+const RUN_ID = (() => {
+  // Workers re-evaluate the config module, so a bare new Date() yields a
+  // DIFFERENT folder per process (2 runs -> 3 folders). Stamp it into the
+  // env once; workers inherit it.
+  if (!process.env.PW_RUN_ID) {
+    process.env.PW_RUN_ID =
+      process.env.RUN_ID ||
+      new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+  }
+  return process.env.PW_RUN_ID;
+})();
+
+export default defineConfig({
+  outputDir: `test-results/${RUN_ID}`,
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: `playwright-report/${RUN_ID}` }],
+    ['json', { outputFile: `test-results/${RUN_ID}/results.json` }],
+    ['allure-playwright', { resultsDir: `allure-results/${RUN_ID}` }],
+  ],
+});
 ```
 
 **Rules:**
-- The first full run is the **evidence run**. Harvest before touching Playwright again.
-- Targeted runs (`--grep`, `--repeat-each`) are diagnostic only — never the source of record.
-- If a spec changed after the evidence run, ONE final full run re-establishes the record. That is legitimate; state why in the summary so it never reads as flakiness.
-- **Demo discipline:** a client-facing run should execute the suite ONCE. Budget one clean full run, harvest, then do all analysis from the harvested artefacts.
+- Every artefact sink (outputDir, html, json, allure) gets the same `${RUN_ID}` suffix. Miss one and that sink still overwrites.
+- `RUN_ID=baseline npm test` names a run for comparison against later runs.
+- `--reporter=line` on the CLI **overrides all config reporters** — Allure and JSON produce nothing. Never pass it when you need artefacts.
+- Retained per-run dirs are what make cross-run trend reporting possible at all (Allure history, flake detection).
+- `test-results/`, `playwright-report/`, `allure-results/`, `allure-report/` all belong in `.gitignore`.
 
-**Lesson (2026-08-18):** SCRUM-318 execution ran the full 18-test suite twice. The second run was needed only because two targeted diagnostic runs had wiped the first run's 15 passing screenshots. Results were byte-identical both times — the re-run added zero information and cost demo credibility.
+**Lesson (2026-08-18):** a SCRUM-318 run executed its 18-test suite twice because two `--grep` diagnostic runs had wiped the first run's 15 passing screenshots. The first remedy written here was "harvest manually before the second run" — discipline the operator must remember. That was the wrong altitude: a per-run `outputDir` removes the failure mode entirely and makes runs comparable instead of disposable. Verified by running twice and confirming both folders survive.
 
 ---
 

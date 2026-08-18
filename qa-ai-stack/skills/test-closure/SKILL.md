@@ -171,6 +171,35 @@ State the verdict, the rule that triggered it, and what would change it.
 
 ---
 
+### Step 4B: Attach the Evidence Report (OPTIONAL — only if Allure results exist)
+
+**Skip entirely if `allure-results/` is absent.** This step never blocks closure and never becomes the oracle — `progress.md` execution rows remain the source of truth for pass/fail (Step 0).
+
+Playwright projects configured per AH Rule 31 write per-run artefacts to `allure-results/{RUN_ID}/`. When present, generate a browsable evidence report and link it from the closure report:
+
+```bash
+# one run
+npx allure generate allure-results/{RUN_ID} --clean -o allure-report/{RUN_ID}
+
+# all retained runs — enables the trend/history graph
+npx allure generate allure-results --clean -o allure-report
+```
+
+**What to pull from it (evidence only, never verdicts):**
+
+| Use for | Do NOT use for |
+|---|---|
+| Report path linked in the closure output | Deriving pass/fail — that comes from `progress.md` |
+| Per-test duration (flags slow tests worth a perf AC) | Overriding a defect tier assigned by the `BR-xx` oracle |
+| Screenshot/trace attachment links per test row | Inventing coverage a test did not actually assert |
+| Trend across retained runs (a test that flips = FLAKY candidate, AH Rule 23) | Claiming a trend from a single run |
+
+**Trend requires ≥2 retained run folders.** With one folder there is no history — say "single run, no trend available" rather than implying stability.
+
+**If `allure-results/` exists but `allure` CLI is not installed:** note `[report not generated — allure CLI unavailable]` in the closure output and continue. Never fabricate report contents or a URL.
+
+---
+
 ### Step 5: Output
 
 Write to `output/closure-{EPIC-KEY}-{YYYY-MM-DD}.md`:
@@ -180,6 +209,7 @@ Write to `output/closure-{EPIC-KEY}-{YYYY-MM-DD}.md`:
 
 **Date:** {YYYY-MM-DD} · **Cycle:** {execution run timestamp from progress.md}
 **Spec:** {spec path} · **Source:** progress.md run {timestamp}
+**Evidence report:** {allure-report/{RUN_ID}/index.html — or "not generated"}
 
 ## Verdict: {🟢 GO / 🟡 GO WITH RISK / 🔴 NO-GO}
 {trigger rule, ship risk, what would change it}

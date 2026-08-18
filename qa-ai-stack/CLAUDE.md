@@ -44,6 +44,7 @@ The user should only ever have to say one line — or nothing at all. You guard 
 | One-command orchestrator — chains explore→creation→execution with checkpoints | `/qa-run` (conductor only, doesn't modify the 3 skills it chains) |
 | Static 0–100 quality gate on generated specs (flaky/secrets/missing-expect/unawaited/empty) | `/spec-quality` (read-only, pure regex, optional gate before `/test-case-execution`) |
 | STLC closure — AC→test traceability matrix, counted coverage, defect tiering, go/no-go verdict | `/test-closure` (reads `progress.md` execution rows + Jira + KB; hard-stops if no execution block exists; never auto-transitions the Epic) |
+| Per-run artefact retention + optional Allure evidence report | `playwright.config.template.ts` (AH Rule 31 `RUN_ID` pattern) + `/test-closure` Step 4B |
 
 ## The 4-Step E2E Flow
 
@@ -71,6 +72,7 @@ Steps 1–3 are the build-and-run loop. Step 4 answers *"can we ship?"* rather t
 6. **Dedup before filing** — check `knowledge-base/<PROJECT>/known-defects.md` then JQL before any new bug (AH Rule 21/25)
 7. **Confidence tiers** — REAL_BUG that violates a `BR-xx` rule = **Confirmed** (cite it); heuristic only = **Suspected** (AH Rule 25)
 8. **pressSequentially() not fill()** for constraint tests (maxlength/pattern) — `fill()` bypasses browser enforcement (AH Rule 18)
+8b. **Per-run `outputDir`** — copy `playwright.config.template.ts`. Playwright wipes `outputDir` on EVERY invocation (before `globalSetup`, so an archive hook is a no-op). Without the `RUN_ID` pattern a targeted `--grep` run destroys the previous run's evidence (AH Rule 31)
 9. **Never invent** — selectors, BR-xx rules, error text, URLs. Every assertion + rule traces to a real source (Epic AC, filed bug, observed+verified)
 10. **Stay in command scope** — produce only the command's defined deliverable; no bonus files/steps. Scope creep = scope hallucination (AH Rule 26)
 11. **URL scope** — `/explore` + `/test-case-creation` cover only the given URL. Same-URL states (dropdowns/modals/tabs) are IN; a click that changes the URL is OUT. For a link/button that navigates away, write ONE navigation test (assert destination) but never cover the destination page's contents — that's a separate run (AH Rule 27 / explore Lesson #6 / test-case-creation Lesson #2)
