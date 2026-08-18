@@ -200,6 +200,30 @@ npx allure generate allure-results --clean -o allure-report
 
 ---
 
+### Step 4C: Auto-Open the Evidence Report (MANDATORY when Step 4B generated a report)
+
+Closure is not finished until the human can SEE the evidence. A path in a markdown file is not evidence delivered — the report must be open in a browser tab by the time the summary is reported.
+
+**Run as the LAST action of the closure run**, after the report file is written (Step 5) and `progress.md` is appended:
+
+```bash
+npx allure open allure-report --port 8800    # background it — the server blocks
+```
+
+`allure open` starts a local web server AND launches the default browser at that URL. Both are required: Allure is a single-page app that fetches `widgets/*.json` over HTTP, so opening `index.html` from `file://` renders a blank page. Never hand the user a raw `file://` path or tell them to double-click `index.html`.
+
+**Rules:**
+- Run it **backgrounded** — the server stays alive for the session; a foreground call hangs the run.
+- Verify it actually came up before reporting success: `curl -s -o /dev/null -w "%{http_code}" http://localhost:8800/` → expect `200`. Never claim the report opened without this check.
+- **Port in use?** Increment (8801, 8802…) and retry once. Report the port actually used.
+- Prefer the **aggregate** report (`allure-report/`, all retained runs) — it carries the trend graph. Fall back to the per-run folder if only that exists.
+- Always print the live URL in the summary, so the user can reopen it after closing the tab.
+- **Never block closure on this.** If the server fails to start, report `[report generated but not served — {reason}]` plus the manual command, and continue. The verdict does not depend on it.
+
+**Check the npm script target before using it.** `npm run allure:open` may point at `allure-report/` while Step 4B generated `allure-report/{RUN_ID}/` — mismatched paths fail. Either generate the aggregate first (`npm run allure:generate`) or call `npx allure open` on the folder that actually exists.
+
+---
+
 ### Step 5: Output
 
 Write to `output/closure-{EPIC-KEY}-{YYYY-MM-DD}.md`:
@@ -255,6 +279,7 @@ Before finishing:
 - ✅ Verdict states its trigger rule + what would change it
 - ✅ Orphan tests listed, not dropped
 - ✅ Appended to `progress.md`
+- ✅ **Allure report auto-opened (Step 4C)** — server verified `200`, live URL printed in the summary. If it couldn't be served, the reason and the manual command are stated.
 
 ## BLAST Progress Logging
 
@@ -292,3 +317,13 @@ Do NOT overwrite — always append.
 | Soften NO-GO because the team wants to ship | State the verdict and its trigger |
 | Auto-transition the Epic to Done | Recommend; human signs off |
 | Drop a test that maps to no AC | List it as an orphan |
+
+## Lessons
+
+❌ **Don't:** End a closure run with only a file path to the Allure report in the markdown output. A path is not delivered evidence — the user has to hunt for it, and `file://` on `index.html` renders a blank page because Allure fetches `widgets/*.json` over HTTP. Also don't assume `npm run allure:open` matches whatever Step 4B generated; the script may target `allure-report/` while the run produced `allure-report/{RUN_ID}/`.
+✅ **Do:** Auto-open the report as the final action of every closure run (Step 4C) — `npx allure open allure-report --port 8800`, backgrounded, verified with a `200` check, live URL printed in the summary. Generate the aggregate first if the npm script points there. Never block the verdict on it: if serving fails, state the reason plus the manual command and continue.
+*(Lesson #1 — 2026-08-19: QA asked "where is the allure report" on a closure whose report WAS generated and referenced twice — the paths were plain backticks, unclickable, and the server was never started. Fix: serve + open automatically, don't just cite a path.)*
+
+❌ **Don't:** Treat `allure generate`'s "Report successfully generated" message — or the existence of `index.html` — as proof the report has data. It prints that on success even when it found ZERO results, producing a browsable shell whose Overview reads 0 tests. Nor assume `allure generate allure-results` picks up per-run subfolders: it scans only the TOP level for `*-result.json`, so a config writing to `allure-results/{RUN_ID}/` (AH Rule 31) yields an empty report every time. Shell globs (`allure-results/*`) don't rescue it — npm on Windows passes the `*` through unexpanded and the CLI errors.
+✅ **Do:** After generating, **verify `widgets/summary.json` has `statistic.total > 0`** before reporting the report as ready or linking it. Pass run folders explicitly (`allure generate allure-results/exec-338 allure-results/smoke ...`) or enumerate them in a helper script. `total: 0` means the path was wrong, not that the suite was empty — check the raw `*-result.json` count under each run folder to confirm.
+*(Lesson #2 — 2026-08-19: QA asked "why 0 details, why is overview not showing" on a report reported as generated. Both the aggregate AND per-run reports were empty shells; 13 valid result files existed the whole time. Root cause: generate pointed at the parent dir. Fix: scripts/allure-report.js enumerates run folders and fails loudly on total:0.)*
