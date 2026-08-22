@@ -62,6 +62,32 @@ When applying any auto-fix to a POM or spec (Step 5B), follow `karpathy-guidelin
 
 ## Instructions
 
+### Step 0B: Capture Build Identity + Redeployment Check (MANDATORY)
+
+**A test result belongs to the build it ran against.** A pass recorded on an earlier build proves nothing about the current one. Capture the build before running anything.
+
+**Determine the current build**, in this order of preference:
+1. A version the user supplied (`/test-case-execution SCRUM-255 build 4.2.1`)
+2. A version the app exposes — meta tag, `/version` endpoint, footer build number
+3. `git rev-parse --short HEAD` in the app repo, when the app is local to the workspace
+4. For a local static demo app — the AUT file's modified timestamp
+
+**Compare against the `Build:` line of the most recent `/test-case-execution` block in `progress.md`:**
+
+| Condition | Meaning | Action |
+|---|---|---|
+| Build identical | App unchanged since last run | Prior results still valid for unchanged ACs |
+| **Build differs** | **App was redeployed** | **All prior results EXPIRED** — full re-run, no selective scope |
+| No build on the last run | Unknown | Treat as expired; start recording from this cycle |
+
+**Never infer "nothing changed" from a missing build record** — absence of evidence is not evidence of no deployment.
+
+Record the value in the Step 7B log as `**Build:**`. If it cannot be determined, log `**Build:** UNKNOWN` and state that in the summary — never omit the line.
+
+**For requirement changes** (AC edited / added / removed), run `/requirement-drift {EPIC}` first — it scopes which tests need re-running and flags stale `BR-xx` rules.
+
+---
+
 ### Step 0: Load Knowledge Base (MANDATORY — runs first, AH Rule 25)
 
 Before parsing input, load the standing product memory so the bug oracle + dedup list are in context for the whole session.
@@ -978,6 +1004,7 @@ After reporting summary to user, append run log to `progress.md` at workspace ro
 ## {YYYY-MM-DD HH:MM} — /test-case-execution {EPIC-KEY or ISSUE-KEY}
 
 **Epic/Issue:** {key} — {summary}
+**Build:** {version / commit SHA / AUT timestamp}   ← MANDATORY, see Step 0B
 **Total Tests:** {N}
 **Results:** {X} Pass | {Y} Auto-Fixed | {Z} Flaky | {W} Blocked | {V} Failed
 **Duration:** {total time}

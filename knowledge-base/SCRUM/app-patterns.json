@@ -1,0 +1,101 @@
+{
+  "_doc": {
+    "purpose": "App-specific patterns learned across runs. The 3rd form with a mobile field reuses what runs 1-2 established instead of re-deriving it.",
+    "authority": "HINT ONLY — never an oracle. The Epic AC decides expected behaviour (AH Rule 19). A pattern suggests WHICH cases to write and WHERE the element usually is.",
+    "staleness": "AH Rule 30 applies. Re-verify against live DOM before use; on mismatch trust the DOM and update the pattern.",
+    "written_by": "/explore (Step 7B), /test-case-execution (Step 7C)",
+    "read_by": "/test-case-creation (Step 3A)"
+  },
+
+  "project": "SCRUM",
+  "lastUpdated": "2026-08-22",
+
+  "fieldPatterns": [
+    {
+      "id": "FP-01",
+      "name": "mobile-number",
+      "matches": ["mobile", "phone"],
+      "seenIn": ["blinkit-login.spec.ts", "forgot-password.spec.ts", "registration.spec.ts"],
+      "constraints": {
+        "maxLength": 10,
+        "inputType": "tel",
+        "required": true
+      },
+      "errorText": {
+        "invalid": "Enter valid 10-digit mobile number"
+      },
+      "standardCases": [
+        "empty submit (Negative)",
+        "9 digits — below min (BVA)",
+        "11 digits via pressSequentially — maxlength enforcement (BVA, AH Rule 18)",
+        "alphabetic input (ECP-invalid)",
+        "special characters (ECP-invalid)",
+        "SQLi + XSS (Security, always)"
+      ],
+      "source": "blinkit-login.html #mobile maxlength=10, #mobileErr text — observed 2026-08-22",
+      "lastVerified": "2026-08-22"
+    },
+    {
+      "id": "FP-02",
+      "name": "email",
+      "matches": ["email", "userEmail"],
+      "seenIn": ["login.spec.ts", "forgot-password.spec.ts", "registration.spec.ts"],
+      "constraints": {
+        "inputType": "email",
+        "required": true
+      },
+      "errorText": {},
+      "standardCases": [
+        "empty submit (Negative)",
+        "missing @ (ECP-invalid)",
+        "missing domain (ECP-invalid)",
+        "leading/trailing whitespace (ECP-invalid)",
+        "max length (BVA)",
+        "SQLi + XSS (Security, always)"
+      ],
+      "source": "observed across 3 specs — 2026-08-22",
+      "lastVerified": "2026-08-22"
+    }
+  ],
+
+  "uiConventions": [
+    {
+      "id": "UC-01",
+      "name": "inline-field-error",
+      "rule": "Validation errors render in a span adjacent to the field, id = <fieldName> + error suffix",
+      "seenIn": ["blinkit-login.html", "registration-demo.html"],
+      "counterExamples": [],
+      "source": "observed 2026-08-22",
+      "lastVerified": "2026-08-22"
+    }
+  ],
+
+  "flowPatterns": [
+    {
+      "id": "FL-01",
+      "name": "blinkit-successful-login",
+      "steps": [
+        "fill first name, last name, 10-digit mobile",
+        "submit",
+        "OTP toast appears",
+        "redirect after ~1.5s"
+      ],
+      "endState": "navigates to blinkit-products.html",
+      "source": "blinkit-login.html window.location.href — observed 2026-08-22",
+      "lastVerified": "2026-08-22"
+    }
+  ],
+
+  "locatorStrategies": [],
+
+  "inconsistencies": [
+    {
+      "id": "IN-01",
+      "observation": "Error-element id suffix differs across pages: blinkit-login.html uses 'Err' (#mobileErr, #firstNameErr), registration-demo.html uses 'Error' (#emailError, #firstNameError)",
+      "pages": ["blinkit-login.html", "registration-demo.html"],
+      "status": "UNREPORTED",
+      "note": "Naming inconsistency across the app. Raise with the team as a convention finding — do not auto-normalise, and do not file as a product bug without an AC to cite.",
+      "source": "observed 2026-08-22"
+    }
+  ]
+}

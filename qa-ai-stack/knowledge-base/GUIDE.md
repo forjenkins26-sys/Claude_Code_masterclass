@@ -18,7 +18,7 @@ knowledge-base/
 
 A session loads **only** `knowledge-base/<JIRA_PROJECT>/`. Default project = `SCRUM`.
 
-## The four files
+## The five files
 
 | File | Answers | Used for |
 |------|---------|----------|
@@ -26,6 +26,9 @@ A session loads **only** `knowledge-base/<JIRA_PROJECT>/`. Default project = `SC
 | `known-defects.md` | Where has this product broken before? | Dedup before filing (check here before JQL); probe weak spots harder |
 | `feature-map.md` | What depends on what? | Regression blast radius — a feature's `Used by` chain becomes test scope |
 | `product-flows.md` | How does a user actually move through it? | Ground happy-path tests in real navigation |
+| `app-patterns.json` | How is this app *built*? | **Hint layer, never an oracle.** Field constraints + exact error text, UI conventions, flow end-states, locator strategies, cross-page inconsistencies. Written by `/explore` Step 7B (propose-only), read by `test-case-creation` Step 3A |
+
+**The authority split matters.** The four markdown files record *what is correct* (behaviour). `app-patterns.json` records *how the app is built* (structure). Structure is a hint that speeds up test design; behaviour comes from the Epic AC (AH Rule 19). A pattern never decides an expected result, and is re-verified against live DOM before use — on mismatch the DOM wins (AH Rule 30).
 
 ## Bug confidence tiers (the core upgrade)
 

@@ -194,6 +194,31 @@ readonly cancelOrderButton: Locator;
 
 This is a **comment only** — no assertion, no behavior change. It surfaces risk to the human + the downstream `/test-case-creation` run. Never invent a defect link; only annotate when the element clearly matches a `known-defects.md` row.
 
+### Step 7B: Propose App Pattern Updates (additive — never blocks)
+
+While the live DOM from Step 5 is in context, note anything reusable for future runs. Target: `knowledge-base/<PROJECT>/app-patterns.json` (default `SCRUM`).
+
+Propose an entry when the DOM shows something that will recur:
+
+| Observed | Pattern to propose |
+|---|---|
+| A field type already in `fieldPatterns` | Confirm it still matches → bump `lastVerified`. **Differs → the live DOM wins**, update the pattern and say what changed |
+| A NEW field type with real constraints (`maxlength`, `type`, error element) | New `fieldPattern` with its constraints + exact error text |
+| A consistent error/label convention across the page | New or reinforced `uiConvention` |
+| A locator that had to be scoped to avoid a strict-mode clash | `locatorStrategy` — record the preferred form and what to avoid |
+| Same-concept text differing from a recorded pattern | `inconsistency` — a finding to report, never auto-normalised |
+
+**Rules:**
+- **Propose, never auto-write.** Show the proposed JSON and ask. Patterns feed future test generation — a wrong entry costs more than a missing one (AH Rule 30).
+- **Only record what the DOM actually showed.** Constraints must be read attributes; error text must be the observed string. Never infer a `maxLength` nobody saw.
+- **Every entry carries `source` and `lastVerified`.** An unsourced pattern cannot be drift-checked and is unusable.
+- **No behaviour claims.** Patterns record structure — where things are, what they constrain. What SHOULD happen comes from the Epic (AH Rule 19).
+- File missing → offer to create it from `knowledge-base/_TEMPLATE/app-patterns.json`.
+
+Stays within `/explore`'s deliverable (AH Rule 26): the POM is still the only artefact written. This is a proposal in the report.
+
+---
+
 ### Step 8: Output
 
 Output in this order:

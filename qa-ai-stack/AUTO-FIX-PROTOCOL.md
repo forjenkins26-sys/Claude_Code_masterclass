@@ -1,7 +1,7 @@
 # Auto-Fix Protocol
 
 **Author:** Anand Soni  
-**Updated:** 2026-06-09
+**Updated:** 2026-08-22 · 17 rules
 
 ---
 

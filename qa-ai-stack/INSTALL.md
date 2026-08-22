@@ -54,6 +54,7 @@ Then show me the 3-step QA flow for this project.
 | `/test-case-creation` skill | Epic AC → Jira test cases + spec file |
 | `/test-case-execution` skill | Runs tests, auto-fixes locators, files bugs, updates Jira |
 | `/test-closure` skill | AC→test traceability matrix, counted coverage, defect tiering, go/no-go verdict |
+| `/requirement-drift` skill | Detects AC changes + redeployment before a cycle; reports stale rules and re-test scope |
 | `/bug-triage` skill | Manual bug investigation fallback |
 | `/create-bug` skill | Manual Jira bug creation fallback |
 | `playwright-ai-mcp-tutor` skill | 3-agent Planner/Generator/Healer workflow |

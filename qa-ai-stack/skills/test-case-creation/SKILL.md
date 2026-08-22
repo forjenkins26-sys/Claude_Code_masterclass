@@ -342,6 +342,27 @@ For each requirement statement:
 | **Link / nav element** | navigates to the right destination — same-tab vs `_blank` popup (AH Rule 27) + destination screenshot |
 | **Promo / coupon / discount** | valid code (ECP-valid) · invalid code (ECP-invalid) · empty apply (Negative) · recalculation (usually Epic-gap → fixme) |
 
+**App-specific layer — `app-patterns.json` (additive, hint-only):**
+
+The matrix above is generic by control TYPE. `knowledge-base/<PROJECT>/app-patterns.json` adds what THIS app has already taught us — so the 3rd form with a mobile field reuses what runs 1–2 established instead of re-deriving it.
+
+Before walking a control's row, check for a matching `fieldPattern`:
+
+| Pattern field | How it feeds Step 3A |
+|---|---|
+| `constraints` (maxLength, inputType) | Gives BVA its real boundaries — test 9/10/11 instead of guessing |
+| `errorText` | The exact string a Negative case should assert |
+| `standardCases` | Cases this field type always needed here — merge with the generic row |
+| `flowPatterns` | Known end-state for a journey (e.g. login → products page) |
+| `inconsistencies` | Known cross-page mismatches worth probing again |
+
+**Three hard limits (AH Rule 19 + Rule 30):**
+1. **A pattern is a hint, never an oracle.** It suggests WHICH cases to write and WHERE the element usually is. The **Epic AC still decides the expected result**. A pattern's `errorText` may only be asserted when the AC does not state one — otherwise it is `[VERIFICATION REQUIRED]`.
+2. **Re-verify before use.** A pattern reflects the app when it was written. Confirm against the Step 2 DOM. **On mismatch, the live DOM wins** — update the pattern, never bend the test to the stale value.
+3. **Never invent a pattern to fill a gap.** No matching pattern → walk the generic matrix normally. Absence is not a reason to guess.
+
+If the file is missing → continue silently. It is purely additive.
+
 **Output:** a per-control verdict table in the report, tagged with technique. Example (GreenKart quantity stepper):
 
 | Cell | Technique | Verdict | Note |

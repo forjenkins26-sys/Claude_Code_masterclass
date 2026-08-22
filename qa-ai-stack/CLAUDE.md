@@ -45,6 +45,8 @@ The user should only ever have to say one line — or nothing at all. You guard 
 | Static 0–100 quality gate on generated specs (flaky/secrets/missing-expect/unawaited/empty) | `/spec-quality` (read-only, pure regex, optional gate before `/test-case-execution`) |
 | STLC closure — AC→test traceability matrix, counted coverage, defect tiering, go/no-go verdict | `/test-closure` (reads `progress.md` execution rows + Jira + KB; hard-stops if no execution block exists; never auto-transitions the Epic) |
 | Per-run artefact retention + optional Allure evidence report | `playwright.config.template.ts` (AH Rule 31 `RUN_ID` pattern) + `/test-closure` Step 4B |
+| Change detection before a regression cycle — did the AC move, was the app redeployed | `/requirement-drift` (re-compares every `BR-xx` against its cited Jira AC → CHANGED/REMOVED/NEW + re-test scope; build change EXPIRES all prior results; never auto-edits `business-rules.md`) |
+| App-structure memory that speeds repeat work | `knowledge-base/<PROJECT>/app-patterns.json` — field constraints + exact error text, UI conventions, flow end-states, locator strategies, cross-page inconsistencies. **Hint only, never an oracle** (Epic AC still owns expected results, AH Rule 19); re-verified against live DOM, DOM wins on mismatch (AH Rule 30) |
 
 ## The 4-Step E2E Flow
 
