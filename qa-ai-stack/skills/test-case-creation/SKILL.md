@@ -162,7 +162,21 @@ mcp__atlassian__getJiraIssue({
 
 **Do NOT:** fall back to the Jira REST API, search the filesystem for API tokens, or scrape Jira through a browser session. Archiving is a payload-size condition, not an auth failure — MCP is working. A credential hunt will be blocked by the classifier and is the wrong instinct regardless (secrets policy).
 
-If all three attempts archive, STOP and report it. Do not proceed on a partially-read Epic — inventing ACs from a truncated fetch violates AH Rule 19 at the source.
+**If narrowing does not help, archiving is session-level, not size-level.** Some sessions archive every MCP result regardless of payload size — the same call that archives in one session returns inline in another. Narrowing cannot fix that, and neither can any other tool.
+
+**When all three attempts archive, STOP. Do not improvise a workaround.**
+
+Report exactly this to the user and end the run:
+
+> Cannot read Epic {KEY} — every MCP result is being archived in this session, including single-field requests. This is a session-level condition, not a Jira or auth problem. **Fix: start a fresh Claude Code session and re-run this command.** The Epic is readable; this session cannot receive it.
+
+**Never do any of these instead — all are wrong and one is a security violation:**
+- ❌ Jira REST API via curl/Bash — the MCP server is the sanctioned path; going around it defeats the integration
+- ❌ Searching for `.env` files, `JIRA_API_TOKEN`, `ATLASSIAN_TOKEN`, or any credential — blocked by the classifier, and hunting for secrets is prohibited regardless of intent
+- ❌ Scraping Jira through a Playwright browser session
+- ❌ Proceeding on partial ACs, or reconstructing them from memory, a prior run, or the KB — inventing ACs violates AH Rule 19 at the source and produces tests that assert the wrong thing
+
+A blocked run that reports honestly is a correct outcome. A run that invents ACs to keep going is a silent failure that ships wrong tests.
 
 **Extract from Epic:**
 - Summary (feature name)

@@ -170,6 +170,12 @@ mcp__atlassian__getJiraIssue({
 
 If a result still comes back archived, retry that issue with `fields: ["summary", "description"]`. Never fall back to the Jira REST API or search the filesystem for credentials — archiving is a payload-size condition, not an auth failure, and MCP is working.
 
+**If narrowing does not help, archiving is session-level, not size-level.** Some sessions archive every MCP result regardless of payload size. When that happens, STOP and report:
+
+> Cannot read {KEY} — every MCP result is being archived in this session. This is a session-level condition, not a Jira or auth problem. **Fix: start a fresh Claude Code session and re-run.**
+
+**Never** fall back to the Jira REST API, search for `.env` files or API tokens (blocked by the classifier and prohibited regardless), scrape Jira through a browser, or proceed on partial/remembered ACs. A blocked run reported honestly is correct; an invented AC is a silent failure.
+
 Extract:
 - Issue key (SCRUM-69)
 - Summary (contains test ID like "TC-001")

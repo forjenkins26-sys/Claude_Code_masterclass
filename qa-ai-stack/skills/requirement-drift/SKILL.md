@@ -74,6 +74,12 @@ mcp__atlassian__getJiraIssue({
 
 **The narrow `fields` array is mandatory, not cosmetic.** Omitting it pulls the full default field set plus expand metadata, which can exceed the tool-result size limit and be **archived** before the content reaches you. If archived, retry with `fields: ["description", "updated"]`, then `searchJiraIssuesUsingJql` (`jql: "key = {EPIC}"`). Never fall back to the REST API or search for credentials — archiving is a payload-size condition, not an auth failure.
 
+**If narrowing does not help, archiving is session-level, not size-level.** Some sessions archive every MCP result regardless of payload size. When that happens, STOP and report:
+
+> Cannot read {KEY} — every MCP result is being archived in this session. This is a session-level condition, not a Jira or auth problem. **Fix: start a fresh Claude Code session and re-run.**
+
+**Never** fall back to the Jira REST API, search for `.env` files or API tokens (blocked by the classifier and prohibited regardless), scrape Jira through a browser, or proceed on partial/remembered ACs. A blocked run reported honestly is correct; an invented AC is a silent failure.
+
 **If the AC text cannot be read, STOP.** Drift detection compares stored rules against current ACs; a partial or failed fetch means the comparison is unsound. Report "could not read current ACs" rather than declaring "no drift" — absence of evidence is not evidence of no change.
 
 Parse the description into numbered AC lines, same numbering as when the rules were seeded. Capture the Epic's `updated` timestamp.
