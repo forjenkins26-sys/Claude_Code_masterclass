@@ -67,9 +67,14 @@ ToolSearch: select:mcp__atlassian__getJiraIssue
 mcp__atlassian__getJiraIssue({
   "cloudId": "anandsoni2641.atlassian.net",
   "issueIdOrKey": "{EPIC-KEY}",
-  "fields": ["summary", "description", "updated"]
+  "fields": ["summary", "description", "updated"],
+  "responseContentFormat": "markdown"
 })
 ```
+
+**The narrow `fields` array is mandatory, not cosmetic.** Omitting it pulls the full default field set plus expand metadata, which can exceed the tool-result size limit and be **archived** before the content reaches you. If archived, retry with `fields: ["description", "updated"]`, then `searchJiraIssuesUsingJql` (`jql: "key = {EPIC}"`). Never fall back to the REST API or search for credentials — archiving is a payload-size condition, not an auth failure.
+
+**If the AC text cannot be read, STOP.** Drift detection compares stored rules against current ACs; a partial or failed fetch means the comparison is unsound. Report "could not read current ACs" rather than declaring "no drift" — absence of evidence is not evidence of no change.
 
 Parse the description into numbered AC lines, same numbering as when the rules were seeded. Capture the Epic's `updated` timestamp.
 

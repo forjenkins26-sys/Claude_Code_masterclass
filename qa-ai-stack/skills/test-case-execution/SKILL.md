@@ -158,9 +158,17 @@ Use provided issue key directly.
 ```
 mcp__atlassian__getJiraIssue({
   cloudId: "anandsoni2641.atlassian.net",
-  issueIdOrKey: "SCRUM-69"
+  issueIdOrKey: "SCRUM-69",
+  fields: ["summary", "description", "status"],
+  responseContentFormat: "markdown"
 })
 ```
+
+**The narrow `fields` array is mandatory here.** This call runs once per test case — a 28-test Epic makes 28 of them. Omitting `fields` pulls the full default set plus expand metadata on every call, which can exceed the tool-result size limit and be **archived**, losing the expected-result text mid-run.
+
+**Prefer one bulk fetch over N single fetches.** `mcp__atlassian__searchJiraIssuesUsingJql` with `jql: "parent = {EPIC}"` and the same narrow fields returns every child in one flatter payload — fewer round trips and less archiving risk than looping `getJiraIssue`.
+
+If a result still comes back archived, retry that issue with `fields: ["summary", "description"]`. Never fall back to the Jira REST API or search the filesystem for credentials — archiving is a payload-size condition, not an auth failure, and MCP is working.
 
 Extract:
 - Issue key (SCRUM-69)

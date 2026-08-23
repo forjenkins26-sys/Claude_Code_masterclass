@@ -68,8 +68,15 @@ Also capture the header lines: `Total`, `Passed`, `Failed`, and any `Bug Filed` 
 ToolSearch: select:mcp__atlassian__getJiraIssue,mcp__atlassian__searchJiraIssuesUsingJql
 ```
 ```json
-mcp__atlassian__getJiraIssue({ "cloudId": "anandsoni2641.atlassian.net", "issueIdOrKey": "{EPIC-KEY}" })
+mcp__atlassian__getJiraIssue({
+  "cloudId": "anandsoni2641.atlassian.net",
+  "issueIdOrKey": "{EPIC-KEY}",
+  "fields": ["summary", "description"],
+  "responseContentFormat": "markdown"
+})
 ```
+
+**ALWAYS pass a narrow `fields` array** — omitting it pulls the full default field set plus expand metadata, which can exceed the tool-result size limit and be **archived** before it reaches you. If archived, retry with `fields: ["description"]` alone, then `searchJiraIssuesUsingJql` (`jql: "key = {EPIC}"`, same narrow fields). Never fall back to the REST API or hunt for credentials — archiving is a size condition, not an auth failure.
 Extract the **acceptance criteria lines** — these are the requirement rows of the matrix. Number them `AC-1..AC-n` in the order they appear.
 
 Then fetch children for status reconciliation:

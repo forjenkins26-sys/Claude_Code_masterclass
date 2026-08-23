@@ -144,9 +144,25 @@ ToolSearch: select:mcp__atlassian__getJiraIssue
 ```json
 mcp__atlassian__getJiraIssue({
   "cloudId": "anandsoni2641.atlassian.net",
-  "issueIdOrKey": "SCRUM-48"
+  "issueIdOrKey": "SCRUM-48",
+  "fields": ["summary", "description"],
+  "responseContentFormat": "markdown"
 })
 ```
+
+**ALWAYS pass a narrow `fields` array.** Omitting it pulls the default set (status, issuetype, priority, labels, components, assignee, reporter, timestamps, resolution, project) plus expand metadata. That payload can exceed the tool-result size limit and get **archived** — the content never reaches you, and the run stalls at Step 1A.
+
+**If the result still comes back archived — escalate narrower, never sideways:**
+
+| Attempt | Call |
+|---|---|
+| 1 | `fields: ["summary", "description"]` |
+| 2 | `fields: ["description"]` alone — the ACs are all that Step 1A needs |
+| 3 | `mcp__atlassian__searchJiraIssuesUsingJql` with `jql: "key = {EPIC}"` and the same narrow fields — a flatter payload |
+
+**Do NOT:** fall back to the Jira REST API, search the filesystem for API tokens, or scrape Jira through a browser session. Archiving is a payload-size condition, not an auth failure — MCP is working. A credential hunt will be blocked by the classifier and is the wrong instinct regardless (secrets policy).
+
+If all three attempts archive, STOP and report it. Do not proceed on a partially-read Epic — inventing ACs from a truncated fetch violates AH Rule 19 at the source.
 
 **Extract from Epic:**
 - Summary (feature name)
