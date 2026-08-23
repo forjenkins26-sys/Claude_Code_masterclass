@@ -171,7 +171,23 @@ mcp__atlassian__getJiraIssue({
 
 **Do NOT:** fall back to the Jira REST API, search the filesystem for API tokens, or scrape Jira through a browser session. Archiving is a payload-size condition, not an auth failure — MCP is working. A credential hunt will be blocked by the classifier and is the wrong instinct regardless (secrets policy).
 
-**If narrowing does not help, archiving is session-level, not size-level.** Some sessions archive every MCP result regardless of payload size — the same call that archives in one session returns inline in another. Narrowing cannot fix that, and neither can any other tool.
+**If narrowing does not help, the payload is still too large — page it, do not abandon MCP.**
+
+Archiving is **payload-size-driven, not session-wide**. Proven: `maxResults: 25` on a 20-issue JQL archives, while `maxResults: 5` on the same query returns inline, in the same session. Writes (`createJiraIssue`) and small reads work throughout.
+
+**Escalation ladder — never leave MCP:**
+
+| Step | Action |
+|---|---|
+| 1 | Narrow `fields` to the minimum the step needs |
+| 2 | **Paginate.** `maxResults: 5` (or lower), follow `nextPageToken` until `isLast: true`, accumulate across pages |
+| 3 | Fetch one issue at a time by key with a single field |
+
+Pagination is the reliable fix for a large result set — a 20-issue Epic reads cleanly in 4 pages of 5.
+
+**Only if a single-field, single-issue read still archives**, STOP and report:
+
+> Cannot read {KEY} — MCP results are archiving even at minimum page size. **Fix: start a fresh Claude Code session and re-run.**
 
 **When all three attempts archive, STOP. Do not improvise a workaround.**
 

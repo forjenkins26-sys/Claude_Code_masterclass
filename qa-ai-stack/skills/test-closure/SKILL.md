@@ -78,9 +78,23 @@ mcp__atlassian__getJiraIssue({
 
 **ALWAYS pass a narrow `fields` array** — omitting it pulls the full default field set plus expand metadata, which can exceed the tool-result size limit and be **archived** before it reaches you. If archived, retry with `fields: ["description"]` alone, then `searchJiraIssuesUsingJql` (`jql: "key = {EPIC}"`, same narrow fields). Never fall back to the REST API or hunt for credentials — archiving is a size condition, not an auth failure.
 
-**If narrowing does not help, archiving is session-level, not size-level.** Some sessions archive every MCP result regardless of payload size. When that happens, STOP and report:
+**If narrowing does not help, the payload is still too large — page it, do not abandon MCP.**
 
-> Cannot read {KEY} — every MCP result is being archived in this session. This is a session-level condition, not a Jira or auth problem. **Fix: start a fresh Claude Code session and re-run.**
+Archiving is **payload-size-driven, not session-wide**. Proven: `maxResults: 25` on a 20-issue JQL archives, while `maxResults: 5` on the same query returns inline, in the same session. Writes (`createJiraIssue`) and small reads work throughout.
+
+**Escalation ladder — never leave MCP:**
+
+| Step | Action |
+|---|---|
+| 1 | Narrow `fields` to the minimum the step needs |
+| 2 | **Paginate.** `maxResults: 5` (or lower), follow `nextPageToken` until `isLast: true`, accumulate across pages |
+| 3 | Fetch one issue at a time by key with a single field |
+
+Pagination is the reliable fix for a large result set — a 20-issue Epic reads cleanly in 4 pages of 5.
+
+**Only if a single-field, single-issue read still archives**, STOP and report:
+
+> Cannot read {KEY} — MCP results are archiving even at minimum page size. **Fix: start a fresh Claude Code session and re-run.**
 
 **Never** fall back to the Jira REST API, search for `.env` files or API tokens (blocked by the classifier and prohibited regardless), scrape Jira through a browser, or proceed on partial/remembered ACs. A blocked run reported honestly is correct; an invented AC is a silent failure.
 Extract the **acceptance criteria lines** — these are the requirement rows of the matrix. Number them `AC-1..AC-n` in the order they appear.

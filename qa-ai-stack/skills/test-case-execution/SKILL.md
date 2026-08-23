@@ -143,9 +143,13 @@ Use JQL to find all child issues:
 ```
 mcp__atlassian__searchJiraIssuesUsingJql({
   cloudId: "anandsoni2641.atlassian.net",
-  jql: "parent = SCRUM-68 ORDER BY key ASC"
+  jql: "parent = SCRUM-68 ORDER BY key ASC",
+  fields: ["summary", "status"],
+  maxResults: 5
 })
 ```
+
+**Page through the children — `maxResults: 5`, then follow `nextPageToken` until `isLast: true`.** A single unbounded call on a 20-issue Epic exceeds the tool-result size limit and gets archived; the same query at 5 per page returns inline. Accumulate keys across pages before proceeding.
 
 Extract all child issue keys (e.g., SCRUM-69, SCRUM-70, ..., SCRUM-84).
 
@@ -166,13 +170,27 @@ mcp__atlassian__getJiraIssue({
 
 **The narrow `fields` array is mandatory here.** This call runs once per test case — a 28-test Epic makes 28 of them. Omitting `fields` pulls the full default set plus expand metadata on every call, which can exceed the tool-result size limit and be **archived**, losing the expected-result text mid-run.
 
-**Prefer one bulk fetch over N single fetches.** `mcp__atlassian__searchJiraIssuesUsingJql` with `jql: "parent = {EPIC}"` and the same narrow fields returns every child in one flatter payload — fewer round trips and less archiving risk than looping `getJiraIssue`.
+**Prefer a paged JQL fetch over N single fetches.** `mcp__atlassian__searchJiraIssuesUsingJql` with `jql: "parent = {EPIC}"`, narrow `fields`, and `maxResults: 5` — following `nextPageToken` until `isLast: true` — is both fewer round trips and safer than looping `getJiraIssue` per issue. Do **not** request all children in one unbounded call: that is exactly the payload that archives.
 
 If a result still comes back archived, retry that issue with `fields: ["summary", "description"]`. Never fall back to the Jira REST API or search the filesystem for credentials — archiving is a payload-size condition, not an auth failure, and MCP is working.
 
-**If narrowing does not help, archiving is session-level, not size-level.** Some sessions archive every MCP result regardless of payload size. When that happens, STOP and report:
+**If narrowing does not help, the payload is still too large — page it, do not abandon MCP.**
 
-> Cannot read {KEY} — every MCP result is being archived in this session. This is a session-level condition, not a Jira or auth problem. **Fix: start a fresh Claude Code session and re-run.**
+Archiving is **payload-size-driven, not session-wide**. Proven: `maxResults: 25` on a 20-issue JQL archives, while `maxResults: 5` on the same query returns inline, in the same session. Writes (`createJiraIssue`) and small reads work throughout.
+
+**Escalation ladder — never leave MCP:**
+
+| Step | Action |
+|---|---|
+| 1 | Narrow `fields` to the minimum the step needs |
+| 2 | **Paginate.** `maxResults: 5` (or lower), follow `nextPageToken` until `isLast: true`, accumulate across pages |
+| 3 | Fetch one issue at a time by key with a single field |
+
+Pagination is the reliable fix for a large result set — a 20-issue Epic reads cleanly in 4 pages of 5.
+
+**Only if a single-field, single-issue read still archives**, STOP and report:
+
+> Cannot read {KEY} — MCP results are archiving even at minimum page size. **Fix: start a fresh Claude Code session and re-run.**
 
 **Never** fall back to the Jira REST API, search for `.env` files or API tokens (blocked by the classifier and prohibited regardless), scrape Jira through a browser, or proceed on partial/remembered ACs. A blocked run reported honestly is correct; an invented AC is a silent failure.
 
