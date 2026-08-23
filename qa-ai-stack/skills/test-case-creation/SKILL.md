@@ -82,27 +82,18 @@ Generate comprehensive functional test cases using a **two-source approach**:
 **Inputs:**
 - Epic key or URL (e.g., `SCRUM-48`, `https://site.atlassian.net/browse/SCRUM-48`)
 - URL of feature under test (optional if Epic description contains URL)
-- Output format: **`jira` when an Epic key is supplied** · `markdown` only when explicitly requested
-- Jira project key (defaults to the Epic key's prefix — `SCRUM-603` → project `SCRUM`)
+- Output format: `markdown` (default) or `jira`
+- Jira project key (required if output=jira)
 
-**⚠️ Output format — an Epic means Jira:**
+**⚠️ MANDATORY — If Epic provided but output format NOT specified:**
 
-Supplying an Epic key IS the request to create test cases under it. Do **not** treat markdown as the default in Mode A, and do **not** stop to ask which format — creating the issues in Jira is the expected deliverable.
+Do NOT silently default to markdown. Ask first:
 
-| Input | Output |
-|---|---|
-| `/test-case-creation SCRUM-603` | **Jira** — create under SCRUM-603 |
-| `/test-case-creation <URL> epic SCRUM-603` | **Jira** — create under SCRUM-603 |
-| `/test-case-creation SCRUM-603 output markdown` | Markdown table only |
-| `/test-case-creation <URL>` (Mode B, no Epic) | Markdown — nothing to parent to |
+> "Where would you like the test cases?
+> 1. **Jira (via MCP)** — create them directly under Epic SCRUM-XX in Jira
+> 2. **Here** — show them as a table in this chat"
 
-**Confirm the count before creating, not the format:**
-
-> "Ready to create **N test cases** in Jira under SCRUM-603 (project SCRUM). Proceed?"
-
-That single confirmation covers the write. Do not additionally ask where the output should go when an Epic was given.
-
-**Finishing with only a spec file and no Jira issues is a failed run in Mode A.** If issue creation fails, report the failure explicitly — never fall back to markdown silently and present it as success.
+Wait for user answer before proceeding to Step 2.
 
 #### Mode B: UI-Observed (No Epic — partial coverage)
 
@@ -153,55 +144,9 @@ ToolSearch: select:mcp__atlassian__getJiraIssue
 ```json
 mcp__atlassian__getJiraIssue({
   "cloudId": "anandsoni2641.atlassian.net",
-  "issueIdOrKey": "SCRUM-48",
-  "fields": ["summary", "description"],
-  "responseContentFormat": "markdown"
+  "issueIdOrKey": "SCRUM-48"
 })
 ```
-
-**ALWAYS pass a narrow `fields` array.** Omitting it pulls the default set (status, issuetype, priority, labels, components, assignee, reporter, timestamps, resolution, project) plus expand metadata. That payload can exceed the tool-result size limit and get **archived** — the content never reaches you, and the run stalls at Step 1A.
-
-**If the result still comes back archived — escalate narrower, never sideways:**
-
-| Attempt | Call |
-|---|---|
-| 1 | `fields: ["summary", "description"]` |
-| 2 | `fields: ["description"]` alone — the ACs are all that Step 1A needs |
-| 3 | `mcp__atlassian__searchJiraIssuesUsingJql` with `jql: "key = {EPIC}"` and the same narrow fields — a flatter payload |
-
-**Do NOT:** fall back to the Jira REST API, search the filesystem for API tokens, or scrape Jira through a browser session. Archiving is a payload-size condition, not an auth failure — MCP is working. A credential hunt will be blocked by the classifier and is the wrong instinct regardless (secrets policy).
-
-**If narrowing does not help, the payload is still too large — page it, do not abandon MCP.**
-
-Archiving is **payload-size-driven, not session-wide**. Proven: `maxResults: 25` on a 20-issue JQL archives, while `maxResults: 5` on the same query returns inline, in the same session. Writes (`createJiraIssue`) and small reads work throughout.
-
-**Escalation ladder — never leave MCP:**
-
-| Step | Action |
-|---|---|
-| 1 | Narrow `fields` to the minimum the step needs |
-| 2 | **Paginate.** `maxResults: 5` (or lower), follow `nextPageToken` until `isLast: true`, accumulate across pages |
-| 3 | Fetch one issue at a time by key with a single field |
-
-Pagination is the reliable fix for a large result set — a 20-issue Epic reads cleanly in 4 pages of 5.
-
-**Only if a single-field, single-issue read still archives**, STOP and report:
-
-> Cannot read {KEY} — MCP results are archiving even at minimum page size. **Fix: start a fresh Claude Code session and re-run.**
-
-**When all three attempts archive, STOP. Do not improvise a workaround.**
-
-Report exactly this to the user and end the run:
-
-> Cannot read Epic {KEY} — every MCP result is being archived in this session, including single-field requests. This is a session-level condition, not a Jira or auth problem. **Fix: start a fresh Claude Code session and re-run this command.** The Epic is readable; this session cannot receive it.
-
-**Never do any of these instead — all are wrong and one is a security violation:**
-- ❌ Jira REST API via curl/Bash — the MCP server is the sanctioned path; going around it defeats the integration
-- ❌ Searching for `.env` files, `JIRA_API_TOKEN`, `ATLASSIAN_TOKEN`, or any credential — blocked by the classifier, and hunting for secrets is prohibited regardless of intent
-- ❌ Scraping Jira through a Playwright browser session
-- ❌ Proceeding on partial ACs, or reconstructing them from memory, a prior run, or the KB — inventing ACs violates AH Rule 19 at the source and produces tests that assert the wrong thing
-
-A blocked run that reports honestly is a correct outcome. A run that invents ACs to keep going is a silent failure that ships wrong tests.
 
 **Extract from Epic:**
 - Summary (feature name)
@@ -475,9 +420,7 @@ All behavioral expected results tagged: `[VERIFICATION REQUIRED — verify again
 
 ### Step 6: Output Test Cases
 
-#### Option A: Markdown Table (Mode B, or when markdown is explicitly requested)
-
-**Not the default in Mode A.** If an Epic key was supplied, use Option B (Jira) — see Step 1.
+#### Option A: Markdown Table (default)
 
 ```markdown
 # Test Cases for [Feature Name]
@@ -777,7 +720,6 @@ Before finishing:
 - ✅ Test steps are clear, numbered, actionable
 - ✅ Test data provided for all scenarios
 - ✅ Source column populated for every test case — with Epic line ref not just key
-- ✅ **Mode A: test cases EXIST IN JIRA under the Epic.** An Epic key was supplied, so Jira issues are the deliverable — a run that produced only a spec file and no issues has **not** completed. Verify with `searchJiraIssuesUsingJql: parent = {EPIC}` before reporting success, and report the actual count returned.
 - ✅ **If Jira output:** Confirm count + project before creating
 - ✅ **If Jira output:** Report all created keys
 - ✅ **If POM created:** Run Step 6B locator verification — all ✅ or flagged ⚠️

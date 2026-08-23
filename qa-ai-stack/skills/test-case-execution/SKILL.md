@@ -62,32 +62,6 @@ When applying any auto-fix to a POM or spec (Step 5B), follow `karpathy-guidelin
 
 ## Instructions
 
-### Step 0B: Capture Build Identity + Redeployment Check (MANDATORY)
-
-**A test result belongs to the build it ran against.** A pass recorded on an earlier build proves nothing about the current one. Capture the build before running anything.
-
-**Determine the current build**, in this order of preference:
-1. A version the user supplied (`/test-case-execution SCRUM-255 build 4.2.1`)
-2. A version the app exposes — meta tag, `/version` endpoint, footer build number
-3. `git rev-parse --short HEAD` in the app repo, when the app is local to the workspace
-4. For a local static demo app — the AUT file's modified timestamp
-
-**Compare against the `Build:` line of the most recent `/test-case-execution` block in `progress.md`:**
-
-| Condition | Meaning | Action |
-|---|---|---|
-| Build identical | App unchanged since last run | Prior results still valid for unchanged ACs |
-| **Build differs** | **App was redeployed** | **All prior results EXPIRED** — full re-run, no selective scope |
-| No build on the last run | Unknown | Treat as expired; start recording from this cycle |
-
-**Never infer "nothing changed" from a missing build record** — absence of evidence is not evidence of no deployment.
-
-Record the value in the Step 7B log as `**Build:**`. If it cannot be determined, log `**Build:** UNKNOWN` and state that in the summary — never omit the line.
-
-**For requirement changes** (AC edited / added / removed), run `/requirement-drift {EPIC}` first — it scopes which tests need re-running and flags stale `BR-xx` rules.
-
----
-
 ### Step 0: Load Knowledge Base (MANDATORY — runs first, AH Rule 25)
 
 Before parsing input, load the standing product memory so the bug oracle + dedup list are in context for the whole session.
@@ -143,13 +117,9 @@ Use JQL to find all child issues:
 ```
 mcp__atlassian__searchJiraIssuesUsingJql({
   cloudId: "anandsoni2641.atlassian.net",
-  jql: "parent = SCRUM-68 ORDER BY key ASC",
-  fields: ["summary", "status"],
-  maxResults: 5
+  jql: "parent = SCRUM-68 ORDER BY key ASC"
 })
 ```
-
-**Page through the children — `maxResults: 5`, then follow `nextPageToken` until `isLast: true`.** A single unbounded call on a 20-issue Epic exceeds the tool-result size limit and gets archived; the same query at 5 per page returns inline. Accumulate keys across pages before proceeding.
 
 Extract all child issue keys (e.g., SCRUM-69, SCRUM-70, ..., SCRUM-84).
 
@@ -162,37 +132,9 @@ Use provided issue key directly.
 ```
 mcp__atlassian__getJiraIssue({
   cloudId: "anandsoni2641.atlassian.net",
-  issueIdOrKey: "SCRUM-69",
-  fields: ["summary", "description", "status"],
-  responseContentFormat: "markdown"
+  issueIdOrKey: "SCRUM-69"
 })
 ```
-
-**The narrow `fields` array is mandatory here.** This call runs once per test case — a 28-test Epic makes 28 of them. Omitting `fields` pulls the full default set plus expand metadata on every call, which can exceed the tool-result size limit and be **archived**, losing the expected-result text mid-run.
-
-**Prefer a paged JQL fetch over N single fetches.** `mcp__atlassian__searchJiraIssuesUsingJql` with `jql: "parent = {EPIC}"`, narrow `fields`, and `maxResults: 5` — following `nextPageToken` until `isLast: true` — is both fewer round trips and safer than looping `getJiraIssue` per issue. Do **not** request all children in one unbounded call: that is exactly the payload that archives.
-
-If a result still comes back archived, retry that issue with `fields: ["summary", "description"]`. Never fall back to the Jira REST API or search the filesystem for credentials — archiving is a payload-size condition, not an auth failure, and MCP is working.
-
-**If narrowing does not help, the payload is still too large — page it, do not abandon MCP.**
-
-Archiving is **payload-size-driven, not session-wide**. Proven: `maxResults: 25` on a 20-issue JQL archives, while `maxResults: 5` on the same query returns inline, in the same session. Writes (`createJiraIssue`) and small reads work throughout.
-
-**Escalation ladder — never leave MCP:**
-
-| Step | Action |
-|---|---|
-| 1 | Narrow `fields` to the minimum the step needs |
-| 2 | **Paginate.** `maxResults: 5` (or lower), follow `nextPageToken` until `isLast: true`, accumulate across pages |
-| 3 | Fetch one issue at a time by key with a single field |
-
-Pagination is the reliable fix for a large result set — a 20-issue Epic reads cleanly in 4 pages of 5.
-
-**Only if a single-field, single-issue read still archives**, STOP and report:
-
-> Cannot read {KEY} — MCP results are archiving even at minimum page size. **Fix: start a fresh Claude Code session and re-run.**
-
-**Never** fall back to the Jira REST API, search for `.env` files or API tokens (blocked by the classifier and prohibited regardless), scrape Jira through a browser, or proceed on partial/remembered ACs. A blocked run reported honestly is correct; an invented AC is a silent failure.
 
 Extract:
 - Issue key (SCRUM-69)
@@ -614,11 +556,25 @@ mcp__atlassian__createIssueLink({
 ⚠️ **SCRUM project has NO "Blocked" status.** Available transitions: To Do (11), In Progress (21), In Review (31), Done (41).
 Use **In Review (id=31)** as proxy — means "test written, waiting on app fix".
 
+**Parameter shape — `transition` is an OBJECT, not `transitionId`.**
+Passing `transitionId: "31"` fails with `MCP error -32602: Required at transition`.
+
+**Transition IDs for project SCRUM** (verified 2026-08-23 via `getTransitionsForJiraIssue`):
+
+| Target status | `transition.id` |
+|---|---|
+| To Do | `11` |
+| In Progress | `21` |
+| In Review | `31` |
+| Done | `41` |
+
+If a transition fails, call `mcp__atlassian__getTransitionsForJiraIssue({ cloudId, issueIdOrKey })` to read the IDs available on that issue — never guess.
+
 ```
 mcp__atlassian__transitionJiraIssue({
   cloudId: "anandsoni2641.atlassian.net",
   issueIdOrKey: "SCRUM-69",
-  transitionId: "31"
+  transition: { id: "31" }        // In Review
 })
 ```
 
@@ -928,7 +884,7 @@ Returns: `[{id: "11", name: "Start Progress"}, {id: "21", name: "Done"}]`
 mcp__atlassian__transitionJiraIssue({
   cloudId: "anandsoni2641.atlassian.net",
   issueIdOrKey: "SCRUM-69",
-  transitionId: "21"  // "Done" transition
+  transition: { id: "41" }        // Done
 })
 ```
 
@@ -1036,7 +992,6 @@ After reporting summary to user, append run log to `progress.md` at workspace ro
 ## {YYYY-MM-DD HH:MM} — /test-case-execution {EPIC-KEY or ISSUE-KEY}
 
 **Epic/Issue:** {key} — {summary}
-**Build:** {version / commit SHA / AUT timestamp}   ← MANDATORY, see Step 0B
 **Total Tests:** {N}
 **Results:** {X} Pass | {Y} Auto-Fixed | {Z} Flaky | {W} Blocked | {V} Failed
 **Duration:** {total time}
