@@ -1,0 +1,19 @@
+{
+  "name": "blinkit-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Blinkit demo — AI-powered E2E QA framework (requirement-driven test generation, governed failure triage, counted closure)",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}

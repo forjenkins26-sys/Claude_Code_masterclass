@@ -39,7 +39,7 @@ export default defineConfig({
   use: {
     // AH Rule 17 — headed mode is mandatory. Never flip this to true.
     headless: false,
-    baseURL: process.env.BASE_URL ?? 'https://medicare-pharmacy-demo-eight.vercel.app',
+    baseURL: process.env.BASE_URL ?? 'https://blinkit-demo-qa.vercel.app',
     screenshot: 'on',            // PASS and FAIL both need evidence
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
