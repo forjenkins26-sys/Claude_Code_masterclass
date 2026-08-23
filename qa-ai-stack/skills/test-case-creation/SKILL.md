@@ -82,18 +82,27 @@ Generate comprehensive functional test cases using a **two-source approach**:
 **Inputs:**
 - Epic key or URL (e.g., `SCRUM-48`, `https://site.atlassian.net/browse/SCRUM-48`)
 - URL of feature under test (optional if Epic description contains URL)
-- Output format: `markdown` (default) or `jira`
-- Jira project key (required if output=jira)
+- Output format: **`jira` when an Epic key is supplied** · `markdown` only when explicitly requested
+- Jira project key (defaults to the Epic key's prefix — `SCRUM-603` → project `SCRUM`)
 
-**⚠️ MANDATORY — If Epic provided but output format NOT specified:**
+**⚠️ Output format — an Epic means Jira:**
 
-Do NOT silently default to markdown. Ask first:
+Supplying an Epic key IS the request to create test cases under it. Do **not** treat markdown as the default in Mode A, and do **not** stop to ask which format — creating the issues in Jira is the expected deliverable.
 
-> "Where would you like the test cases?
-> 1. **Jira (via MCP)** — create them directly under Epic SCRUM-XX in Jira
-> 2. **Here** — show them as a table in this chat"
+| Input | Output |
+|---|---|
+| `/test-case-creation SCRUM-603` | **Jira** — create under SCRUM-603 |
+| `/test-case-creation <URL> epic SCRUM-603` | **Jira** — create under SCRUM-603 |
+| `/test-case-creation SCRUM-603 output markdown` | Markdown table only |
+| `/test-case-creation <URL>` (Mode B, no Epic) | Markdown — nothing to parent to |
 
-Wait for user answer before proceeding to Step 2.
+**Confirm the count before creating, not the format:**
+
+> "Ready to create **N test cases** in Jira under SCRUM-603 (project SCRUM). Proceed?"
+
+That single confirmation covers the write. Do not additionally ask where the output should go when an Epic was given.
+
+**Finishing with only a spec file and no Jira issues is a failed run in Mode A.** If issue creation fails, report the failure explicitly — never fall back to markdown silently and present it as success.
 
 #### Mode B: UI-Observed (No Epic — partial coverage)
 
@@ -450,7 +459,9 @@ All behavioral expected results tagged: `[VERIFICATION REQUIRED — verify again
 
 ### Step 6: Output Test Cases
 
-#### Option A: Markdown Table (default)
+#### Option A: Markdown Table (Mode B, or when markdown is explicitly requested)
+
+**Not the default in Mode A.** If an Epic key was supplied, use Option B (Jira) — see Step 1.
 
 ```markdown
 # Test Cases for [Feature Name]
@@ -750,6 +761,7 @@ Before finishing:
 - ✅ Test steps are clear, numbered, actionable
 - ✅ Test data provided for all scenarios
 - ✅ Source column populated for every test case — with Epic line ref not just key
+- ✅ **Mode A: test cases EXIST IN JIRA under the Epic.** An Epic key was supplied, so Jira issues are the deliverable — a run that produced only a spec file and no issues has **not** completed. Verify with `searchJiraIssuesUsingJql: parent = {EPIC}` before reporting success, and report the actual count returned.
 - ✅ **If Jira output:** Confirm count + project before creating
 - ✅ **If Jira output:** Report all created keys
 - ✅ **If POM created:** Run Step 6B locator verification — all ✅ or flagged ⚠️
