@@ -386,8 +386,33 @@ All behavioral expected results tagged: `[VERIFICATION REQUIRED — verify again
 
 **Output as markdown table:**
 
-| Test ID | Summary | Type | Priority | Source | Preconditions | Test Steps | Expected Result | Test Data |
-|---------|---------|------|----------|--------|---------------|------------|-----------------|-----------|
+| Test ID | Summary | Type | Priority | Source | Grounding Evidence | Preconditions | Test Steps | Expected Result | Test Data |
+|---------|---------|------|----------|--------|--------------------|---------------|------------|-----------------|-----------|
+
+**Column: Grounding Evidence** — the requirement text **quoted verbatim**, sitting beside the assertion it justifies.
+
+`Source` is a pointer; `Grounding Evidence` is the proof. Without it, verifying one expected result means opening the Epic or the PDF and finding the cited line. With it, a reviewer checks the row.
+
+| Mode | What to quote |
+|---|---|
+| **A** | The exact AC line text from the Epic |
+| **C** | The exact sentence from the retrieved chunk |
+| **B** | `Not specified — UI observed only` (no requirement source exists) |
+| Security tests | `Security Standard — no AC required` |
+
+**Rules:**
+- **Quote, never paraphrase.** A summary in this column defeats its purpose — the reader must see the source wording.
+- **Cap at ~15 words**, ellipsis for the rest. Long enough to verify, short enough to keep the row readable.
+- **When the requirement is silent, write `Not specified in the document`** — never leave the cell blank and never fill it with an inference. A blank reads as an oversight; the explicit string is a finding.
+- **If you cannot quote a source, you cannot assert the expected result.** An empty Grounding Evidence cell beside a confident Expected Result is the exact hallucination shape AH Rule 19 exists to prevent — that row must be `[VERIFICATION REQUIRED]` or a Step 7 gap instead.
+
+Example (Mode C):
+
+| Test ID | Expected Result | Source | Grounding Evidence |
+|---|---|---|---|
+| BL-004 | Error text "Enter valid 10-digit mobile number" is displayed | `Doc spec.pdf p.2 chunk#4` | *"Mobile numbers shorter than 10 digits must be rejected with the message…"* |
+
+Markdown output only — Jira descriptions already carry the full AC text in the Source section.
 
 **New column: Source** — MUST be traceable to exact Epic section, not just Epic key:
 - `Epic SCRUM-XX AC line N` — expected result traced to specific AC line (RICEPOT Context — C)
@@ -720,6 +745,7 @@ Before finishing:
 - ✅ Test steps are clear, numbered, actionable
 - ✅ Test data provided for all scenarios
 - ✅ Source column populated for every test case — with Epic line ref not just key
+- ✅ **Grounding Evidence quoted for every behavioural assertion** (markdown output). An expected result with an empty evidence cell is unverifiable — mark it `[VERIFICATION REQUIRED]` or raise it as a Step 7 gap rather than asserting it.
 - ✅ **If Jira output:** Confirm count + project before creating
 - ✅ **If Jira output:** Report all created keys
 - ✅ **If POM created:** Run Step 6B locator verification — all ✅ or flagged ⚠️
