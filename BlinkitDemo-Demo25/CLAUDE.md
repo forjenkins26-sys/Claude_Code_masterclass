@@ -14,9 +14,9 @@ A clean E2E QA project for a **live client demonstration**. Nothing has been run
 | **App** | Blinkit — grocery delivery, customer login |
 | **Hosting** | Vercel, public, no auth wall |
 | **Jira project** | `SCRUM` on `anandsoni2641.atlassian.net` |
-| **Epic** | **SCRUM-672** — *Blinkit Customer Login — Client Demo (25Aug)* |
+| **Epic** | **SCRUM-722** — *Blinkit Login QA — Pipeline Dry Run 24Aug1930* |
 
-**SCRUM-672 is verified fresh: 0 child issues at creation.** 15 ACs, login page only.
+**SCRUM-722 is verified fresh: 0 child issues at creation.** 15 ACs, login page only.
 
 **Do not create another Epic.** Several exist for this same page — a duplicate splits test cases and breaks the traceability the demo is meant to show.
 
@@ -40,9 +40,9 @@ The app is public, so `/explore` uses **live Playwright MCP**, not `scripts/fetc
 | # | Command | What the client sees | Takes |
 |---|---|---|---|
 | 1 | `/explore https://blinkit-demo-qa.vercel.app` | Live browser opens, DOM read, Page Object generated from real elements | ~2 min |
-| 2 | `/test-case-creation SCRUM-672` | Requirements → test cases in Jira, edge-case matrix walked per control | ~4 min |
-| 3 | `/test-case-execution SCRUM-672` | Headed run. **Failures classified before any fix.** Real bugs filed, test issues auto-fixed | ~5 min |
-| 4 | `/test-closure SCRUM-672` | AC→test traceability, counted coverage, Allure evidence report, Go / No-Go verdict | ~2 min |
+| 2 | `/test-case-creation SCRUM-722` | Requirements → test cases in Jira, edge-case matrix walked per control | ~4 min |
+| 3 | `/test-case-execution SCRUM-722` | Headed run. **Failures classified before any fix.** Real bugs filed, test issues auto-fixed | ~5 min |
+| 4 | `/test-closure SCRUM-722` | AC→test traceability, counted coverage, Allure evidence report, Go / No-Go verdict | ~2 min |
 
 ## The moment that sells it
 
@@ -89,11 +89,50 @@ Allure is **evidence, not the oracle** — `progress.md` remains the source of t
 
 ## If MCP results start archiving
 
-A tool result that comes back as `[Full result archived]` means the content never reached the model. It is payload-size driven and **session-local**.
+A tool result that comes back as `[Full result archived]` means the content never reached the model. It is payload-size driven.
 
-1. Narrow `fields` to the minimum the step needs
-2. Paginate — `maxResults: 5`, follow `nextPageToken`
-3. If a single-field, single-issue read still archives → **start a fresh session and re-run**
+**`MAX_MCP_OUTPUT_TOKENS` is NOT the fix — disproved 2026-08-24.** A fresh child process spawned with `MAX_MCP_OUTPUT_TOKENS=50000` in its environment still archived SCRUM-722 at exactly 4,645 chars. Setting it is harmless (it genuinely was unset) but does not resolve archiving. Do not send anyone to restart on this.
+
+Set it anyway for hygiene, in `.claude/settings.json` → `env`:
+
+```json
+{ "env": { "MAX_MCP_OUTPUT_TOKENS": "50000" } }
+```
+
+**Narrowing `fields` does NOT fix this** — measured on 2026-08-24 against SCRUM-722:
+
+| Fields requested | Payload |
+|---|---|
+| summary, description, status, issuetype, labels, priority | 4,884 chars |
+| description | 4,645 chars |
+| summary | 4,645 chars |
+| `searchJiraIssuesUsingJql` (`key = SCRUM-722`, summary only) | 4,787 chars |
+
+Two different single-field reads returned **byte-identical** sizes, and switching to a different tool changed almost nothing. The bulk is the Atlassian MCP response envelope (`context` object, account/cloud ids, client metadata), which `fields` does not trim. *(Inference from byte counts — the archived payloads were not readable on disk to confirm directly.)*
+
+## ✅ THE FIX — use `fetch` with an ARI (verified 2026-08-24)
+
+`getJiraIssue` and `searchJiraIssuesUsingJql` both wrap every response in a `context` envelope (account id, cloud id, client metadata) that `fields` cannot trim — that envelope alone exceeds the injection threshold. **`mcp__atlassian__fetch` does not carry it.**
+
+Two steps:
+
+```
+1. mcp__atlassian__search  { query: "\"<exact issue title>\"" }   → returns the ARI
+2. mcp__atlassian__fetch   { id: "ari:cloud:jira:<cloudId>:issue/<numericId>" }
+```
+
+Step 1 must return **one** result — a broad query returns 10 and archives (4,922 chars). Quote the exact title to narrow it. Step 2 returns the full description, all ACs, plus status/priority/issueType/reporter metadata.
+
+Verified on SCRUM-722: all 15 ACs retrieved verbatim after `getJiraIssue` failed 6 times.
+`cloudId` for this site: `e74af77d-c1bf-4809-aa7e-20b6020a077b`.
+
+**Measured — what does NOT work:** 4,645 chars for single-field reads, 4,884 for 6-field, 4,787 for JQL, 4,645 in a fresh process with `MAX_MCP_OUTPUT_TOKENS=50000`, 4,645 with ADF format. The token cap was tested and ruled out — do not chase it, and do not ask the user to restart.
+
+**Fallback if `fetch` ever fails too:** ask the human to paste the ACs. Cite `Epic {KEY} AC line N` as normal; note in `progress.md` that ACs came from paste rather than a live read.
+
+**Process lesson:** when one MCP read tool archives, try the *other read tools on the same server* before declaring the path exhausted. `getJiraIssue`, `searchJiraIssuesUsingJql`, `search`, and `fetch` have different response shapes.
+
+Switching `getJiraIssue` → `searchJiraIssuesUsingJql` is **not** a workaround — measured above, same envelope.
 
 **Never** fall back to the Jira REST API, search for `.env` files or API tokens, scrape Jira through a browser, or proceed on partial/remembered ACs. A blocked run reported honestly is correct; an invented AC is a silent failure.
 
@@ -103,14 +142,14 @@ A tool result that comes back as `[Full result archived]` means the content neve
 
 ```
 knowledge-base/SCRUM/
-  business-rules.md    ← bug oracle (BR-xx). Seed from the SCRUM-672 ACs before Step 3
+  business-rules.md    ← bug oracle (BR-xx). Seed from the SCRUM-722 ACs before Step 3
   known-defects.md     ← dedup register — check before filing
   feature-map.md       ← regression blast radius
   product-flows.md     ← user journeys
   app-patterns.json    ← how the app is BUILT — hint only, never an oracle
 ```
 
-**Seed `business-rules.md` from the SCRUM-672 ACs during Step 2.** Without it, Step 3 loses Confirmed/Suspected bug tiering and dedup — and it fails *silently*.
+**Seed `business-rules.md` from the SCRUM-722 ACs during Step 2.** Without it, Step 3 loses Confirmed/Suspected bug tiering and dedup — and it fails *silently*.
 
 **Dedup warning:** earlier Blinkit Epics (SCRUM-121, SCRUM-386, SCRUM-403, SCRUM-603, SCRUM-626, SCRUM-653) already carry filed defects for this same app. If a defect here matches one of those, reference it rather than filing a duplicate (AH Rule 21).
 
