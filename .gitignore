@@ -22,3 +22,14 @@ node_modules/
 **/.env
 .vercel/
 **/.vercel/
+
+# ── Demo / client E2E projects — LOCAL ONLY, never pushed ──────────────────
+# These are disposable per-Epic working folders. Only workspace-level assets
+# (skills, rulebooks, qa-ai-stack, scripts/) belong in this repo.
+# Files stay on disk; git simply ignores them.
+ClientDemo-*/
+BlinkitDemo-*/
+Blinkit-Demo/
+MediCare-QA-Demo/
+*-QA-Demo/
+*-E2E/
