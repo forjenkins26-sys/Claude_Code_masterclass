@@ -55,11 +55,15 @@ cat > "$DEST/package.json" <<JSON
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
     "report": "playwright show-report",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
     "@types/node": "^22.0.0",
+    "allure-playwright": "^3.10.2",
     "typescript": "^5.6.0"
   }
 }
@@ -98,6 +102,17 @@ export default defineConfig({
     ['list'],
     ['html', { outputFolder: \`playwright-report/\${RUN_ID}\`, open: 'never' }],
     ['json', { outputFile: \`test-results/\${RUN_ID}/results.json\` }],
+    // Allure — per-run results dir so \`allure generate\` can build cross-run trends.
+    // REQUIRED by /test-closure Step 4B: closure attaches this as the evidence report.
+    // Consumed as EVIDENCE only — progress.md stays the pass/fail oracle.
+    ['allure-playwright', {
+      resultsDir: \`allure-results/\${RUN_ID}\`,
+      environmentInfo: {
+        RUN_ID,
+        BASE_URL: process.env.BASE_URL ?? '$URL',
+        mode: 'headed',
+      },
+    }],
   ],
 
   use: {
@@ -162,4 +177,7 @@ echo
 echo "Still to do by hand:"
 echo "  1. Create the Jira Epic, then write $NAME/CLAUDE.md with its key + the app URL"
 echo "  2. npx playwright install   (first time on this machine only)"
+echo "  2b. Allure CLI (first time on this machine only) — needed by /test-closure Step 4B:"
+echo "        npm i -g allure-commandline     # or: npx allure --version"
+echo "      View ONLY over HTTP: npm run allure:serve   (file:// leaves widgets on 'Loading...')"
 echo "  3. /explore $URL"

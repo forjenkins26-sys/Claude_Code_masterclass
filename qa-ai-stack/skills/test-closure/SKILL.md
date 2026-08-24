@@ -171,9 +171,61 @@ State the verdict, the rule that triggered it, and what would change it.
 
 ---
 
-### Step 4B: Attach the Evidence Report (OPTIONAL — only if Allure results exist)
+### Step 4B: Attach the Evidence Report (MANDATORY — Allure is part of every closure)
 
-**Skip entirely if `allure-results/` is absent.** This step never blocks closure and never becomes the oracle — `progress.md` execution rows remain the source of truth for pass/fail (Step 0).
+**Allure is a standing deliverable of `/test-closure`, not an optional extra.** A closure report without a browsable evidence report is incomplete — for a client-facing cycle the Allure report IS the artefact people open.
+
+**If `allure-results/` is absent, do NOT silently skip.** Wire it up and produce one:
+
+1. `npm i -D allure-playwright`
+2. Append to the `reporter` array in `playwright.config.ts` (keep existing reporters):
+   ```ts
+   ['allure-playwright', {
+     resultsDir: `allure-results/${RUN_ID}`,
+     environmentInfo: { BASE_URL: <baseURL>, RUN_ID, headed: 'true' },
+   }],
+   ```
+3. Re-run the suite headed (AH Rule 17) so results are produced — **ASK FIRST, see below**.
+4. Generate + **verify content** (below).
+
+**🚫 `/test-closure` NEVER re-runs the suite on its own.** Closure reports on a run that already happened; it is not an execution phase. Re-running silently is wrong for three reasons: it wipes `test-results/` (AH Rule 31), it costs minutes of wall-clock in front of a client, and it can produce results that no longer match the `progress.md` block the report is built from.
+
+When Allure results are missing, the correct order is:
+1. Wire up the config (steps 1–2 above) — cheap, no run needed.
+2. **Ask the user** before executing: *"Allure needs a run to produce results. Re-run the 18 tests now (~1 min), or wire it up for the next cycle?"*
+3. If they decline → generate nothing, and state prominently in the closure output that no evidence report exists and why.
+
+**Prefer an existing run's artefacts if any exist.** Only execute when there is genuinely no other way to produce results AND the user agreed.
+
+**Viewing the report — ALWAYS over HTTP, never `file://`.** Allure fetches its data as JSON; browsers block `fetch()` on `file://` URLs, so opening `index.html` directly leaves every widget stuck on **"Loading..."** forever. The report is fine; the transport is not. Use:
+```bash
+npx allure open <report-dir> --port 8090     # serves a generated report
+npx allure serve <results-dir>               # generate + serve in one step
+```
+Then verify before handing the link over: `curl -s -o /dev/null -w "%{http_code}" http://localhost:8090/widgets/summary.json` must return `200`.
+
+Only skip Allure entirely if the user explicitly declines — and then say so prominently in the closure output, never as a buried footnote.
+
+**⚠️ Two failure modes that produce a FALSE GREEN — check both, every run:**
+
+**(a) A `--reporter=` CLI flag overrides the ENTIRE config reporter array**, silently disabling Allure. Run with **no** `--reporter` flag so the config applies. Symptom: run succeeds, `allure-results/` never appears.
+
+**(b) `allure generate` prints "Report successfully generated" even when the results dir does not exist**, producing an empty report. Never trust that message — verify:
+
+```bash
+node -e "
+const fs=require('fs');
+const p='allure-report/<RUN_ID>/widgets/summary.json';
+if(!fs.existsSync(p)){console.log('EMPTY REPORT — no summary.json');process.exit(1);}
+const s=JSON.parse(fs.readFileSync(p,'utf8')).statistic;
+console.log('total',s.total,'passed',s.passed,'failed',s.failed,'broken',s.broken,'skipped',s.skipped);
+"
+```
+`total` must equal the test count in `progress.md`. A mismatch = stale or partial report; regenerate before citing it.
+
+**Counting attachments:** they nest inside test **steps**, not the top-level `attachments` array. A naive top-level count reads `0` on tests that DO have screenshots/videos/traces. Walk `testStage.steps[].attachments` recursively, or count files in `data/attachments/`.
+
+This step never becomes the oracle — `progress.md` execution rows remain the source of truth for pass/fail (Step 0).
 
 Playwright projects configured per AH Rule 31 write per-run artefacts to `allure-results/{RUN_ID}/`. When present, generate a browsable evidence report and link it from the closure report:
 
@@ -209,10 +261,24 @@ Write to `output/closure-{EPIC-KEY}-{YYYY-MM-DD}.md`:
 
 **Date:** {YYYY-MM-DD} · **Cycle:** {execution run timestamp from progress.md}
 **Spec:** {spec path} · **Source:** progress.md run {timestamp}
-**Evidence report:** {allure-report/{RUN_ID}/index.html — or "not generated"}
+**Evidence report:** {allure-report/{RUN_ID}/index.html — verified {total} tests, {N} attachments}
+**Serve it:** `npm run allure:serve` (HTTP — never open index.html over `file://`)
 
 ## Verdict: {🟢 GO / 🟡 GO WITH RISK / 🔴 NO-GO}
 {trigger rule, ship risk, what would change it}
+
+## Evidence Report (Allure)
+
+| | |
+|---|---|
+| Report | `allure-report/{RUN_ID}/index.html` — serve with `npm run allure:serve` |
+| Tests in report | {total} — **must equal the progress.md row count**; a mismatch means a partial run, say so |
+| Passed / Failed / Broken / Skipped | {p} / {f} / {b} / {s} (from `widgets/summary.json`) |
+| Attachments | {N} (screenshots, videos, traces — walk `steps[].attachments`, not the top-level array) |
+| Duration | {total run duration} |
+| Trend | {"single run — no trend available" if <2 retained run folders, else the flip/stability read} |
+
+Numbers here are **evidence, not the verdict**. If `widgets/summary.json` disagrees with `progress.md`, `progress.md` wins and the discrepancy is reported explicitly — never silently reconciled.
 
 ## Coverage
 Requirements: {n/m (xx%)} · Pass rate: {n/m (xx%)} · Execution: {n/m (xx%)}
@@ -253,6 +319,8 @@ Before finishing:
 - ✅ Non-functional coverage reported separately
 - ✅ Defects tiered Confirmed / `[SUSPECTED]`; pre-existing separated from this cycle
 - ✅ Verdict states its trigger rule + what would change it
+- ✅ Allure evidence report generated AND verified non-empty (summary.json total == progress.md test count); wired up if it was missing
+- ✅ **Evidence Report (Allure) summary table filled with real numbers** from `widgets/summary.json` — never left as `{placeholders}`, never estimated. Mismatch vs `progress.md` reported, not reconciled
 - ✅ Orphan tests listed, not dropped
 - ✅ Appended to `progress.md`
 
@@ -291,4 +359,9 @@ Do NOT overwrite — always append.
 | Report 100% coverage ignoring non-functional | Separate non-functional table |
 | Soften NO-GO because the team wants to ship | State the verdict and its trigger |
 | Auto-transition the Epic to Done | Recommend; human signs off |
+| Skip Allure because `allure-results/` is absent | Wire it up (`npm i -D allure-playwright` + reporter), re-run, generate |
+| Trust "Report successfully generated" | Verify `widgets/summary.json` — it prints that for an EMPTY report |
+| Pass `--reporter=list` on the closure re-run | Omit `--reporter` entirely; the flag overrides the whole config array and disables Allure |
+| Re-run the suite during closure without asking | Closure reports on a run that already happened. Wire the config, then ASK before executing |
+| Hand over a `file://` link to the Allure report | Serve over HTTP (`allure open --port` / `allure serve`); `file://` leaves every widget on "Loading..." |
 | Drop a test that maps to no AC | List it as an orphan |
