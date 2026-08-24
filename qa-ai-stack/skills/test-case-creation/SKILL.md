@@ -135,6 +135,28 @@ Same output pipeline as Mode A from Step 2 onward (locators, scenario mapping, d
 
 If no folder → continue silently (KB is additive). Then proceed to fetch the Epic.
 
+**Seed or re-seed `business-rules.md` from THIS Epic's ACs (do this once the Epic is fetched).**
+
+The KB is the oracle `/test-case-execution` uses to decide bug-vs-intended. It must describe the Epic being tested, or it will tier defects against requirements that no longer apply.
+
+Check the `Source` column of every `BR-xx` row:
+
+| State | Action |
+|---|---|
+| Template placeholders (`<JIRA-KEY>`, `<feature>`) | **Seed it** — one `BR-xx` per AC, `Source` = `Epic {KEY} AC {n}`, severity by impact |
+| Every `Source` cites the Epic under test | Current — leave it alone |
+| Any `Source` cites a **different** Epic | **STOP and tell the human it is stale.** Show the contradicting rows, propose the re-seed, and wait. Never auto-overwrite (AH Rule 30) |
+
+```bash
+grep -oE "Epic [A-Z]+-[0-9]+" knowledge-base/<PROJECT>/business-rules.md | sort -u
+```
+
+A rule whose `Source` names a different Epic is not "extra context" — it is a wrong oracle, and a wrong oracle files bugs against correct behaviour.
+
+**Also seed `known-defects.md`** from bugs already filed against the same application (prior Epics on the same URL count). An unseeded dedup register is why a later run files duplicates of defects that are already open (AH Rule 21).
+
+**Root cause to avoid:** reusing a project folder across Epics and retargeting only `CLAUDE.md`. Scaffold a fresh project per Epic and the KB arrives as a clean template, seeded from the right Epic on first run.
+
 **Load Jira MCP tool:**
 ```
 ToolSearch: select:mcp__atlassian__getJiraIssue
@@ -704,12 +726,34 @@ Report ❌ rows even when no test case was generated for them — an untested di
 
 ---
 
+## Mandatory Prompt Checklist (run before declaring the skill done)
+
+The MANDATORY user-prompts are scattered across the steps, which makes it easy to
+finish the *work* and skip a *gate*. Before reporting completion, walk this table
+and confirm each row was either **asked** or **covered by a standing user preference**.
+A prompt replaced by your own prose summary ("want specs or execution?") is NOT asked —
+an open-ended offer is not the gate. The gate is the explicit question.
+
+| # | Gate | When it fires | Skippable if |
+|---|---|---|---|
+| 1 | Output format — Jira vs markdown | Epic given, format unstated (Step 1) | Standing preference exists (e.g. memory says "always Jira") |
+| 2 | Existing-children reconciliation — Sync/Skip/Replace/Add | JQL finds children under the Epic (Step 6) | Zero existing children |
+| 3 | **POM + spec creation — yes/no** | **ALWAYS, after Jira issues are created (Step 6)** | **Never skippable. Ask even when a POM already exists — scope it to what is actually missing (spec/fixtures).** |
+| 4 | POM file exists — Skip/Replace | User said yes to #3 and POM file present | No POM file present |
+| 5 | Spec file exists — Skip/Replace | User said yes to #3 and spec file present | No spec file present |
+
+**Gate #3 is the one that gets dropped.** It fires at the moment the run feels
+finished — issues are created, keys are reported, the summary reads complete.
+Ending on a prose question instead of the gate is the exact failure. If a POM
+already exists, the gate does not vanish; it narrows to the missing artifacts.
+
 ## Quality Gates
 
 Before finishing:
 - ✅ **RICEPOT P enforced:** AH Rules 17/18/19/20 applied — can cite which rule prevented which mistake
 - ✅ **RICEPOT O enforced:** Source column has Epic line reference (not just Epic key) for every assertion
 - ✅ **RICEPOT T enforced:** Jira descriptions follow strict template — no prose, no filler
+- ✅ Mode A: `business-rules.md` seeded from THIS Epic, or confirmed already current. A `Source` column naming a different Epic is a hard stop, reported not auto-fixed
 - ✅ Mode A: Step 1B spec-level dedup scan run before scenario generation — overlaps noted, not regenerated
 - ✅ Mode A/C: Step 1C requirement gap scan run — 5 dimensions scored, ⚠️/❌ carried into Step 7, no ❌ closed by invention
 - ✅ Mode A: Every behavioral expected result traced to exact Epic AC line (Source column)
@@ -862,3 +906,7 @@ If a follow-up question only offers a subset, still report a verdict for the omi
 ❌ **Don't:** Only dedup at the Jira-issue level (Step 6, JQL on the parent Epic) — that check fires AFTER scenarios are already generated, and misses overlap with existing `.spec.ts` coverage from an EARLIER Epic touching the same page/control (e.g. login re-tested under two different Epics because Step 6 only looks at siblings under the SAME parent).
 ✅ **Do:** Run **Step 1B — Spec-Level Dedup Scan** right after the Epic is fetched (Step 1A), before scenario generation (Step 3): glob+grep existing `tests/ui/*.spec.ts` for the feature/page name, list what's already covered, generate only the delta. Additive to Step 6, not a replacement — Step 6 still guards Jira-issue idempotency at creation time.
 *(Lesson #9 — 2026-07-16: gap found comparing against an external Jira-to-Playwright agent that scans `tests/features/` before generating, to avoid duplicate feature logic. Adopted because it closes a real observed pain — near-duplicate TCs across SCRUM-68/85/86/121/255 — not to match the external tool feature-for-feature.)*
+
+❌ **Don't:** Replace a MANDATORY user-prompt with your own prose offer when the run feels finished. After creating 21 Jira issues, ending with "Want me to generate the spec files now, or go straight to /test-case-execution?" is NOT the Step 6 POM gate — it is an open-ended suggestion that hands the checkpoint back to the user as a casual choice. Also don't treat "a POM already exists" as reason to drop the gate: the gate covers POM **and spec/fixtures**, and specs are usually the missing half.
+✅ **Do:** Walk the **Mandatory Prompt Checklist** (before Quality Gates) before declaring the skill done. Gate #3 (POM + spec creation) fires ALWAYS after Jira creation — it is never skippable, only narrowable to the artifacts actually missing. Ask the explicit question with concrete options; a prose alternative does not discharge it.
+*(Lesson #10 — 2026-08-24: SCRUM-694 run created 21 issues, then skipped the Step 6 POM/spec gate and ended on a prose question. QA caught it: "why you didnt ask to creat case on pom?". Root cause was NOT a missing rule — line 551 already said ALWAYS ask. The gates were scattered across 11 line locations with no single end-of-run reconciliation point, so the one that fires at the "feels done" moment got softened into conversation. Fix = one checklist table walked before completion, mirroring Lesson #7's reconcile-every-candidate discipline.)*

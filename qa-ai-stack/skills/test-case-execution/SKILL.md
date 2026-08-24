@@ -77,6 +77,28 @@ Before parsing input, load the standing product memory so the bug oracle + dedup
 
 **Never load another project's folder.** Only `<PROJECT>/` is in scope.
 
+#### Step 0A: Oracle staleness gate (MANDATORY — run before any classification)
+
+`business-rules.md` is the bug oracle. If its rules were seeded from a DIFFERENT Epic than the one under test, it will tier defects against requirements that no longer apply — filing a bug against correct behaviour.
+
+**Check the `Source` column.** Every `BR-xx` row cites its origin (`Epic SCRUM-672 AC 6`). Compare that Epic key against the Epic being executed:
+
+| Finding | Action |
+|---|---|
+| Every `Source` cites the Epic under test | Proceed — oracle is current |
+| Any `Source` cites a **different** Epic | **STOP. Report it as stale and ask the human to re-seed.** Do not classify defects against it, and do not auto-edit the file (AH Rule 30) |
+| No `Source` column, or `<JIRA-KEY>` placeholders | Template, never seeded — treat as no KB (continue silently, Confirmed/Suspected tiering unavailable) |
+
+```bash
+grep -oE "Epic [A-Z]+-[0-9]+" knowledge-base/<PROJECT>/business-rules.md | sort -u
+```
+
+One line of output that is not the Epic under test = stale.
+
+**Why this is a hard stop, not a warning.** A stale rule and a current AC can be *contradictory*, not merely different — e.g. `BR-06` "control is disabled until valid" vs `AC 6` "control is always enabled". Classification against the stale rule marks correct behaviour as a Confirmed defect, and a filed bug is outward-facing work that is expensive to retract.
+
+**Most common cause:** a project folder reused across Epics, where `CLAUDE.md` was retargeted but the KB was not. Scaffolding a fresh project per Epic avoids it entirely.
+
 ### Step 1: Parse Input
 
 **Two modes:**
@@ -482,6 +504,13 @@ From test failure + investigation:
 - No matching rule → **Suspected**. Bug summary gets `[SUSPECTED]` prefix.
 
 **3c. JQL fallback** (only if KB had no matching Ref): search existing bugs — same defect may have been filed from a prior run or manual report.
+
+**⛔ A COUNT IS NOT A DEDUP CHECK.** `searchResultMode: "count"` tells you *how many* matched, never *what* they are. A non-zero count with unreadable titles means dedup **FAILED**, not "no duplicate found". Two hard consequences:
+
+1. **Never file on an unread count.** If the count is >0 and you cannot read the titles, STOP and tell the user dedup is blocked — do not offer "file anyway with a flag" as the leading option. Try every read path first: `mcp__atlassian__fetch` on a direct `issue/<numericId>` ARI (survives the envelope), a tighter JQL that narrows to 1–2 rows, or `created < <today>` to exclude your own writes.
+2. **Never re-issue a create on a count of 0.** After `createJiraIssue`, a count query can read 0 because the write has not committed yet. Retrying then creates a REAL duplicate. Verify by ARI (`issue/<lastKnownId+1>`) and wait — an archived response means *unknown*, never *failed*.
+
+**Filing is not idempotent. A count is eventually-consistent. Never combine the two.**
 
 ```
 mcp__atlassian__searchJiraIssuesUsingJql({
@@ -1035,6 +1064,7 @@ If the run established a NEW business rule (from the Epic AC, not previously in 
 ## Quality Gates
 
 Before finishing:
+- ✅ **Oracle staleness gate (Step 0A) run** — every `BR-xx` `Source` cites the Epic under test. A rule sourced from a different Epic is a hard stop, reported to the human, never auto-edited and never used for tiering
 - ✅ All test cases executed (or failure reason reported)
 - ✅ Jira status updated for each test (or comment added if update failed)
 - ✅ Summary table shows all results
@@ -1138,3 +1168,7 @@ Before finishing:
 - Auto-detect test specs from Jira description
 - Handle Jira transition workflow properly
 - Report summary with pass/fail/flaky/auto-fixed counts
+
+❌ **Don't:** Treat a JQL `searchResultMode: "count"` result as a completed dedup check, or re-issue a `createJiraIssue` because a follow-up count read 0. A count answers "how many", never "which" — and it is eventually-consistent, so it can read 0 for a write that already succeeded.
+✅ **Do:** Dedup means READ THE TITLES. Count >0 + unreadable titles = dedup FAILED, report it blocked. After an archived create, verify by ARI (`issue/<lastId+1>`) and wait — never retry the create. Filing is not idempotent.
+*(Lesson — 2026-08-24, SCRUM-694: filed 4 bugs on an unread count of 7 and 2 matches, then created 2 REAL duplicates (SCRUM-717, SCRUM-719) by retrying archived creates that had actually succeeded. AH Rule 21 and Step 3 both already forbade this — the rules were not missing, the count was mistaken for a check. Root cause: I offered "file all 4, flag as unverified" as the recommended option instead of exhausting the read paths (`fetch` on a direct ARI worked all session, and `created < today` cleanly excludes own writes — neither was tried before asking).)*
