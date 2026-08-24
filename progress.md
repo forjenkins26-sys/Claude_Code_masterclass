@@ -919,3 +919,62 @@ SCRUM-717 (dup of SCRUM-716) and SCRUM-719 (dup of SCRUM-718). Cause: `createJir
 **Smoke Gate (Step 6C):** PASS 1/1 (BL-001, headed chromium, 1.1s). Allure emitted results + screenshot attachment.
 **Typecheck:** clean
 **Dedup:** 0 duplicates. All 18 creates returned keys in-band — no archived-write retry triggered.
+
+## 2026-08-24 23:50 — /test-case-execution SCRUM-722
+
+**Epic:** SCRUM-722 — Blinkit Login QA — Pipeline Dry Run 24Aug1930
+**Build:** ETag `6fd46ec3818f08374b290e4e4d601830` · Last-Modified 2026-08-24 11:25:15 GMT
+**App:** https://blinkit-demo-qa.vercel.app
+**Mode:** headed chromium, workers=1, retries=0 · RUN_ID `exec-722` · 44.4s
+**Total Tests:** 18
+**Results:** 13 Pass | 0 Auto-Fixed | 0 Flaky | 4 Blocked | 0 Failed | 1 Skipped
+**Session Score:** 76% PASS (13/17 runnable)
+
+| Test ID | Jira | Result | Duration | Jira Status | Note |
+|---|---|---|---|---|---|
+| BL-001 | SCRUM-723 | PASS | 2330ms | Done | |
+| BL-002 | SCRUM-724 | PASS | 962ms | Done | |
+| BL-003 | SCRUM-725 | PASS | 838ms | Done | |
+| BL-004 | SCRUM-726 | BLOCKED | 8849ms | In Review | REAL_BUG BR-04 — bug NOT filed, dedup blocked |
+| BL-005 | SCRUM-727 | PASS | 1220ms | Done | |
+| BL-006 | SCRUM-728 | PASS | 984ms | Done | stale BR-06 would have failed this |
+| BL-007 | SCRUM-729 | PASS | 3380ms | Done | |
+| BL-008 | SCRUM-730 | PASS | 832ms | Done | |
+| BL-009 | SCRUM-731 | PASS | 1067ms | Done | |
+| BL-010 | SCRUM-732 | BLOCKED | 1065ms | In Review | Bug: SCRUM-716 (referenced) |
+| BL-011 | SCRUM-733 | PASS | 959ms | Done | label mismatch = observation, not defect |
+| BL-012 | SCRUM-734 | BLOCKED | 6064ms | In Review | Bug: SCRUM-718 (referenced) |
+| BL-013 | SCRUM-735 | BLOCKED | 1038ms | In Review | Bug: SCRUM-721 (referenced) |
+| BL-014 | SCRUM-736 | PASS | 1228ms | Done | |
+| BL-015 | SCRUM-737 | PASS | 990ms | Done | |
+| BL-016 | SCRUM-738 | PASS | 2083ms | Done | |
+| BL-017 | SCRUM-739 | PASS | 2054ms | Done | |
+| BL-018 | SCRUM-740 | SKIP | 0ms | To Do | test.fixme — no AC governs first/last name |
+
+**Blocked (App Bugs) — 3 referenced, 0 duplicates filed:**
+- SCRUM-732 BL-010: existing SCRUM-716 — toast says "email" on mobile-only login (BR-10)
+- SCRUM-734 BL-012: existing SCRUM-718 — #signupBtn has no handler (BR-12)
+- SCRUM-735 BL-013: existing SCRUM-721 — 0 aria-describedby/role=alert/aria-live (BR-13)
+
+**Blocked — bug NOT filed (dedup blocked, human action needed):**
+- SCRUM-726 BL-004: regex `/^\d{9,10}$/` accepts 9 digits (BR-04, BR-01). JQL for pre-existing bugs returns count=5 but every read path archived (single-row single-field JQL, search+fetch). A count is not a dedup check (AH Rule 21) — filing on an unread count is what produced SCRUM-717/719 last cycle. Human must run: `project = SCRUM AND issuetype = Bug AND created < startOfDay() AND summary ~ "9-digit mobile"`
+
+**Oracle staleness gate (Step 0A):** PASS — all 15 BR rules cite Epic SCRUM-722, 0 stale.
+**Dedup outcome:** 3 existing bugs referenced (all verified still open), 0 duplicates created, 1 filing blocked and reported.
+**Evidence:** test-results/exec-722/ — 17 screenshots, 4 videos, 4 traces · allure-results/exec-722/ — 48 files
+
+## 2026-08-25 00:15 — /test-closure SCRUM-722
+
+**Epic:** SCRUM-722 — Blinkit Login QA — Pipeline Dry Run 24Aug1930
+**Verdict:** 🔴 NO-GO — open P1 (SCRUM-718, registration unreachable) + unfiled P1 (9-digit regex accepts invalid mobile)
+**Coverage:** 15/15 ACs have tests (100%) · 11/15 ACs passing (73%) · Pass rate 13/17 (76%) · Execution 17/18 (94%)
+**Open Defects:** SCRUM-718 (P1), SCRUM-716 (P2), SCRUM-721 (P2) — all pre-existing, referenced not re-filed · 1 UNFILED P1 (dedup blocked)
+**Not Covered:** performance · authorization/session · i18n · cross-browser · viewports other than 1280px — none have an AC
+**Build:** ETag 6fd46ec3818f08374b290e4e4d601830 — re-verified unchanged at closure, results still valid
+**Evidence:** allure-report/exec-722 — verified non-empty (total 18 == progress.md rows), 29 attachments, SERVED at http://127.0.0.1:8092 (HTTP 200)
+**Report:** BlinkitDemo-Demo25/output/closure-SCRUM-722-2026-08-25.md
+
+**Human action required:** BL-004's bug is NOT filed. Dedup returned count=5 with unreadable titles (every read path archived). A count is not a dedup check (AH Rule 21). Run:
+`project = SCRUM AND issuetype = Bug AND created < startOfDay() AND summary ~ "9-digit mobile"`
+
+**Pipeline dry-run outcome:** oracle staleness gate PASS · dedup register worked (0 duplicates vs 2 last cycle) · archived-write guard worked · transition shape worked · Allure generated AND served · stale-oracle false positive on BL-006 prevented by the re-seed. Residual: MCP read archiving still blocks title-level dedup on broad queries — handled correctly by refusing to file.
