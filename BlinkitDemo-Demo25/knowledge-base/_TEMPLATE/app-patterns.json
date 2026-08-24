@@ -1,0 +1,84 @@
+{
+  "_doc": {
+    "purpose": "App-specific patterns learned across runs. Makes repeat work cheap and consistent: the 3rd form with a mobile field reuses what runs 1 and 2 established, instead of re-deriving it.",
+    "authority": "HINT ONLY — never an oracle. The Epic AC decides expected behaviour (AH Rule 19). A pattern only suggests WHICH cases to write and WHERE the element usually is.",
+    "staleness": "AH Rule 30 applies. Every pattern carries lastVerified + source. Re-verify against live DOM before use; on mismatch, trust the DOM and update the pattern.",
+    "written_by": "/explore (Step 7B) and /test-case-execution (Step 7C)",
+    "read_by": "/test-case-creation (Step 3A — app-specific layer on top of the generic control matrix)"
+  },
+
+  "project": "<PROJECT-KEY>",
+  "lastUpdated": "<YYYY-MM-DD>",
+
+  "fieldPatterns": [
+    {
+      "id": "FP-01",
+      "name": "<e.g. mobile-number>",
+      "matches": ["<id/name/placeholder fragments that identify this field type>"],
+      "seenIn": ["<spec or page where observed>"],
+      "constraints": {
+        "maxLength": null,
+        "inputType": "<text|tel|email|number>",
+        "required": null
+      },
+      "errorText": {
+        "empty": "<exact error text observed>",
+        "invalid": "<exact error text observed>"
+      },
+      "standardCases": [
+        "empty submit (Negative)",
+        "below min length (BVA)",
+        "above max length via pressSequentially (BVA, AH Rule 18)",
+        "wrong character class (ECP-invalid)",
+        "SQLi + XSS (Security, always)"
+      ],
+      "source": "<EPIC AC line | observed run YYYY-MM-DD>",
+      "lastVerified": "<YYYY-MM-DD>"
+    }
+  ],
+
+  "uiConventions": [
+    {
+      "id": "UC-01",
+      "name": "<e.g. inline-field-error>",
+      "rule": "<e.g. validation errors render below the field in red, id pattern #<field>Error>",
+      "seenIn": ["<pages where this held true>"],
+      "counterExamples": [],
+      "source": "<observed run YYYY-MM-DD>",
+      "lastVerified": "<YYYY-MM-DD>"
+    }
+  ],
+
+  "flowPatterns": [
+    {
+      "id": "FL-01",
+      "name": "<e.g. successful-login>",
+      "steps": ["<step 1>", "<step 2>"],
+      "endState": "<observable end state — URL, toast, element>",
+      "source": "<EPIC AC line | observed run YYYY-MM-DD>",
+      "lastVerified": "<YYYY-MM-DD>"
+    }
+  ],
+
+  "locatorStrategies": [
+    {
+      "id": "LS-01",
+      "control": "<e.g. primary submit button>",
+      "preferred": "<e.g. getByRole('button', { name: '<exact text>' })>",
+      "avoid": "<e.g. .btn-primary — 4 matches on checkout>",
+      "source": "<observed run YYYY-MM-DD>",
+      "lastVerified": "<YYYY-MM-DD>"
+    }
+  ],
+
+  "inconsistencies": [
+    {
+      "id": "IN-01",
+      "observation": "<e.g. login says 'Enter valid mobile number', registration says 'Invalid phone'>",
+      "pages": ["<page A>", "<page B>"],
+      "status": "<REPORTED SCRUM-xxx | UNREPORTED>",
+      "note": "Same-concept text differing across pages. Report as a finding — never auto-normalise.",
+      "source": "<observed run YYYY-MM-DD>"
+    }
+  ]
+}
