@@ -32,6 +32,18 @@ cp "$STACK"/knowledge-base/_TEMPLATE/*.md   "$DEST/knowledge-base/$PROJ/"
 cp "$STACK"/knowledge-base/_TEMPLATE/*.json "$DEST/knowledge-base/$PROJ/"
 cp "$STACK/knowledge-base/GUIDE.md"         "$DEST/knowledge-base/"
 
+# --- .gitkeep so the generated dirs survive a clone.
+# Git does not track empty directories, so without these a fresh clone has no
+# tests/ui, src/pages or output — and Playwright's testDir points at a path
+# that does not exist.
+cat > "$DEST/tests/ui/.gitkeep" <<'K'
+Specs are generated here by /test-case-creation.
+Kept in git so a fresh clone has the directory Playwright's testDir expects.
+K
+echo "Page Objects are generated here by /explore." > "$DEST/src/pages/.gitkeep"
+echo "Fixture DI lives here when a project needs it." > "$DEST/src/fixtures/.gitkeep"
+echo "Closure reports are written here by /test-closure." > "$DEST/output/.gitkeep"
+
 # --- localhost DOM fallback (only needed when the AUT is on localhost)
 cp "$STACK/scripts/fetch-local-page.js" "$DEST/scripts/"
 
@@ -114,6 +126,7 @@ req  "rulebook reference copies"     "$(ls *.md 2>/dev/null | grep -cE 'ANTI|AUT
 req  "allure npm scripts"            "$(node -e "console.log(Object.keys(require('./package.json').scripts).filter(k=>k.startsWith('allure')).length)")" "3"
 req  "tsconfig present"              "$([ -f tsconfig.json ] && echo 1 || echo 0)" "1"
 req  "gitignore present"             "$([ -f .gitignore ] && echo 1 || echo 0)" "1"
+req  "gitkeep files (survive clone)" "$(find . -name '.gitkeep' -not -path './node_modules/*' | wc -l | tr -d ' ')" "4"
 req  "clean slate — specs"           "$(ls tests/ui/*.spec.ts 2>/dev/null | wc -l | tr -d ' ')" "0"
 req  "clean slate — POMs"            "$(ls src/pages/*.ts 2>/dev/null | wc -l | tr -d ' ')" "0"
 warn "allure CLI available"          "$(npx --no-install allure --version >/dev/null 2>&1 && echo 1 || echo 0)" "1"
