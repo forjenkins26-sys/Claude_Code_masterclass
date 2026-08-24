@@ -42,6 +42,33 @@ Coverage is computed from recorded execution results, never estimated. A require
 
 ## Instructions
 
+### Step 0-PRE: Verification Contract (MANDATORY — applies to every statement in the report)
+
+This skill produces a **client-facing** artefact: a traceability matrix, a counted coverage figure, and a ship verdict. A number stated here gets read as fact by people who will not re-derive it. That makes an assumption more expensive here than anywhere else in the pipeline.
+
+**State nothing you have not read from a tool result in THIS run.**
+
+| Kind of claim | What discharges it |
+|---|---|
+| A count (tests, ACs, defects, attachments) | Counted from a file or query result you actually read this run |
+| A file exists (report, spec, screenshot) | A directory listing or read that returned it |
+| A test passed or failed | The row in `progress.md` / `results.json`, not recollection |
+| A Jira key, status, or summary | A tool result naming it — never a key you inferred from a pattern |
+| A coverage percentage | `n/m` where both n and m were counted, never estimated |
+| A URL is reachable | A response code you saw |
+
+**Three hard prohibitions:**
+
+1. **An unreadable result means UNKNOWN, never a value.** An archived MCP response, a failed read, a timed-out command — none of these are evidence of absence. Report the block; do not fill the hole.
+2. **A plausible number is still a guess.** "18 tests" recalled from earlier in the conversation is a claim; the same figure counted from `results.json` this run is a fact. Prefer the second even when they agree.
+3. **A tool printing "success" is not verification of the outcome.** `allure generate` reports success against a non-existent results dir. Verify the artefact, not the exit message.
+
+**When you cannot verify something, say so in the report** — `[not verified — reason]`. A closure report that admits one unverified line is trustworthy. One that quietly rounds a gap into a number is not, and nobody can tell which they are holding.
+
+This is the rulebook's own premise (strict verification, bounded scope of knowledge) applied to the reporting phase, and it sits above every step below.
+
+---
+
 ### Step 0: Load Sources (MANDATORY — in this order)
 
 **1. `progress.md`** — the only source of truth for what actually ran.
@@ -185,6 +212,18 @@ npx allure generate allure-results/{RUN_ID} --clean -o allure-report/{RUN_ID}
 npx allure generate allure-results --clean -o allure-report
 ```
 
+**Then SERVE it — generating alone is not delivering.** A generated report opened via `file://` leaves every widget stuck on "Loading..." forever: browsers block `fetch()` on file URLs. The report is fine; the transport is not. A closure that links an unviewable report has not produced evidence.
+
+```bash
+npx allure serve allure-results/{RUN_ID}     # generate + serve, prints the URL
+# or, for an already-generated report:
+npx allure open allure-report/{RUN_ID}
+```
+
+Run it in the background, capture the printed `http://127.0.0.1:{port}` URL, and **put that URL in the closure report AND in the summary to the user**. If the project defines its own script (`npm run allure:serve`), prefer it — it carries the project's own paths.
+
+If serving fails or prints no port, say so plainly and link the file path with the `file://` caveat attached. Never imply a report is viewable when it is not.
+
 **What to pull from it (evidence only, never verdicts):**
 
 | Use for | Do NOT use for |
@@ -246,6 +285,8 @@ Post to the Epic. Never transition the Epic to Done automatically — release si
 ## Quality Gates
 
 Before finishing:
+- ✅ **Verification contract (Step 0-PRE) honoured** — every count, file path, Jira key and status in the report was read from a tool result THIS run. Anything unverifiable is marked `[not verified — reason]`, never rounded into a number
+- ✅ **Every artefact the report links was confirmed to exist AND be non-empty** — a generator printing "success" is not proof (`allure generate` reports success against a missing results dir). Verify the artefact, not the exit message
 - ✅ `progress.md` re-read this run (AH Rule 30) — no result from memory
 - ✅ Every matrix row traces to a real `progress.md` result row or is marked `NOT COVERED`
 - ✅ No invented test result, no invented AC
@@ -292,3 +333,9 @@ Do NOT overwrite — always append.
 | Soften NO-GO because the team wants to ship | State the verdict and its trigger |
 | Auto-transition the Epic to Done | Recommend; human signs off |
 | Drop a test that maps to no AC | List it as an orphan |
+
+## Lessons
+
+❌ **Don't:** Stop at `allure generate` and link the resulting `index.html` path in the closure report. A generated report opened via `file://` shows "Loading..." on every widget forever — browsers block `fetch()` on file URLs. Linking it looks like evidence was delivered when nothing is viewable.
+✅ **Do:** Generate THEN serve (`npx allure serve allure-results/{RUN_ID}`, or the project's own `npm run allure:serve`), capture the printed `http://127.0.0.1:{port}`, and put that URL in both the closure report and the summary to the user. Step 4B is not complete at generate.
+*(Lesson — 2026-08-24, SCRUM-694: the report generated fine and was linked by file path, but was never served, so it could not actually be opened. The project's own CLAUDE.md documented `npm run allure:serve` and the `file://` trap; Step 4B said only "generate". The local project rule and the skill disagreed — the skill was the one missing the step.)*

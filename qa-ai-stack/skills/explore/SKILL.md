@@ -11,6 +11,30 @@ Navigate to any URL using Playwright MCP browser, extract all interactive elemen
 
 ## Instructions
 
+### Step 0: Verification Contract (MANDATORY — applies to every locator emitted)
+
+This skill hands a POM to `/test-case-creation`, which builds assertions on top of it. A locator invented here becomes a false test failure two steps later, blamed on the app rather than on the POM.
+
+**Emit nothing the live page did not show you in THIS run.**
+
+| Kind of claim | What discharges it |
+|---|---|
+| An element exists | It appears in the accessibility snapshot, or in page source you fetched this run |
+| An attribute (`id`, `maxlength`, `type`, `href`) | Read from the served HTML — **the a11y snapshot does NOT expose attributes** |
+| A locator resolves uniquely | `count()` returned exactly 1 in a live run |
+| An element is hidden until an action | You performed the action and captured the resulting state |
+| A click navigates | You observed the URL change — an `href` alone is markup, not behaviour |
+
+**Three hard prohibitions:**
+
+1. **Never generate a locator from convention.** `data-testid`, `role`, and `name` values that "look standard" are guesses. The snapshot is the only source (this is what AH Rule 11's `// VERIFICATION REQUIRED` tag exists for).
+2. **Absence from the snapshot is not absence from the DOM.** Validation errors, toasts and modals are commonly `display:none` at rest. Trigger the state and re-snapshot before concluding an element does not exist.
+3. **A POM that typechecks is not a POM that works.** TypeScript proves the syntax, never that a selector matches. Resolve every locator against the live page before handing off.
+
+**Verify before handoff, not after.** Run every emitted locator through a `count()` check on the live page; tag anything you could not resolve `// VERIFICATION REQUIRED` and say so explicitly in the summary. An honestly flagged locator costs one comment; a silently wrong one costs a bug investigation.
+
+---
+
 ### Step 1: Parse Input
 
 Extract URL from user input:
