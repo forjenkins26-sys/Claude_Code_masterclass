@@ -47,6 +47,9 @@ echo "Closure reports are written here by /test-closure." > "$DEST/output/.gitke
 # --- localhost DOM fallback (only needed when the AUT is on localhost)
 cp "$STACK/scripts/fetch-local-page.js" "$DEST/scripts/"
 
+# --- screenshot organiser (used by /test-case-execution Step 5D)
+cp "$STACK/scripts/organise-screenshots.js" "$DEST/scripts/"
+
 # --- config: stack template, baseURL repointed at this project's app
 sed "s|'http://localhost:7000'|process.env.BASE_URL ?? '$URL'|g" \
   "$STACK/playwright.config.template.ts" > "$DEST/playwright.config.ts"
@@ -127,6 +130,7 @@ req  "allure npm scripts"            "$(node -e "console.log(Object.keys(require
 req  "tsconfig present"              "$([ -f tsconfig.json ] && echo 1 || echo 0)" "1"
 req  "gitignore present"             "$([ -f .gitignore ] && echo 1 || echo 0)" "1"
 req  "gitkeep files (survive clone)" "$(find . -name '.gitkeep' -not -path './node_modules/*' | wc -l | tr -d ' ')" "4"
+req  "screenshot organiser present"  "$([ -f scripts/organise-screenshots.js ] && echo 1 || echo 0)" "1"
 req  "clean slate — specs"           "$(ls tests/ui/*.spec.ts 2>/dev/null | wc -l | tr -d ' ')" "0"
 req  "clean slate — POMs"            "$(ls src/pages/*.ts 2>/dev/null | wc -l | tr -d ' ')" "0"
 warn "allure CLI available"          "$(npx --no-install allure --version >/dev/null 2>&1 && echo 1 || echo 0)" "1"

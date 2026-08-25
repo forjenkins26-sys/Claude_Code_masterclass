@@ -635,78 +635,43 @@ mcp__atlassian__addCommentToJiraIssue({
 - ✅ Bug report filed
 - ✅ Test marked "Blocked"
 
-### Step 5D: Screenshot Capture, Organise & Jira Attachment
+### Step 5D: Screenshot Capture & Organise
 
-**Run after EVERY test (pass or fail) before updating Jira.**
+**Run ONCE after the suite finishes — not once per test.**
 
-#### 1. Find screenshot file
+Screenshots are captured automatically by `screenshot: 'on'` in `playwright.config.ts` (Step 5 — NOT a CLI flag). This step only *organises* them into a traceable folder.
 
-After a test run (with `screenshot: 'on'` set in `playwright.config.ts` — see Step 5, NOT a CLI flag):
+#### 1. Organise the whole run in one command
 
-```
-# Pass screenshot — Playwright saves here:
-test-results/{sanitized-test-name}/test-1.png
-
-# Fail screenshot — Playwright saves here:
-test-results/{sanitized-test-name}/test-failed-1.png
+```bash
+node scripts/organise-screenshots.js <RUN_ID> <EPIC-KEY>
 ```
 
-Find latest screenshot:
-```powershell
-Get-ChildItem "test-results" -Recurse -Filter "*.png" | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName
+It reads `test-results/{RUN_ID}/results.json`, pairs every screenshot with its spec, and copies them to:
+
+```
+screenshots/{EpicKey}/{IssueKey}_{TestID}_{kebab-title}_{PASS|FAIL}.png
 ```
 
-#### 2. Organise into Epic/Issue folder with proper naming
+Test ID, Jira key and verdict are derived from the test title and the run result — nothing to fill in by hand. If a title carries no Jira key, pass an explicit map:
 
-**Folder structure:**
-```
-Playwright Automation Framework/
-  screenshots/
-    {EpicKey}/
-      {IssueKey}_{TestID}_{kebab-title}_{PASS|FAIL}.png
+```bash
+node scripts/organise-screenshots.js demo-741 SCRUM-741 '{"BL-001":"SCRUM-742"}'
 ```
 
-**Naming convention:**
-- `{EpicKey}` — parent Epic (e.g., `SCRUM-121`)
-- `{IssueKey}` — Jira issue key for this test (e.g., `SCRUM-122`)
-- `{TestID}` — test ID from summary (e.g., `BL-001`, `TC-001`)
-- `{kebab-title}` — test title slugified: lowercase, spaces→hyphens, special chars removed, max 60 chars
-- `{PASS|FAIL}` — result from JSON `ok: true/false`
+The script **copies, never moves**, so `test-results/` stays intact as raw evidence and a later re-run cannot silently empty `screenshots/`. It exits non-zero if a file it wrote is missing, or if zero screenshots were copied (which means `screenshot: 'on'` is not set).
 
-**Example filenames:**
-```
-screenshots/SCRUM-121/SCRUM-122_BL-001_verify-page-loads-and-all-elements-are-visible_PASS.png
-screenshots/SCRUM-121/SCRUM-131_BL-010_verify-create-new-account-button-navigates_FAIL.png
-screenshots/SCRUM-68/SCRUM-69_TC-001_verify-login-page-dom-elements-exist_PASS.png
+**After an auto-fix, run it again for the verify run** so the corrected PASS sits alongside the original FAIL:
+
+```bash
+node scripts/organise-screenshots.js verify-bl005 SCRUM-741
 ```
 
-**PowerShell to copy + rename screenshot:**
-```powershell
-# Build values from current test context
-$epicKey    = "SCRUM-121"
-$issueKey   = "SCRUM-122"
-$testId     = "BL-001"
-$titleRaw   = "Verify page loads and all elements are visible"
-$result     = "PASS"   # or "FAIL"
+Both files are correct history — the `_FAIL` is the pre-fix run, the `_PASS` is the verified re-run. Say which is which in the Jira comment; do not delete the FAIL to make the folder look clean.
 
-# Slugify title: lowercase, spaces→hyphens, strip special chars, max 60 chars
-$slug = ($titleRaw.ToLower() -replace '[^a-z0-9\s-]','' -replace '\s+','-').Substring(0, [Math]::Min(60, $titleRaw.Length))
+**Why one batch command and not per-test.** The previous approach ("find the newest `.png` after each test") was tedious across a full Epic and got skipped in practice — a real run left `screenshots/{EPIC}/` empty while 17 PNGs sat unorganised in `test-results/`. It was also unsound: sorting by modified-time picks whatever finished last, not the test being processed, so a slow test could be labelled with another test's screenshot. Mapping from `results.json` makes the pairing exact.
 
-# Destination
-$destDir  = "screenshots\$epicKey"
-$destFile = "${issueKey}_${testId}_${slug}_${result}.png"
-$destPath = Join-Path $destDir $destFile
-
-# Source — latest screenshot in test-results
-$srcPath = Get-ChildItem "test-results" -Recurse -Filter "*.png" | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName
-
-# Copy
-New-Item -ItemType Directory -Force $destDir | Out-Null
-Copy-Item $srcPath $destPath -Force
-Write-Output "Screenshot saved: $destPath"
-```
-
-**If no screenshot found in test-results:** Skip silently — do NOT block Jira update.
+**If the script is absent** (older project): note it in the summary and continue — the raw PNGs in `test-results/{RUN_ID}/` are still valid evidence. Never claim screenshots were organised when they were not.
 
 #### 3. Attempt Jira attachment via MCP fetch
 
@@ -1065,6 +1030,7 @@ If the run established a NEW business rule (from the Epic AC, not previously in 
 
 Before finishing:
 - ✅ **Oracle staleness gate (Step 0A) run** — every `BR-xx` `Source` cites the Epic under test. A rule sourced from a different Epic is a hard stop, reported to the human, never auto-edited and never used for tiering
+- ✅ **Screenshots organised (Step 5D)** — `screenshots/{EPIC}/` verified non-empty and its file count reconciles with the executed rows. An empty folder while PNGs sit in `test-results/` means the step was skipped: say so, never imply evidence was filed
 - ✅ All test cases executed (or failure reason reported)
 - ✅ Jira status updated for each test (or comment added if update failed)
 - ✅ Summary table shows all results
