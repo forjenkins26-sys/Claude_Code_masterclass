@@ -276,6 +276,65 @@ Additive to Step 6's Jira-level dedup, not a replacement — Step 6 still runs a
 
 ---
 
+### Step 1D: Verify an EXISTING POM (MANDATORY whenever a POM is present)
+
+**Runs before scenario generation, and does NOT depend on the POM/spec gate.**
+
+Step 6B verifies a POM the skill just wrote. That leaves a hole: a POM produced by an earlier `/explore`, or edited by hand since, is never re-checked — so a broken locator survives into the spec and only surfaces as a red test later, where it looks like an application bug.
+
+**Check first, then decide:**
+
+```
+Glob: src/pages/*.ts   (also src/pages/*.page.ts)
+```
+
+If no POM exists → skip this step; Step 6B covers the one you are about to create.
+
+If a POM exists, resolve **every** locator against the live page before writing any scenario:
+
+```javascript
+// verify-existing-pom.js — temp file, delete after
+const { chromium } = require('@playwright/test');
+const { PageClass } = require('./src/pages/<file>');
+
+(async () => {
+  const browser = await chromium.launch({ headless: false });  // AH Rule 17
+  const page = await browser.newPage();
+  const po = new PageClass(page);
+  await po.navigate();
+
+  // Reveal state-dependent nodes (errors, toasts) — they are display:none at rest
+  // and would otherwise read as "missing" when they are merely hidden (AH Rule 9).
+  await po.submitEmpty?.().catch(() => {});
+
+  let bad = 0;
+  for (const [name, loc] of Object.entries(po)) {
+    if (!loc || typeof loc.count !== 'function') continue;
+    const n = await loc.count();
+    if (n !== 1) { bad++; console.log(`BROKEN ${name}: count=${n}`); }
+  }
+  console.log(bad === 0 ? 'ALL LOCATORS OK' : `${bad} BROKEN`);
+  await browser.close();
+})();
+```
+
+**On any locator resolving to 0 (or >1) — AUTO-FIX, do not ask.**
+
+Apply the AUTO-FIX Protocol exactly as Step 6B does (max 3 attempts):
+
+1. **Investigate the live DOM** — what is the real attribute? Never guess a replacement.
+2. **Patch the POM property** surgically — that one locator, nothing adjacent (AFP Rule 16 / karpathy Surgical Changes). Add `// VERIFIED: headed mode [date]`.
+3. **Re-run the script** — confirm the locator now resolves to exactly 1.
+4. **Rename if the name no longer matches the UI** — property + methods + any spec reference (AFP Rule 13).
+
+Report what was healed in the run summary: `POM auto-fix: mobileError #mErr → #mobileErr (VERIFIED headed 2026-08-26)`.
+
+**Escalate to the user only after 3 failed attempts**, with the DOM evidence gathered — never as the first move. A broken locator has an objectively correct answer sitting in the DOM; asking the human to supply it is work the skill is meant to do.
+
+**Do not confuse a broken locator with an application bug.** This step runs *before* any test exists, so nothing here is evidence about the app. A locator that cannot resolve is a POM defect, full stop — bug classification belongs to `/test-case-execution` (AH Rule 23).
+
+---
+
 ### Step 2: UI Analysis (Locator Discovery ONLY)
 
 **Purpose: Find element selectors. NOT to determine expected behavior.**
@@ -534,9 +593,14 @@ Glob: Playwright Automation Framework/tests/ui/*.spec.ts   → look for file mat
 ```
 
 **If POM file already exists:**
-> "POM file `[filename].page.ts` already exists. What should I do?
-> 1. **Skip** — use existing POM
-> 2. **Replace** — overwrite with fresh POM based on current test cases"
+
+Its locators were already verified and healed in **Step 1D** before scenarios were generated, so "Skip" is safe by the time this gate fires. Say so when asking:
+
+> "POM file `[filename].page.ts` already exists — its locators were verified in Step 1D ({N} OK{, M auto-fixed}). What should I do?
+> 1. **Skip** — use the existing (verified) POM
+> 2. **Replace** — regenerate from the current DOM"
+
+**Never offer Skip/Replace as the response to a BROKEN locator.** Neither answer reports the defect: Skip keeps it, Replace overwrites it silently and by luck. Heal it in Step 1D first, then ask this question about a POM already known to be sound.
 
 **If spec file already exists:**
 > "Spec file `[filename].spec.ts` already exists. What should I do?
@@ -585,9 +649,14 @@ Glob: Playwright Automation Framework/tests/ui/*.spec.ts   → look for file mat
 ```
 
 **If POM file already exists:**
-> "POM file `[filename].page.ts` already exists. What should I do?
-> 1. **Skip** — use existing POM
-> 2. **Replace** — overwrite with fresh POM based on current test cases"
+
+Its locators were already verified and healed in **Step 1D** before scenarios were generated, so "Skip" is safe by the time this gate fires. Say so when asking:
+
+> "POM file `[filename].page.ts` already exists — its locators were verified in Step 1D ({N} OK{, M auto-fixed}). What should I do?
+> 1. **Skip** — use the existing (verified) POM
+> 2. **Replace** — regenerate from the current DOM"
+
+**Never offer Skip/Replace as the response to a BROKEN locator.** Neither answer reports the defect: Skip keeps it, Replace overwrites it silently and by luck. Heal it in Step 1D first, then ask this question about a POM already known to be sound.
 
 **If spec file already exists:**
 > "Spec file `[filename].spec.ts` already exists. What should I do?
@@ -754,6 +823,7 @@ Before finishing:
 - ✅ **RICEPOT O enforced:** Source column has Epic line reference (not just Epic key) for every assertion
 - ✅ **RICEPOT T enforced:** Jira descriptions follow strict template — no prose, no filler
 - ✅ Mode A: `business-rules.md` seeded from THIS Epic, or confirmed already current. A `Source` column naming a different Epic is a hard stop, reported not auto-fixed
+- ✅ **Step 1D run whenever a POM exists** — every locator resolved against the live page BEFORE scenario generation. A broken locator was auto-fixed via AFP and re-verified, never handed to the user as a question on the first attempt
 - ✅ Mode A: Step 1B spec-level dedup scan run before scenario generation — overlaps noted, not regenerated
 - ✅ Mode A/C: Step 1C requirement gap scan run — 5 dimensions scored, ⚠️/❌ carried into Step 7, no ❌ closed by invention
 - ✅ Mode A: Every behavioral expected result traced to exact Epic AC line (Source column)
