@@ -535,6 +535,24 @@ All behavioral expected results tagged: `[VERIFICATION REQUIRED — verify again
 
 #### Option B: Direct Jira Creation via MCP
 
+> ## ⛔ DEFINITION OF DONE — read before creating a single issue
+>
+> **Creating Jira issues is NOT the deliverable. It is the first half of one.**
+>
+> This step is complete only when BOTH are true:
+>
+> 1. Test cases exist in Jira, AND
+> 2. A spec file exists — **or** the user has explicitly declined one.
+>
+> Jira issues with no spec is a **PARTIAL** result. Reporting it as finished is a false completion: the client sees issue keys and assumes runnable tests exist, and `/test-case-execution` then has nothing to run.
+>
+> **The failure mode is specific and it has happened twice.** After the issues are created, the run *feels* finished — keys are reported, the summary reads complete. That is exactly when the gate gets softened into a prose question ("want me to generate the specs?") or the run simply ends. Both times, `progress.md` was never written either, because Step 7B sits after this point too.
+>
+> **Treat an unanswered spec question as an unfinished step, not a finished one.** If you are about to write a completion summary and no spec exists and the user has not declined, you are mid-step. Ask Gate #3 (below) with concrete options — then finish.
+>
+> *(Recurrence — SCRUM-694 on 2026-08-24, SCRUM-774 on 2026-08-26. The rule was present all three times, stated at three separate places. Restating it is not the fix; making the step's completion condition explicit at its start is.)*
+
+
 ```json
 mcp__atlassian__createJiraIssue({
   "cloudId": "anandsoni2641.atlassian.net",
@@ -836,6 +854,8 @@ Before finishing:
 - ✅ Source column populated for every test case — with Epic line ref not just key
 - ✅ **If Jira output:** Confirm count + project before creating
 - ✅ **If Jira output:** Report all created keys
+- ✅ **Jira issues WITHOUT a spec is a PARTIAL result, never a completion.** Either a spec file exists, or the user explicitly declined one. If neither, the step is unfinished — ask Gate #3, do not write a completion summary
+- ✅ **`progress.md` entry written.** Its absence is a reliable tell that the run ended early, since Step 7B sits after Jira creation
 - ✅ **If POM created:** Run Step 6B locator verification — all ✅ or flagged ⚠️
 - ✅ **If POM created:** Run Step 6C smoke gate — at least 1 test passes before handoff
 - ✅ Append run to `progress.md` (BLAST protocol)

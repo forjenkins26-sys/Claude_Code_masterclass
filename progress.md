@@ -978,3 +978,98 @@ SCRUM-717 (dup of SCRUM-716) and SCRUM-719 (dup of SCRUM-718). Cause: `createJir
 `project = SCRUM AND issuetype = Bug AND created < startOfDay() AND summary ~ "9-digit mobile"`
 
 **Pipeline dry-run outcome:** oracle staleness gate PASS · dedup register worked (0 duplicates vs 2 last cycle) · archived-write guard worked · transition shape worked · Allure generated AND served · stale-oracle false positive on BL-006 prevented by the re-seed. Residual: MCP read archiving still blocks title-level dedup on broad queries — handled correctly by refusing to file.
+
+## 2026-08-25 — /test-case-creation SCRUM-741
+
+**Epic:** SCRUM-741 — Blinkit Customer Login QA — CLIENT DEMO 25Aug
+**Mode:** A (requirements-driven, 15 ACs fetched via MCP)
+**Test Cases Created:** 18 in Jira (verified totalCount=18 under parent)
+**Jira Keys:** SCRUM-742 to SCRUM-759 (BL-001 to BL-018)
+**KB Seeded:** business-rules.md BR-01..BR-15 (all Source = Epic SCRUM-741) | known-defects.md SCRUM-718/716/721 + 1 suspected
+**Requirement Gaps Found:** 2 — (1) First/Last Name fields ungoverned by any AC -> BL-018 test.fixme; (2) AC-8 "concurrent requests" unobservable client-side -> BL-008 flagged AMBIGUOUS
+**Expected failures at execution:** BL-004 (regex /^\d{9,10}$/ accepts 9 digits, BR-04), BL-010 (toast says email, BR-10 -> SCRUM-716), BL-012 (#signupBtn no handler + outside form, BR-12 -> SCRUM-718), BL-013 (0 aria-*, BR-13 -> SCRUM-721)
+**POM Created:** blinkitLoginPage.ts (from prior /explore run) — spec files not yet generated
+**Spec + fixtures generated:** tests/ui/blinkit-login.spec.ts (18 blocks, 17 live + 1 test.fixme) | src/fixtures/test-fixtures.ts
+**Typecheck:** clean | **Smoke gate (Step 6C):** BL-001 1/1 PASS headed — ready for /test-case-execution
+
+## 2026-08-25 21:07 — /test-case-execution SCRUM-741
+
+**Epic:** SCRUM-741 — Blinkit Customer Login QA — CLIENT DEMO 25Aug
+**Build:** ETag `6fd46ec3818f08374b290e4e4d601830` · Last-Modified 2026-08-23 · X-Vercel-Id bom1::l5mcw-1787671838647-f3480d387188
+**Mode:** headed (AH Rule 17) · RUN_ID=demo-741 · chromium
+**Oracle staleness gate (Step 0A):** PASS — all 15 BR rules cite Epic SCRUM-741
+**Total Tests:** 18
+**Results:** 12 Pass | 1 Auto-Fixed | 0 Flaky | 4 Blocked | 0 Failed | 1 Skipped
+**Session Score:** 76% PASS (13/17 executed; BL-018 skipped, excluded)
+**Duration:** 1.1m
+
+| Test | Key | Result | Jira | Detail |
+|---|---|---|---|---|
+| BL-001 | SCRUM-742 | PASS | Done | maxlength=10 enforced |
+| BL-002 | SCRUM-743 | PASS | Done | non-numeric stripped |
+| BL-003 | SCRUM-744 | PASS | Done | empty -> exact error text |
+| BL-004 | SCRUM-745 | BLOCKED | In Review | REAL_BUG Confirmed BR-04 -> SCRUM-645 |
+| BL-005 | SCRUM-746 | AUTO-FIXED | Done | TEST issue, not app bug. 3/3 verified |
+| BL-006 | SCRUM-747 | PASS | Done | Login always enabled |
+| BL-007 | SCRUM-748 | PASS | Done | valid -> no error |
+| BL-008 | SCRUM-749 | PASS | Done | AMBIGUOUS AC-8, trivially true (no network call) |
+| BL-009 | SCRUM-750 | PASS | Done | forgot link visible |
+| BL-010 | SCRUM-751 | BLOCKED | In Review | REAL_BUG Confirmed BR-10 -> SCRUM-716 |
+| BL-011 | SCRUM-752 | PASS | Done | control visible; label mismatch = observation only |
+| BL-012 | SCRUM-753 | BLOCKED | In Review | REAL_BUG Confirmed BR-12 -> SCRUM-718 |
+| BL-013 | SCRUM-754 | BLOCKED | In Review | REAL_BUG Confirmed BR-13 -> SCRUM-721 |
+| BL-014 | SCRUM-755 | PASS | Done | no creds in console/storage |
+| BL-015 | SCRUM-756 | PASS | Done | 1280px no h-scroll |
+| BL-016 | SCRUM-757 | PASS | Done | SQLi inert |
+| BL-017 | SCRUM-758 | PASS | Done | XSS not executed |
+| BL-018 | SCRUM-759 | SKIPPED | To Do | test.fixme — no AC governs name fields |
+
+**Auto-Fixed:**
+- SCRUM-746 BL-005: TEST issue. App DOES trim correctly (verified in source + live DOM). Red was caused by the `#mobile` input listener stripping non-digits so `fill()` could not deliver a padded value. Fixed by filling names + setting value via evaluate. 3/3 green. NO bug filed — app was correct (AH Rule 32).
+
+**Blocked (App Bugs) — 0 new bugs filed, 4 existing referenced (AH Rule 21 dedup by reading titles):**
+- SCRUM-745 BL-004 -> SCRUM-645 (also SCRUM-497, SCRUM-418 open on same defect)
+- SCRUM-751 BL-010 -> SCRUM-716
+- SCRUM-753 BL-012 -> SCRUM-718
+- SCRUM-754 BL-013 -> SCRUM-721
+All 4 linked via Blocks. All 4 Confirmed against a BR-xx rule.
+
+**Failed (Stuck):** none
+
+**KB updated (Step 7C):** known-defects.md — SCRUM-645 promoted Suspected->Confirmed; added "Verified NOT defects" section (BR-05 trim works; BR-11 label is observation not defect)
+
+**Evidence:** test-results/demo-741/ (17 screenshots, videos, traces) + allure-results/demo-741/
+
+## 2026-08-25 21:12 — /test-closure SCRUM-741
+
+**Epic:** SCRUM-741 — Blinkit Customer Login QA — CLIENT DEMO 25Aug
+**Verdict:** 🟡 GO WITH RISK — no P0/Highest/Blocker open (verified in Jira); coverage 15/15 (100%) >= 80%; 4 open Confirmed defects on non-critical paths, all named
+**Coverage:** 15/15 ACs (100%) · **Pass rate:** 13/17 (76%) · **Execution:** 17/18 (94%)
+**Open Defects:** SCRUM-645 (High), SCRUM-716 (Med), SCRUM-718 (Med), SCRUM-721 (Med) — all pre-existing, 0 new filed this cycle
+**Not Covered:** First/Last Name validation (no AC — BL-018 fixme) · performance · authorization · i18n. Accessibility IS covered and FAILS (SCRUM-721).
+**Caveats:** AC-8 marked PARTIAL (passes trivially — no network call on this build). SCRUM-718 priority disagreement (field=Medium, body argues P1) — re-triage could move verdict to NO-GO.
+**Evidence:** Allure served http://127.0.0.1:8745 (HTTP 200 verified) · summary.json total=18 matches 18 progress rows
+**Report:** ClientDemo-25Aug/output/closure-SCRUM-741-2026-08-25.md
+
+## 2026-08-26 — /test-case-creation SCRUM-760
+
+**Epic:** SCRUM-760 — Blinkit Login — QUICK CLIENT DEMO
+**Mode:** A (requirements-driven)
+**Test Cases Created:** 13 in Jira
+**Jira Keys:** SCRUM-761 to SCRUM-773
+**Requirement Gaps Found:** 8 — first/last name validation has no AC (app validates both); AC-5 names no destination URL; no test data specified; no performance AC; no security AC; no i18n AC; no audit AC; AC-1/AC-2 overlap at 0 digits
+**KB Seeded:** business-rules.md (BR-01..BR-06, all sourced to SCRUM-760) + known-defects.md (SCRUM-645/716/718/721)
+**POM Created:** blinkitLoginPage.ts (from /explore, pre-existing) — spec not yet created
+
+## 2026-08-26 22:05 — /test-case-creation SCRUM-774 (spec completion)
+
+**Epic:** SCRUM-774 — Blinkit Login — CLIENT DEMO 26Aug
+**Mode:** A (requirements-driven)
+**Test Cases:** 9 in Jira — SCRUM-775..783 (BL-001..BL-009), created in a prior session
+**Spec Created:** tests/ui/blinkit-login.spec.ts — 9 test() blocks, 1:1 with Jira
+**POM:** src/pages/blinkitLoginPage.ts (from /explore)
+**Typecheck:** clean · **Smoke Gate (Step 6C):** PASS 1/1 (BL-001, headed, 1.7s)
+
+**AC coverage:** BL-001→AC-1 · BL-002/007/008→AC-2 · BL-003→AC-3 · BL-004→AC-4 · BL-005→AC-5 · BL-006→AC-6 · BL-009→Security Standard. 6/6 ACs covered.
+
+**Gap this closes:** the earlier run created the 9 Jira issues then stopped without asking Gate #3 (POM/spec creation) and without writing a progress.md entry — the same miss recorded as Lesson #10 for SCRUM-694. Skill fixed: Step 6 now opens with a DEFINITION OF DONE stating that Jira issues without a spec is a PARTIAL result, plus two quality gates (spec-or-explicit-decline, and progress.md written).
