@@ -29,6 +29,8 @@ node_modules/
 # Files stay on disk; git simply ignores them.
 ClientDemo-*/
 BlinkitDemo-*/
+QuickDemo*/
+*Demo*/
 Blinkit-Demo/
 MediCare-QA-Demo/
 *-QA-Demo/
