@@ -197,7 +197,22 @@ cd "RAG/Basic_Rag/app/backend"
 .venv\Scripts\activate
 uvicorn main:app --reload --port 8000
 ```
-If not running, start it first (or ask user to).
+**0. HEALTH CHECK FIRST — before uploading anything.**
+
+The backend does not auto-start. Skipping this check means the upload fails with a raw connection error mid-step, which reads like a skill bug rather than a service that is simply down.
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" --max-time 3 http://localhost:8000/docs
+```
+
+| Result | Action |
+|---|---|
+| `200` | Backend is up — proceed to step 1 |
+| `000` / non-200 | **STOP.** Do not upload. Report it and start the backend using the command above |
+
+Re-run the health check after starting; the first boot loads the embedding model and takes a few seconds. **Never proceed to upload on a failed health check** — an unreachable backend produces no chunks, and a Mode C run with no chunks has no requirement source at all.
+
+*(The Vercel-hosted RAG UI is a visual demo only. This step talks to `localhost:8000` directly — the deployed frontend is not in the path.)*
 
 **1. Upload the spec doc:**
 ```bash
