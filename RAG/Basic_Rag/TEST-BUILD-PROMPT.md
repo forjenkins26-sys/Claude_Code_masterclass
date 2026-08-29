@@ -225,8 +225,8 @@ change, check `.env` before editing `config.py`.
           return " [Chunk #" + ", #".join(seen) + "]"
 
       cleaned = _CJK_CITATION.sub(replace, text)
-      cleaned = re.sub(r"[ 	]{2,}", " ", cleaned)          # collapse doubled spaces
-      cleaned = re.sub(r"[ 	]+([.,;:])", r"", cleaned)   # pull punctuation back
+      cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)         # collapse doubled spaces
+      cleaned = re.sub(r"[ \t]+([.,;:])", r"\1", cleaned)  # pull punctuation back
       return cleaned.strip()
   ```
 
