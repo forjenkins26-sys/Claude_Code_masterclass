@@ -427,8 +427,44 @@ The frontend bakes the backend URL into its bundle at build time, so the backend
 **4. Close CORS.** Back in Render, set `CORS_ORIGINS` to the Vercel URL and drop the `*` wildcard.
    Saving triggers a redeploy.
 
+   **More than one frontend?** `CORS_ORIGINS` is comma-separated — no spaces needed, they are
+   stripped anyway, and no trailing slashes:
+
+   ```
+   https://first.vercel.app,https://second.vercel.app
+   ```
+
+   An origin missing from that list produces the **single most misleading failure in this stack**:
+   the backend answers `HTTP 200` but omits the `access-control-allow-origin` header, so the
+   browser discards the response before the app sees it, and the UI reports
+   *"Backend unreachable"* — while `curl` against the same endpoint succeeds. Diagnose it with:
+
+   ```bash
+   curl -si https://<service>.onrender.com/api/status \
+     -H "Origin: https://<your-frontend>.vercel.app" | grep -i access-control
+   ```
+
+   No header returned means the origin is not on the list. Do not go hunting in the frontend code.
+
 **5. Verify end to end** — open the Vercel URL, upload a PDF, ask a question. A grounded answer
    with 4 chunks means both halves are talking.
+
+### One backend means one shared store
+
+Pointing a second frontend at the same Render service makes both **load**, but they are not
+independent. One backend owns one ChromaDB on one disk, so the two sites read and write the same
+documents: upload on either and it appears on both, and **Reset on either wipes both**.
+
+That is fine — sometimes desirable — for two views onto one dataset. For genuinely separate
+instances, each frontend needs its own Render service:
+
+| Want | Do |
+|---|---|
+| Both URLs live, **shared** documents | Add the second origin to `CORS_ORIGINS` on the one backend |
+| Both URLs live, **separate** documents | Second Render service, its own `VITE_API_URL`, its own `CORS_ORIGINS` |
+
+The two look identical from the browser until someone presses Reset, so decide deliberately rather
+than discovering it.
 
 ### Two traps that cost real time
 
@@ -471,6 +507,8 @@ rather host both halves in one container. Render uses the native Python runtime,
 | Fixed-width chunk slice | chunks open mid-word (`"umber, Rest Assured"`) | snap cut **and** overlap to the nearest space |
 | Model's own citation format | `【3†L1-L4】` in answers, pointing at lines that do not exist | name the format in the prompt **and** normalise server-side |
 | Chunker changed after ingest | old documents keep their old chunks | chunking applies at ingest time — re-ingest to rebuild |
+| Origin missing from `CORS_ORIGINS` | UI says "Backend unreachable" while `curl` returns 200 | the response carries no `access-control-allow-origin`; add the origin, comma-separated |
+| Two frontends, one backend | Reset on one wipes the other's documents | one backend = one store; give each frontend its own Render service to separate them |
 
 
 ---
@@ -517,3 +555,13 @@ does not.
 13. **Every control shows a hand cursor**; disabled ones show `not-allowed`.
 14. **The pipeline tracker only pulses while work is running.** With a document stored and nothing
     in flight, no step renders brighter than the rest.
+15. **CORS allows the deployed frontend, and nothing else.** This returns the frontend's own origin:
+
+    ```bash
+    curl -si https://<service>.onrender.com/api/status \
+      -H "Origin: https://<your-frontend>.vercel.app" | grep -i access-control-allow-origin
+    ```
+
+    The same call with `-H "Origin: https://not-yours.example"` returns **no such header**. A
+    frontend showing "Backend unreachable" while `curl` succeeds is this check failing, never a
+    bug in the app.
