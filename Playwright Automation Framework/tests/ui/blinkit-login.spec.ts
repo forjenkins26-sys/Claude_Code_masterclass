@@ -47,7 +47,7 @@ test.describe('Blinkit Login Page Tests', () => {
       expect(toastText).toBe('✅ OTP sent to +91 9876543210');
     });
 
-    test('BL-003: Verify Forgot Password click shows toast', async ({ blinkitLoginPage }) => {
+    test('BL-003: Verify Forgot Password click shows toast @known-defect', async ({ blinkitLoginPage }) => {
       // VERIFIED: forgotBtn listener → showToast('📱 Password reset link sent to your mobile')
       // AUTO-FIX Rule 15: getToastText() waits for #toast.show — validates actual outcome
       await blinkitLoginPage.clickForgotPassword();
@@ -113,7 +113,7 @@ test.describe('Blinkit Login Page Tests', () => {
       await expect(blinkitLoginPage.mobileError).toBeVisible();
     });
 
-    test('BL-009: Verify mobile with fewer than 10 digits shows error', async ({ blinkitLoginPage }) => {
+    test('BL-009: Verify mobile with fewer than 10 digits shows error @known-defect', async ({ blinkitLoginPage }) => {
       // VERIFIED: /^\d{10}$/ requires exactly 10 digits — 9 digits fails regex
       await blinkitLoginPage.fillFirstName('Rahul');
       await blinkitLoginPage.fillLastName('Sharma');
@@ -123,7 +123,7 @@ test.describe('Blinkit Login Page Tests', () => {
       await expect(blinkitLoginPage.mobileError).toBeVisible();
     });
 
-    test('BL-010: Verify Create New Account button navigates to registration page', async ({ blinkitLoginPage }) => {
+    test('BL-010: Verify Create New Account button navigates to registration page @known-defect', async ({ blinkitLoginPage }) => {
       // Expected: clicking "Create New Account" navigates away from login page to a registration/account creation page
       // This test validates EXPECTED behavior — will fail until navigation is implemented (correctly catches defect)
       await blinkitLoginPage.clickCreateNewAccount();
@@ -203,7 +203,7 @@ test.describe('Blinkit Login Page Tests', () => {
       expect(toastText).toBe('✅ OTP sent to +91 9876543210');
     });
 
-    test('BL-019: Verify 9-digit mobile boundary shows error', async ({ blinkitLoginPage }) => {
+    test('BL-019: Verify 9-digit mobile boundary shows error @known-defect', async ({ blinkitLoginPage }) => {
       // VERIFIED: /^\d{10}$/ — 9 digits fails (boundary: exactly 10 required)
       await blinkitLoginPage.fillFirstName('Rahul');
       await blinkitLoginPage.fillLastName('Sharma');

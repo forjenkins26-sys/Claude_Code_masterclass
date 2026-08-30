@@ -1,0 +1,121 @@
+# Blinkit E2E suite
+#
+# Runs the one test project that is fully self-contained: `blinkit` serves
+# blinkit-*.html from this repo on localhost:7000 and needs no credentials and no
+# external site.
+#
+# The chromium / firefox / webkit projects are deliberately NOT run here. They hit
+# the real facebook.com and depend on tests/setup/auth.setup.ts, so in CI they would
+# either fail on bot detection or need real credentials in repository secrets. A
+# suite that fails for reasons unrelated to the code teaches you to ignore the red
+# badge, which is worse than having no badge.
+#
+# On headed mode: CLAUDE.md Rule 1 mandates --headed for *human* test runs, so a
+# person watches the browser rather than trusting a summary line. It is a debugging
+# discipline enforced through the npm scripts, not a config setting — playwright.
+# config.ts sets no `headless` value. CI therefore runs the default (headless)
+# without violating the rule.
+
+name: Blinkit E2E
+
+on:
+  push:
+    paths:
+      - 'Playwright Automation Framework/**'
+      - 'blinkit-*.html'
+      - '.github/workflows/playwright-blinkit.yml'
+  pull_request:
+    paths:
+      - 'Playwright Automation Framework/**'
+      - 'blinkit-*.html'
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 'Playwright Automation Framework'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: 'Playwright Automation Framework/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        # Chromium only — the blinkit project is Desktop Chrome. Installing all
+        # three engines would roughly triple this step for browsers nothing runs.
+        run: npx playwright install --with-deps chromium
+
+      - name: Serve the demo app
+        # Served from the repo root, where blinkit-*.html live. The `&` backgrounds
+        # it for the life of the job; the next step waits for it to answer rather
+        # than assuming a fixed sleep is long enough.
+        working-directory: ${{ github.workspace }}
+        run: python3 -m http.server 7000 &
+
+      - name: Wait for the server
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://localhost:7000/blinkit-login.html; then
+              echo "server up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::localhost:7000 never served blinkit-login.html"
+          exit 1
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run Blinkit tests
+        # --grep-invert @known-defect excludes four tests that FAIL CORRECTLY:
+        # they assert the requirement and the demo app deliberately violates it.
+        #
+        #   BL-003  toast reads "email" instead of "mobile" (blinkit-login.html:409)
+        #   BL-009  regex is /^\d{9,10}$/ but AC-4 demands exactly 10 (line ~382)
+        #   BL-010  #signupBtn has no click handler - Jira SCRUM-141
+        #   BL-019  same 9-digit boundary defect as BL-009
+        #
+        # They are NOT deleted, skipped, or weakened - they still run locally and
+        # still catch those defects (CLAUDE.md Rule 5: never fix a test that is
+        # correctly catching an app bug). They are held out of the CI gate only so
+        # that red here means NEW breakage. A permanently red badge is one nobody
+        # reads, which defeats the point of having CI at all.
+        #
+        # When a defect is fixed, drop its @known-defect tag so the gate guards it.
+        run: npx playwright test --project=blinkit --grep-invert @known-defect
+
+      - name: Run known-defect tests (report only)
+        # Runs the four separately and never fails the job. If one starts PASSING,
+        # that defect was fixed and its tag should come off.
+        if: always()
+        continue-on-error: true
+        run: npx playwright test --project=blinkit --grep @known-defect --reporter=list
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: 'Playwright Automation Framework/playwright-report/'
+          retention-days: 14
+
+      - name: Upload traces and screenshots
+        # Only on failure: these are large, and on a green run nobody opens them.
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: 'Playwright Automation Framework/test-results/'
+          retention-days: 7
