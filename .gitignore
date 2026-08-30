@@ -35,3 +35,14 @@ Blinkit-Demo/
 MediCare-QA-Demo/
 *-QA-Demo/
 *-E2E/
+
+# --- RAG (added 2026-08-30) ---
+# .env.bak-* holds real keys and is NOT covered by the **/.env rule above
+**/.env.bak-*
+**/.env.*.local
+# Python virtualenv + local vector store: huge, machine-specific, never in git
+RAG/**/.venv/
+RAG/**/chroma_db/
+RAG/**/__pycache__/
+RAG/**/node_modules/
+RAG/**/dist/

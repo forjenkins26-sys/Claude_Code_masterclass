@@ -1,0 +1,378 @@
+{
+  "name": "AI_Basic_RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Objective\n\nBuild a basic RAG (Retrieval-Augmented Generation) system that can:\n\nIngest text or PDF documents.\nConvert the content into embeddings.\nStore the embeddings in a database.\nRetrieve relevant information from the database.\nAllow users to query the data through a chat interface.",
+        "height": 208,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1472,
+        -1056
+      ],
+      "typeVersion": 1,
+      "id": "cfcfc4de-7e61-495d-b86d-cfba6b3f0b03",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "formTitle": "RAG Document Upload",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "upload File",
+              "fieldType": "file",
+              "fieldName": ".pdf, .docs, .txt, .json, .html"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -784,
+        -960
+      ],
+      "id": "12602a1e-0561-43f3-ae97-3c1369b52559",
+      "name": "On form submission",
+      "webhookId": "7b472cf6-0c09-4f39-ab0d-a30774c0fca6"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -720
+      ],
+      "id": "77414ee5-5461-48b7-87b5-6ec2586f0f9e",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2sAR5UgQpUqkKlqb",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "fileName",
+                "value": "={{ $('On form submission').item.json[\".pdf, .docs, .txt, .json, .html\"][0].filename }}"
+              },
+              {
+                "name": "uploadedAt",
+                "value": "={{ $('On form submission').item.json.submittedAt }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        -720
+      ],
+      "id": "e91b7979-02ba-46ea-a8be-24c5bb572896",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -592
+      ],
+      "id": "bde15839-2027-4f04-9edc-80f7ece6d20c",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rag-basic",
+          "mode": "list",
+          "cachedResultName": "rag-basic"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -960
+      ],
+      "id": "5417be22-d32b-44ee-9fba-62f0bac454a4",
+      "name": "Store the document to Vector Db",
+      "credentials": {
+        "pineconeApi": {
+          "id": "Rx9KQozgSS5fooHl",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Phase 2 - RAG Fetching (once the data is received in pinecone from phase 1, we can fetch it using the chat option by asking questions) ",
+        "height": 576,
+        "width": 1312
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "baaccfe5-7b2d-4bb1-a8d6-69b9b1b10bea",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -800,
+        -176
+      ],
+      "id": "50a87fd9-8b0a-4491-acd7-4ed48cbb4b8d",
+      "name": "When chat message received",
+      "webhookId": "904aa75c-b52c-45dc-add7-9de8942871f6"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant that answers questions based ONLY on the retrieved documents. Use the \"Retrieve from Pinecone\" tool to search for relevant information. If you cannot find the answer in the retrieved documents, respond with: \"I couldn't find that in the uploaded documents.\" Always cite which document (fileName) you found the information in."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -480,
+        -176
+      ],
+      "id": "d9778614-44bc-494a-8669-ac915d3bb147",
+      "name": "RAG Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        144
+      ],
+      "id": "1266bd7b-f060-417c-a407-c273296f43c5",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Q0D03BwGGC1P6khc",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -384,
+        160
+      ],
+      "id": "a8f6e9ae-142d-4b2f-a50a-6e4977e33c8c",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the uploaded documents knowledge base. Use this to find information from PDFs and files the user has uploaded.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rag-basic",
+          "mode": "list",
+          "cachedResultName": "rag-basic"
+        },
+        "topK": 3,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "af8ebc2e-f6bf-4f8f-995a-7bca29f05f2e",
+      "name": "Retrieve from Pinecone",
+      "credentials": {
+        "pineconeApi": {
+          "id": "Rx9KQozgSS5fooHl",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        144
+      ],
+      "id": "8870ebda-2d3f-4ddf-9629-bffe7c7bda94",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2sAR5UgQpUqkKlqb",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Phase 1- RAG Ingestion (Data into Pinecone)\n",
+        "height": 624,
+        "width": 1328
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -976,
+        -1072
+      ],
+      "typeVersion": 1,
+      "id": "cfdd7c05-1f56-44b7-babd-b4f901f792d3",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Store the document to Vector Db",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Store the document to Vector Db",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Store the document to Vector Db",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Retrieve from Pinecone",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve from Pinecone": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "41177ad7-012c-4c63-b0c1-4c72c2224449",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c5aafcc317c0dd80a5abba07440728e64163f3449e16bcea509476d8e6634caf"
+  },
+  "id": "rv8Od66OPwreqSBg",
+  "tags": []
+}
