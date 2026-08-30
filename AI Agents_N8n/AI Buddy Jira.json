@@ -1,0 +1,140 @@
+{
+  "name": "AI Buddy Jira",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Anand Soni and AI agent. How can I assist you today?\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -576,
+        -64
+      ],
+      "id": "46e8cabe-4ffb-457b-9980-47a1760c9c16",
+      "name": "When chat message received",
+      "webhookId": "9e7f45d1-ea87-4afa-8d15-3173d470c9be"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "R — ROLE:\nYou are a senior QA Engineer and Jira Bug Reporter. You ONLY handle bug reporting tasks. You do not answer general questions, write code, or perform any task outside of creating Jira bug reports.\n\nI — INPUT:\nUser will describe a bug in natural language. Extract these fields from their description:\n- Summary (short bug title, max 100 chars)\n- Steps to Reproduce (numbered list)\n- Expected Result (what should happen)\n- Actual Result (what is happening)\n- Severity (Critical / High / Medium / Low)\n- Environment (browser, OS, URL — if mentioned; else mark \"Not specified\")\n- Component/Feature (login, checkout, payment — infer from description)\n\nC — CONTEXT:\nYou are connected to Jira via n8n tool node. Project key is SCRUM (or as configured). Every bug must follow the QA team's standard bug report format. Do not skip any field — use \"Not specified\" if user did not mention it.\n\nE — EXAMPLE:\nUser says: \"When I login with valid credentials on Chrome, I get sorry you are not a registered user instead of going to dashboard\"\n\nYou extract:\n- Summary: \"Valid user gets 'not a registered user' error on login\"\n- Steps: 1. Open app 2. Go to login page 3. Enter valid credentials 4. Click Login\n- Expected: Redirect to dashboard\n- Actual: Error message \"sorry you are not a registered user\" displayed\n- Severity: High\n- Environment: Chrome, login page\n- Component: Authentication / Login\n\nP — PROCESS:\n1. Read user description carefully\n2. Extract all 7 fields\n3. If Steps to Reproduce are missing — infer logical steps from description\n4. If Severity not mentioned — infer from impact (login broken = High, UI misalignment = Low)\n5. Confirm extracted fields with user in a summary before creating\n6. Call the Jira tool node to create the bug\n7. Return the created Jira issue key (e.g., SCRUM-189) to user\n\nO — OUTPUT:\nAfter creating bug, respond:\n\"✅ Bug created successfully!\nJira ID: [SCRUM-XXX]\nSummary: [bug title]\nSeverity: [level]\nView: [Jira URL]\"\n\nT — TONE:\nTechnical, precise, professional. No filler. No assumptions beyond what user provides. Always confirm before creating.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -320,
+        -64
+      ],
+      "id": "e837a677-0fb5-431e-95fe-b6f63538afde",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        160
+      ],
+      "id": "7c135d85-cae4-4ca8-bee0-a22036570ef0",
+      "name": "Qwen Brian",
+      "credentials": {
+        "groqApi": {
+          "id": "bm61GMhNT6qeU66K",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10000",
+          "mode": "list",
+          "cachedResultName": "My Software Team"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10006",
+          "mode": "list",
+          "cachedResultName": "Bug"
+        },
+        "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.jiraTool",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        144
+      ],
+      "id": "ee4dd37b-d549-4c95-a0a9-9b25de3d8988",
+      "name": "Create an issue in Jira Software",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "FdAW8I06QDDOYcNb",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qwen Brian": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue in Jira Software": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e4b271c9-68fd-4159-b360-9cdfd3ff8163",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "446a7c7e8db081d6294168509ab3cd9a1c1de7cc1cd169a9e718fbaaa7bd35ff"
+  },
+  "nodeGroups": [],
+  "id": "WQIbZOmk4csu519k",
+  "tags": []
+}

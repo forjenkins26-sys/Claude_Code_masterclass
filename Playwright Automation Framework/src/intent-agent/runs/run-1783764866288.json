@@ -1,0 +1,12 @@
+{
+  "goal": "log in with a valid first name, last name, and 10-digit mobile number",
+  "success": false,
+  "steps": [
+    {
+      "action": "fill",
+      "ariaRef": "e1",
+      "value": "Rahul",
+      "reason": "mock: first name field"
+    }
+  ]
+}

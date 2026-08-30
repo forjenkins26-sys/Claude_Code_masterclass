@@ -1,0 +1,255 @@
+- generic [ref=f1e3]:
+  - main [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - radiogroup [ref=f1e71]:
+          - radio "Editor" [checked] [ref=f1e72]
+          - radio "Executions" [ref=f1e74]
+          - radio "Evaluations" [ref=f1e76]
+        - complementary [ref=f1e78]:
+          - generic [ref=f1e79]:
+            - generic [ref=f1e81]:
+              - menubar [ref=f1e82]:
+                - menuitem [ref=f1e83]:
+                  - button "Add new item" [ref=f1e85] [cursor=pointer]
+              - button "Open command palette" [ref=f1e90] [cursor=pointer]
+              - button "Toggle sidebar" [ref=f1e97] [cursor=pointer]
+            - generic [ref=f1e107]:
+              - menuitem "Overview" [ref=f1e110] [cursor=pointer]
+              - menuitem "Personal" [ref=f1e118] [cursor=pointer]
+              - menuitem "Chat" [ref=f1e126] [cursor=pointer]
+            - generic [ref=f1e132]:
+              - menuitem "Templates" [ref=f1e135] [cursor=pointer]
+              - menuitem "Insights" [ref=f1e144] [cursor=pointer]
+              - menuitem "Help" [ref=f1e150] [cursor=pointer]
+              - menuitem "Settings" [ref=f1e158] [cursor=pointer]
+        - main [ref=f1e164]:
+          - generic [ref=f1e167]:
+            - generic [ref=f1e169]:
+              - generic [ref=f1e171]:
+                - generic:
+                  - img:
+                    - group "Edge from 12602a1e-0561-43f3-ae97-3c1369b52559 to 5417be22-d32b-44ee-9fba-62f0bac454a4"
+                  - img:
+                    - group "Edge from 77414ee5-5461-48b7-87b5-6ec2586f0f9e to 5417be22-d32b-44ee-9fba-62f0bac454a4" [ref=f1e172] [cursor=pointer]
+                  - img:
+                    - group "Edge from e91b7979-02ba-46ea-a8be-24c5bb572896 to 5417be22-d32b-44ee-9fba-62f0bac454a4" [ref=f1e176] [cursor=pointer]
+                  - img:
+                    - group "Edge from bde15839-2027-4f04-9edc-80f7ece6d20c to e91b7979-02ba-46ea-a8be-24c5bb572896" [ref=f1e180] [cursor=pointer]
+                  - generic:
+                    - group [ref=f1e184] [cursor=pointer]:
+                      - generic [ref=f1e185]:
+                        - generic [ref=f1e186]:
+                          - button "Delete" [ref=f1e187]
+                          - generic [ref=f1e191]:
+                            - generic "Change color" [ref=f1e192]
+                            - textbox: "#000000"
+                          - button "More actions" [ref=f1e200]
+                        - generic [ref=f1e215]:
+                          - paragraph [ref=f1e216]: Objective
+                          - paragraph [ref=f1e217]: "Build a basic RAG (Retrieval-Augmented Generation) system that can:"
+                          - paragraph [ref=f1e218]: Ingest text or PDF documents. Convert the content into embeddings. Store the embeddings in a database. Retrieve relevant information from the database. Allow users to query the data through a chat interface.
+                    - group [ref=f1e219] [cursor=pointer]:
+                      - generic [ref=f1e220]:
+                        - generic [ref=f1e225]:
+                          - button "Execute step" [ref=f1e226]
+                          - button "Deactivate" [ref=f1e230]
+                          - button "Delete" [ref=f1e235]
+                          - button "More actions" [ref=f1e239]
+                        - generic [ref=f1e243]: On form submission
+                        - button "Execute workflow" [ref=f1e823]
+                    - group [ref=f1e251] [cursor=pointer]:
+                      - generic [ref=f1e252]:
+                        - generic [ref=f1e266]: Embedding*
+                        - generic [ref=f1e271]: Document*
+                        - generic [ref=f1e276]:
+                          - button "Execute step" [ref=f1e277]
+                          - button "Deactivate" [ref=f1e281]
+                          - button "Delete" [ref=f1e286]
+                          - button "More actions" [ref=f1e290]
+                        - generic [ref=f1e294]: Pinecone Vector Store
+                    - group [ref=f1e302] [cursor=pointer]:
+                      - generic [ref=f1e303]:
+                        - generic [ref=f1e304]: Embeddings
+                        - generic [ref=f1e309]:
+                          - button "Deactivate" [ref=f1e310]
+                          - button "Delete" [ref=f1e315]
+                          - button "More actions" [ref=f1e319]
+                        - generic [ref=f1e323]: Embeddings Google Gemini
+                    - group [ref=f1e327] [cursor=pointer]:
+                      - generic [ref=f1e328]:
+                        - generic [ref=f1e329]: Document
+                        - generic [ref=f1e334]: Text Splitter*
+                        - generic [ref=f1e339]:
+                          - button "Deactivate" [ref=f1e340]
+                          - button "Delete" [ref=f1e345]
+                          - button "More actions" [ref=f1e349]
+                        - generic [ref=f1e353]: Default Data Loader
+                    - group [ref=f1e357] [cursor=pointer]:
+                      - generic [ref=f1e358]:
+                        - generic [ref=f1e359]: Text Splitter
+                        - generic [ref=f1e364]:
+                          - button "Deactivate" [ref=f1e365]
+                          - button "Delete" [ref=f1e370]
+                          - button "More actions" [ref=f1e374]
+                        - generic [ref=f1e378]: Recursive Character Text Splitter
+              - generic [ref=f1e385]:
+                - button "Zoom to Fit" [ref=f1e387] [cursor=pointer]
+                - button "Zoom In" [ref=f1e392] [cursor=pointer]
+                - button "Zoom Out" [ref=f1e399] [cursor=pointer]
+                - button "Reset Zoom" [ref=f1e406] [cursor=pointer]
+                - button "Tidy Up" [ref=f1e413] [cursor=pointer]
+            - button "Execute workflow" [ref=f1e420] [cursor=pointer]
+            - generic [ref=f1e425]:
+              - button "Open nodes panel" [ref=f1e427] [cursor=pointer]
+              - button "Command bar" [ref=f1e432] [cursor=pointer]
+              - button "Add sticky note" [ref=f1e439] [cursor=pointer]
+              - button "Open side panel" [ref=f1e446] [cursor=pointer]
+            - generic:
+              - complementary
+          - generic [ref=f1e460] [cursor=pointer]:
+            - generic [ref=f1e461]: Logs
+            - generic [ref=f1e463]:
+              - button "Pop out panel" [ref=f1e465]
+              - button "Open panel" [ref=f1e470]
+      - dialog [ref=f1e829]:
+        - complementary:
+          - list
+          - list:
+            - listitem [ref=f1e830] [cursor=pointer]
+          - list
+        - generic [ref=f1e834]:
+          - generic [ref=f1e835]:
+            - generic "On form submission" [ref=f1e842]
+            - generic [ref=f1e845]:
+              - link "Docs" [ref=f1e846] [cursor=pointer]:
+                - /url: https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.formtrigger/?utm_source=n8n_app&utm_medium=node_settings_modal-credential_link&utm_campaign=n8n-nodes-base.formTrigger
+              - button [ref=f1e854] [cursor=pointer]
+          - main [ref=f1e858]:
+            - generic [ref=f1e864]:
+              - button [active] [ref=f1e866]
+              - generic [ref=f1e873]:
+                - generic [ref=f1e874]:
+                  - generic [ref=f1e876]:
+                    - generic [ref=f1e877]: Parameters
+                    - generic [ref=f1e880]: Settings
+                  - button "Execute step" [disabled] [ref=f1e884]
+                - generic [ref=f1e889]:
+                  - generic [ref=f1e890]:
+                    - generic [ref=f1e891]:
+                      - generic "Click to hide Form URL" [ref=f1e892] [cursor=pointer]: Form URLs
+                      - generic [ref=f1e895]:
+                        - radiogroup [ref=f1e899]:
+                          - radio "Test URL" [checked] [ref=f1e900]
+                          - radio "Production URL" [ref=f1e902]
+                        - generic [ref=f1e904]: http://localhost:5678/form-test/7b472cf6-0c09-4f39-ab0d-a30774c0fca6
+                    - generic [ref=f1e908]:
+                      - generic [ref=f1e911]:
+                        - generic [ref=f1e913]:
+                          - generic [ref=f1e914]: Authentication
+                          - generic [ref=f1e920]:
+                            - button [ref=f1e924] [cursor=pointer]
+                            - radiogroup [ref=f1e930]:
+                              - radio "Fixed" [checked] [ref=f1e931]
+                              - radio "Expression" [ref=f1e933]
+                        - 'generic "Parameter: \"authentication\"" [ref=f1e940]':
+                          - combobox "Select" [ref=f1e945] [cursor=pointer]: None
+                      - generic [ref=f1e952]:
+                        - generic [ref=f1e954]:
+                          - generic [ref=f1e955]: Form Title
+                          - generic [ref=f1e967]:
+                            - button "Focus parameter" [ref=f1e968] [cursor=pointer]
+                            - button [ref=f1e976] [cursor=pointer]
+                            - radiogroup [ref=f1e982]:
+                              - radio "Fixed" [checked] [ref=f1e983]
+                              - radio "Expression" [ref=f1e985]
+                        - 'textbox "Parameter: \"formTitle\" has issues" [ref=f1e995]':
+                          - /placeholder: e.g. Contact us
+                      - generic [ref=f1e1002]:
+                        - generic [ref=f1e1004]:
+                          - generic [ref=f1e1005]: Form Description
+                          - generic [ref=f1e1017]:
+                            - button "Focus parameter" [ref=f1e1018] [cursor=pointer]
+                            - button [ref=f1e1026] [cursor=pointer]
+                            - radiogroup [ref=f1e1032]:
+                              - radio "Fixed" [checked] [ref=f1e1033]
+                              - radio "Expression" [ref=f1e1035]
+                        - 'textbox "Parameter: \"formDescription\"" [ref=f1e1045]':
+                          - /placeholder: e.g. We'll get back to you soon
+                      - generic [ref=f1e1048]:
+                        - generic [ref=f1e1049]:
+                          - generic [ref=f1e1050]: Form Elements
+                          - button "Add Form Element" [ref=f1e1053] [cursor=pointer]
+                        - generic [ref=f1e1059]:
+                          - generic [ref=f1e1060]:
+                            - button "File" [expanded] [ref=f1e1061] [cursor=pointer]
+                            - generic [ref=f1e1065]:
+                              - button "Delete item" [ref=f1e1067] [cursor=pointer]
+                              - button "Drag item" [ref=f1e1071]
+                          - generic [ref=f1e1081]:
+                            - generic [ref=f1e1082]:
+                              - generic [ref=f1e1085]:
+                                - generic [ref=f1e1087]:
+                                  - generic [ref=f1e1088]: Label
+                                  - generic [ref=f1e1100]:
+                                    - button "Focus parameter" [ref=f1e1101] [cursor=pointer]
+                                    - button [ref=f1e1109] [cursor=pointer]
+                                    - radiogroup [ref=f1e1115]:
+                                      - radio "Fixed" [checked] [ref=f1e1116]
+                                      - radio "Expression" [ref=f1e1118]
+                                - 'textbox "Parameter: \"formFields.values[0].fieldLabel\"" [ref=f1e1128]':
+                                  - /placeholder: e.g. What is your name?
+                                  - text: upload File
+                              - generic [ref=f1e1131]:
+                                - generic [ref=f1e1133]:
+                                  - generic [ref=f1e1134]: Element Type
+                                  - generic [ref=f1e1146]:
+                                    - button [ref=f1e1150] [cursor=pointer]
+                                    - radiogroup [ref=f1e1156]:
+                                      - radio "Fixed" [checked] [ref=f1e1157]
+                                      - radio "Expression" [ref=f1e1159]
+                                - 'generic "Parameter: \"formFields.values[0].fieldType\"" [ref=f1e1166]':
+                                  - combobox "Select" [ref=f1e1171] [cursor=pointer]: File
+                              - generic [ref=f1e1178]:
+                                - generic [ref=f1e1180]:
+                                  - generic [ref=f1e1181]: Custom Field Name
+                                  - generic [ref=f1e1193]:
+                                    - button "Focus parameter" [ref=f1e1194] [cursor=pointer]
+                                    - button [ref=f1e1202] [cursor=pointer]
+                                    - radiogroup [ref=f1e1208]:
+                                      - radio "Fixed" [checked] [ref=f1e1209]
+                                      - radio "Expression" [ref=f1e1211]
+                                - 'textbox "Parameter: \"formFields.values[0].fieldName\"" [ref=f1e1221]':
+                                  - /placeholder: ""
+                                  - text: .pdf, .docs, .txt, .json, .html
+                            - button "Add Attributes" [ref=f1e1225] [cursor=pointer]
+                        - button "Add Form Element" [ref=f1e1231] [cursor=pointer]
+                      - generic [ref=f1e1238]:
+                        - generic [ref=f1e1240]:
+                          - generic [ref=f1e1241]: Respond When
+                          - generic [ref=f1e1253]:
+                            - button [ref=f1e1257] [cursor=pointer]
+                            - radiogroup [ref=f1e1263]:
+                              - radio "Fixed" [checked] [ref=f1e1264]
+                              - radio "Expression" [ref=f1e1266]
+                        - 'generic "Parameter: \"responseMode\"" [ref=f1e1273]':
+                          - combobox "Select" [ref=f1e1278] [cursor=pointer]: Form Is Submitted
+                      - alert [ref=f1e1284]:
+                        - region [ref=f1e1287]: Build multi-step forms by adding a form page later in your workflow
+                      - generic [ref=f1e1291]:
+                        - generic [ref=f1e1292]:
+                          - generic [ref=f1e1293]: Options
+                          - button "Add option" [ref=f1e1297] [cursor=pointer]
+                        - button "Add option" [ref=f1e1303] [cursor=pointer]
+                  - generic [ref=f1e1308]: I wish this node would...
+            - generic [ref=f1e1313]:
+              - generic [ref=f1e1314]:
+                - generic [ref=f1e1315]: Output
+                - button "Edit Output" [ref=f1e1319] [cursor=pointer]
+              - article [ref=f1e1327]:
+                - heading "No trigger output" [level=1] [ref=f1e1330]
+                - paragraph [ref=f1e1331]:
+                  - button "Test this trigger" [disabled] [ref=f1e1333]
+                  - text: or
+                  - generic [ref=f1e1336] [cursor=pointer]: set mock data
+  - complementary

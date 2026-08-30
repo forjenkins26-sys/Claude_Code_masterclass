@@ -1,0 +1,282 @@
+{
+  "name": "AI Buddy PRD_TestCases_WorkFlow_E2E",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        176,
+        624
+      ],
+      "id": "77a31544-b2bd-423d-b4d3-0a4c06162836",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "bm61GMhNT6qeU66K",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload PRD Document for Test Case Generation",
+        "formDescription": "Upload a PDF file containing your Product Requirements Document (PRD). The AI will generate a test plan, test cases, and Playwright automation code.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "PRD Document (PDF)",
+              "fieldType": "file",
+              "fieldName": "prdFile",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7d81de83-fe99-436a-94f5-d9981008bcc4",
+      "name": "Upload PRD PDF",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -352,
+        400
+      ],
+      "webhookId": "prd-upload-form"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "prdFile",
+        "options": {
+          "joinPages": true,
+          "maxPages": 0
+        }
+      },
+      "id": "b752bcab-c0cb-4bf0-a7f0-219a52e9bea3",
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Extract PDF Text').item.json.text || $('Extract PDF Text').item.json.content || JSON.stringify($('Extract PDF Text').item.json) }}\n\nBased on the above PRD document, generate THREE outputs exactly as specified in the system message.\n\nANTI-HALLUCINATION RULES (MANDATORY):\n1. DO NOT invent selectors, URLs, or UI elements not present in the PRD\n2. Only use URLs explicitly stated in PRD — mark all others // VERIFICATION REQUIRED\n3. Every Playwright selector must have comment: // VERIFICATION REQUIRED — not tested against live DOM\n4. Expected_Result in CSV must come from PRD text only — never invent error messages\n5. Test assertions must validate outcomes: BAD: \"user redirected\" GOOD: \"URL contains /dashboard AND dashboard heading visible\"\n6. Mark any assumption as [INFERENCE — low confidence]\n\n",
+        "options": {
+          "systemMessage": "You are a senior QA Engineer. Read the PRD text and generate THREE outputs separated exactly like this:\n\n===TEST_PLAN===\nGenerate a complete test_plan.md covering: Objective, Scope, Test Strategy, Test Types, Environment, Entry/Exit Criteria, Risks, Tools\n\n===TEST_CASES===\nGenerate test cases in CSV format with columns: TC_ID,Feature,Title,Type,Priority,Preconditions,Steps,Expected_Result,Test_Data\nCover login (valid/invalid) and dashboard for https://app.vwo.com/. Minimum 20 test cases.\n\n===PLAYWRIGHT===\nGenerate a complete Playwright TypeScript spec file with test() blocks — one test() per CSV row, exactly 20 tests. Each test title must match the CSV Title column exactly. Do NOT group or summarize. Wrap in typescript code block.\n"
+        }
+      },
+      "id": "20a9ec7f-b2af-4468-851e-9e235e0127ed",
+      "name": "Generate Test Artifacts",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        96,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let output = $input.first().json.output;\n\noutput = output.replace(/<think>[\\s\\S]*?<\\/think>/g, '');\n\nconst testPlanMatch = output.match(/===TEST_PLAN===([\\s\\S]*?)===TEST_CASES===/);\nconst testCasesMatch = output.match(/===TEST_CASES===([\\s\\S]*?)===PLAYWRIGHT===/);\nconst playwrightMatch = output.match(/===PLAYWRIGHT===([\\s\\S]*)$/);\n\nconst testPlan = testPlanMatch ? testPlanMatch[1].trim() : '';\nconst testCases = testCasesMatch ? testCasesMatch[1].trim() : '';\nconst playwright = playwrightMatch ? playwrightMatch[1].trim() : '';\n\nreturn [{ testPlan, testCases, playwright }];"
+      },
+      "id": "add0d7ab-da32-49a0-afbf-571fcdc79545",
+      "name": "Split AI Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $json.testPlan }}",
+        "name": "test_plan.md",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "01555adf-fa79-4400-854c-af336b27b0c9",
+      "name": "Create test_plan.md",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        208
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B4e3kmq2ycrHslBA",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $json.testCases }}",
+        "name": "test_cases.csv",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "77921803-cc89-427e-a8dc-16f3f06a12bc",
+      "name": "Create test_cases.csv",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        400
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B4e3kmq2ycrHslBA",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $json.playwright }}",
+        "name": "playwright_test_cases.md",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "eae59dce-dca7-4320-931e-3fa43df88a37",
+      "name": "Create playwright_test_cases.md",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        592
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B4e3kmq2ycrHslBA",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Test Artifacts",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload PRD PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Generate Test Artifacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Test Artifacts": {
+      "main": [
+        [
+          {
+            "node": "Split AI Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split AI Output": {
+      "main": [
+        [
+          {
+            "node": "Create test_plan.md",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create test_cases.csv",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create playwright_test_cases.md",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d53c95e6-60d1-48dd-b494-a5e97413448d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "446a7c7e8db081d6294168509ab3cd9a1c1de7cc1cd169a9e718fbaaa7bd35ff"
+  },
+  "nodeGroups": [],
+  "id": "RnZDNwRog05qc91c",
+  "tags": []
+}

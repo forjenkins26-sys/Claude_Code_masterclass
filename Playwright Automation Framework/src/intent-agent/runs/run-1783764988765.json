@@ -1,0 +1,37 @@
+{
+  "goal": "log in with a valid first name, last name, and 10-digit mobile number",
+  "success": true,
+  "steps": [
+    {
+      "action": "fill",
+      "role": "textbox",
+      "name": "First Name",
+      "value": "Rahul",
+      "reason": "mock: first name field"
+    },
+    {
+      "action": "fill",
+      "role": "textbox",
+      "name": "Last Name",
+      "value": "Sharma",
+      "reason": "mock: last name field"
+    },
+    {
+      "action": "fill",
+      "role": "textbox",
+      "name": "Mobile Number",
+      "value": "9876543210",
+      "reason": "mock: mobile field"
+    },
+    {
+      "action": "click",
+      "role": "button",
+      "name": "Login",
+      "reason": "mock: submit login"
+    },
+    {
+      "action": "done",
+      "reason": "mock: toast shows OTP sent"
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Interview Prep — Anand Soni</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --border:#2a3140;
+  --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --accent2:#3fb950;
+  --code:#0b1622; --shadow:0 8px 24px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+
+header{background:linear-gradient(135deg,#161b22,#1c2742);border-bottom:1px solid var(--border);padding:28px 20px 22px;position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+.hwrap{max-width:1100px;margin:0 auto}
+h1{font-size:23px;font-weight:700;letter-spacing:-.4px}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+
+.tabs{max-width:1100px;margin:18px auto 0;display:flex;gap:8px;flex-wrap:wrap}
+.tab{padding:9px 18px;border-radius:8px;background:var(--panel);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;transition:.15s}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{background:var(--accent);color:#0d1117;border-color:var(--accent)}
+.tab.soon{opacity:.45;cursor:not-allowed}
+.tab.soon:hover{border-color:var(--border);color:var(--muted)}
+
+.toolbar{max-width:1100px;margin:20px auto 0;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#search{flex:1;min-width:220px;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-size:14px;outline:none}
+#search:focus{border-color:var(--accent)}
+.btn{padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.stat{color:var(--muted);font-size:13px;white-space:nowrap}
+.stat b{color:var(--accent2)}
+
+main{max-width:1100px;margin:0 auto;padding:24px 20px 80px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}
+.chip{padding:6px 13px;border-radius:20px;background:var(--panel);border:1px solid var(--border);color:var(--muted);font-size:12.5px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip.active{background:var(--accent);color:#0d1117;border-color:var(--accent);font-weight:600}
+
+.topic{margin-bottom:26px}
+.topic-h{display:flex;align-items:center;gap:10px;margin-bottom:11px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.topic-h h2{font-size:16px;font-weight:700;color:var(--accent)}
+.topic-h .cnt{font-size:12px;color:var(--muted);background:var(--panel);padding:2px 9px;border-radius:12px}
+
+.qa{background:var(--panel);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;overflow:hidden;transition:.15s}
+.qa:hover{border-color:#3d4756}
+.qa.open{border-color:var(--accent)}
+.q{padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;font-weight:600;font-size:14.5px}
+.q .num{color:var(--muted);font-size:12px;min-width:26px;padding-top:2px;font-weight:500}
+.q .arw{margin-left:auto;color:var(--muted);transition:.2s;font-size:12px;padding-top:3px}
+.qa.open .arw{transform:rotate(90deg);color:var(--accent)}
+.a{display:none;padding:0 16px 16px 54px;color:#c9d1d9;font-size:14px;border-top:1px solid var(--border);padding-top:13px;margin-top:0}
+.qa.open .a{display:block}
+.a b{color:var(--text)}
+.a code{background:var(--code);padding:2px 6px;border-radius:4px;font:13px ui-monospace,SFMono-Regular,Consolas,monospace;color:#79c0ff;border:1px solid #1d2d3e}
+.a pre{background:var(--code);padding:13px 15px;border-radius:7px;overflow-x:auto;margin:10px 0;border:1px solid #1d2d3e;font:12.5px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:#a5d6ff;white-space:pre}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+footer{border-top:1px solid var(--border);padding:22px 20px;text-align:center;color:var(--muted);font-size:12.5px}
+mark{background:#3b2f0b;color:#ffd866;padding:0 2px;border-radius:2px}
+
+@media(max-width:640px){
+  .a{padding-left:16px}
+  h1{font-size:19px}
+  .toolbar{padding:0 14px}
+  main{padding:20px 14px 60px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <h1>QA Interview <span>Prep</span></h1>
+    <div class="sub">Anand Soni · Selenium · REST API · Playwright · Cucumber · Java / Python</div>
+    <div class="tabs">
+      <div class="tab active" data-sec="selenium">Selenium</div>
+      <div class="tab" data-sec="restapi">REST API</div>
+      <div class="tab" data-sec="playwright">Playwright</div>
+      <div class="tab" data-sec="cucumber">Cucumber</div>
+      <div class="tab" data-sec="javapython">Java / Python</div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <input id="search" placeholder="Search questions and answers…" autocomplete="off">
+  <button class="btn" id="expandAll">Expand all</button>
+  <button class="btn" id="collapseAll">Collapse all</button>
+  <span class="stat" id="stat"></span>
+</div>
+
+<main>
+  <div class="chips" id="chips"></div>
+  <div id="content"></div>
+</main>
+
+<footer>QA Interview Prep · built for personal study</footer>
+
+<script src="data/selenium.js"></script>
+<script src="data/restapi.js"></script>
+<script src="data/playwright.js"></script>
+<script src="data/cucumber.js"></script>
+<script src="data/javapython.js"></script>
+<script>
+var SECTIONS = {
+  selenium:   window.SELENIUM_DATA,
+  restapi:    window.RESTAPI_DATA,
+  playwright: window.PLAYWRIGHT_DATA,
+  cucumber:   window.CUCUMBER_DATA,
+  javapython: window.JAVAPYTHON_DATA
+};
+var activeSection = 'selenium';
+var DATA = SECTIONS[activeSection];
+var activeTopic = 'all';
+var query = '';
+
+var elContent = document.getElementById('content');
+var elChips = document.getElementById('chips');
+var elStat = document.getElementById('stat');
+var elSearch = document.getElementById('search');
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function stripTags(h){ return h.replace(/<[^>]+>/g,' '); }
+
+function highlight(html, q){
+  if(!q) return html;
+  var parts = html.split(/(<[^>]+>)/);
+  var re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+  for(var i=0;i<parts.length;i++){
+    if(parts[i].charAt(0) !== '<') parts[i] = parts[i].replace(re,'<mark>$1</mark>');
+  }
+  return parts.join('');
+}
+
+function buildChips(){
+  if(!DATA.topics.length){ elChips.innerHTML = ''; return; }
+  var total = 0;
+  DATA.topics.forEach(function(t){ total += t.questions.length; });
+  var h = '<div class="chip'+(activeTopic==='all'?' active':'')+'" data-t="all">All ('+total+')</div>';
+  DATA.topics.forEach(function(t){
+    h += '<div class="chip'+(activeTopic===t.topic?' active':'')+'" data-t="'+esc(t.topic)+'">'+esc(t.topic)+' ('+t.questions.length+')</div>';
+  });
+  elChips.innerHTML = h;
+  Array.prototype.forEach.call(elChips.children, function(c){
+    c.onclick = function(){ activeTopic = c.getAttribute('data-t'); buildChips(); render(); };
+  });
+}
+
+function render(){
+  if(!DATA.topics.length){
+    elContent.innerHTML = '<div class="empty"><h2 style="color:var(--accent);font-size:18px;margin-bottom:10px">'
+      + esc(DATA.section) + ' — coming soon</h2>'
+      + '<p>Share your ' + esc(DATA.section) + ' question files and this section fills in.</p></div>';
+    elStat.innerHTML = '<b>0</b> questions';
+    return;
+  }
+  var q = query.trim().toLowerCase();
+  var html = '', shown = 0, n = 0;
+
+  DATA.topics.forEach(function(t){
+    if(activeTopic !== 'all' && activeTopic !== t.topic) return;
+
+    var hits = t.questions.filter(function(item){
+      if(!q) return true;
+      return (item.q + ' ' + stripTags(item.a)).toLowerCase().indexOf(q) !== -1;
+    });
+    if(!hits.length) return;
+
+    shown += hits.length;
+    html += '<div class="topic"><div class="topic-h"><h2>'+esc(t.topic)+'</h2><span class="cnt">'+hits.length+'</span></div>';
+    hits.forEach(function(item){
+      n++;
+      html += '<div class="qa'+(q?' open':'')+'">'
+            +   '<div class="q"><span class="num">'+n+'</span><span>'+highlight(esc(item.q),q)+'</span><span class="arw">&#9654;</span></div>'
+            +   '<div class="a">'+highlight(item.a,q)+'</div>'
+            + '</div>';
+    });
+    html += '</div>';
+  });
+
+  elContent.innerHTML = html || '<div class="empty">No questions match &ldquo;'+esc(query)+'&rdquo;</div>';
+  elStat.innerHTML = '<b>'+shown+'</b> question'+(shown===1?'':'s');
+
+  Array.prototype.forEach.call(elContent.querySelectorAll('.q'), function(qEl){
+    qEl.onclick = function(){ qEl.parentNode.classList.toggle('open'); };
+  });
+}
+
+elSearch.oninput = function(){ query = elSearch.value; render(); };
+document.getElementById('expandAll').onclick = function(){
+  Array.prototype.forEach.call(elContent.querySelectorAll('.qa'), function(x){ x.classList.add('open'); });
+};
+document.getElementById('collapseAll').onclick = function(){
+  Array.prototype.forEach.call(elContent.querySelectorAll('.qa'), function(x){ x.classList.remove('open'); });
+};
+Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(tb){
+  tb.onclick = function(){
+    activeSection = tb.getAttribute('data-sec');
+    DATA = SECTIONS[activeSection];
+    activeTopic = 'all';
+    query = '';
+    elSearch.value = '';
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(x){ x.classList.remove('active'); });
+    tb.classList.add('active');
+    buildChips();
+    render();
+  };
+});
+
+buildChips();
+render();
+</script>
+</body>
+</html>

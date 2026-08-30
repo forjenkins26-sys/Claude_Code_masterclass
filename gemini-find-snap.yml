@@ -1,0 +1,137 @@
+- generic [ref=f5e3]:
+  - main [ref=f5e4]:
+    - generic [ref=f5e6]:
+      - generic [ref=f5e9]:
+        - generic [ref=f5e11]:
+          - generic [ref=f5e14]:
+            - link "Personal" [ref=f5e16] [cursor=pointer]:
+              - /url: /projects/wR5fxbZ0Q5aFnnuZ
+              - generic [ref=f5e18]:
+                - generic "Personal" [ref=f5e19]
+                - generic "Personal" [ref=f5e24]
+            - generic [ref=f5e25]: /
+            - generic "AI_Basic_RAG" [ref=f5e26]
+          - generic [ref=f5e29]: + Add tag
+          - generic [ref=f5e31]:
+            - generic [ref=f5e32]: 0 / 1
+            - generic [ref=f5e34]:
+              - generic [ref=f5e36]:
+                - button "Publish" [ref=f5e37] [cursor=pointer]
+                - button "More actions" [ref=f5e43] [cursor=pointer]
+              - link [ref=f5e48] [cursor=pointer]:
+                - /url: /workflow/rv8Od66OPwreqSBg/history
+                - button "Version History" [ref=f5e49]
+              - button "Actions" [ref=f5e58] [cursor=pointer]
+        - radiogroup [ref=f5e70]:
+          - radio "Editor" [checked] [ref=f5e71]
+          - radio "Executions" [ref=f5e73]
+          - radio "Evaluations" [ref=f5e75]
+      - complementary [ref=f5e77]:
+        - generic [ref=f5e78]:
+          - generic [ref=f5e80]:
+            - menubar [ref=f5e81]:
+              - menuitem [ref=f5e82]:
+                - button "Add new item" [ref=f5e84] [cursor=pointer]
+            - button "Open command palette" [ref=f5e89] [cursor=pointer]
+            - button "Toggle sidebar" [ref=f5e96] [cursor=pointer]
+          - generic [ref=f5e106]:
+            - menuitem "Overview" [ref=f5e109] [cursor=pointer]
+            - menuitem "Personal" [ref=f5e117] [cursor=pointer]
+            - menuitem "Chat" [ref=f5e125] [cursor=pointer]
+          - generic [ref=f5e131]:
+            - menuitem "Templates" [ref=f5e134] [cursor=pointer]
+            - menuitem "Insights" [ref=f5e143] [cursor=pointer]
+            - menuitem "Help" [ref=f5e149] [cursor=pointer]
+            - menuitem "Settings" [ref=f5e157] [cursor=pointer]
+      - main [ref=f5e163]:
+        - generic [ref=f5e166]:
+          - generic [ref=f5e168]:
+            - generic [ref=f5e170]:
+              - generic:
+                - img:
+                  - group "Edge from 12602a1e-0561-43f3-ae97-3c1369b52559 to 5417be22-d32b-44ee-9fba-62f0bac454a4"
+                - img:
+                  - group "Edge from 77414ee5-5461-48b7-87b5-6ec2586f0f9e to 5417be22-d32b-44ee-9fba-62f0bac454a4" [ref=f5e171] [cursor=pointer]
+                - img:
+                  - group "Edge from e91b7979-02ba-46ea-a8be-24c5bb572896 to 5417be22-d32b-44ee-9fba-62f0bac454a4" [ref=f5e175] [cursor=pointer]
+                - img:
+                  - group "Edge from bde15839-2027-4f04-9edc-80f7ece6d20c to e91b7979-02ba-46ea-a8be-24c5bb572896" [ref=f5e179] [cursor=pointer]
+                - generic:
+                  - group [ref=f5e183] [cursor=pointer]:
+                    - generic [ref=f5e184]:
+                      - generic [ref=f5e185]:
+                        - button "Delete" [ref=f5e186]
+                        - generic [ref=f5e190]:
+                          - generic "Change color" [ref=f5e191]
+                          - textbox: "#000000"
+                        - button "More actions" [ref=f5e199]
+                      - generic [ref=f5e214]:
+                        - paragraph [ref=f5e215]: Objective
+                        - paragraph [ref=f5e216]: "Build a basic RAG (Retrieval-Augmented Generation) system that can:"
+                        - paragraph [ref=f5e217]: Ingest text or PDF documents. Convert the content into embeddings. Store the embeddings in a database. Retrieve relevant information from the database. Allow users to query the data through a chat interface.
+                  - group [ref=f5e218] [cursor=pointer]:
+                    - generic [ref=f5e219]:
+                      - generic [ref=f5e224]:
+                        - button "Execute step" [ref=f5e225]
+                        - button "Deactivate" [ref=f5e229]
+                        - button "Delete" [ref=f5e234]
+                        - button "More actions" [ref=f5e238]
+                      - generic [ref=f5e242]: On form submission
+                      - generic:
+                        - generic:
+                          - button "Execute workflow"
+                  - group [ref=f5e246] [cursor=pointer]:
+                    - generic [ref=f5e247]:
+                      - generic [ref=f5e261]: Embedding*
+                      - generic [ref=f5e266]: Document*
+                      - generic [ref=f5e271]:
+                        - button "Execute step" [ref=f5e272]
+                        - button "Deactivate" [ref=f5e276]
+                        - button "Delete" [ref=f5e281]
+                        - button "More actions" [ref=f5e285]
+                      - generic [ref=f5e289]: Pinecone Vector Store
+                  - group [ref=f5e293] [cursor=pointer]:
+                    - generic [ref=f5e294]:
+                      - generic [ref=f5e295]: Embeddings
+                      - generic [ref=f5e300]:
+                        - button "Deactivate" [ref=f5e301]
+                        - button "Delete" [ref=f5e306]
+                        - button "More actions" [ref=f5e310]
+                      - generic [ref=f5e314]: Embeddings Google Gemini
+                  - group [ref=f5e318] [cursor=pointer]:
+                    - generic [ref=f5e319]:
+                      - generic [ref=f5e320]: Document
+                      - generic [ref=f5e325]: Text Splitter*
+                      - generic [ref=f5e330]:
+                        - button "Deactivate" [ref=f5e331]
+                        - button "Delete" [ref=f5e336]
+                        - button "More actions" [ref=f5e340]
+                      - generic [ref=f5e344]: Default Data Loader
+                  - group [ref=f5e348] [cursor=pointer]:
+                    - generic [ref=f5e349]:
+                      - generic [ref=f5e350]: Text Splitter
+                      - generic [ref=f5e355]:
+                        - button "Deactivate" [ref=f5e356]
+                        - button "Delete" [ref=f5e361]
+                        - button "More actions" [ref=f5e365]
+                      - generic [ref=f5e369]: Recursive Character Text Splitter
+            - generic [ref=f5e376]:
+              - button "Zoom to Fit" [ref=f5e378] [cursor=pointer]
+              - button "Zoom In" [ref=f5e383] [cursor=pointer]
+              - button "Zoom Out" [ref=f5e390] [cursor=pointer]
+              - button "Reset Zoom" [ref=f5e397] [cursor=pointer]
+              - button "Tidy Up" [ref=f5e404] [cursor=pointer]
+          - button "Execute workflow" [ref=f5e411] [cursor=pointer]
+          - generic [ref=f5e416]:
+            - button "Open nodes panel" [ref=f5e418] [cursor=pointer]
+            - button "Command bar" [ref=f5e423] [cursor=pointer]
+            - button "Add sticky note" [ref=f5e430] [cursor=pointer]
+            - button "Open side panel" [ref=f5e437] [cursor=pointer]
+          - generic:
+            - complementary
+        - generic [ref=f5e451] [cursor=pointer]:
+          - generic [ref=f5e452]: Logs
+          - generic [ref=f5e454]:
+            - button "Pop out panel" [ref=f5e456]
+            - button "Open panel" [ref=f5e461]
+  - complementary

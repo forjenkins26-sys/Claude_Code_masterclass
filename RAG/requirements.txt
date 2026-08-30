@@ -1,0 +1,5 @@
+Your task is to build a UI into a React application. It is a simple application which will showcase how the ingestion happens. You will take the PDF, and if I store that in the data/df folder, you will take that PDF and divide it using the nomic embed embedding model.
+
+What I want you to do is install the quadrant also, or you can use Chroma DB local. You will put this into the local Chroma DB automatically.
+
+Whenever I will ask you a query related to that PDF, what you are going to do is you will also show me which chunks we were able to fetch, the top four chunks that we were able to fetch from the document. You will also use groq.com, and you can use OpenGPT 1.2 12OB for that, to retrieve this mechanism to showcase the overall idea.

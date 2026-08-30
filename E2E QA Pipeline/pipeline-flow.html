@@ -1,0 +1,464 @@
+<title>AI-Driven QA Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
+
+<style>
+  :root {
+    --ground:  #f7f8fa;
+    --surface: #ffffff;
+    --raised:  #eef0f4;
+    --line:    #d9dde5;
+    --ink:     #14171c;
+    --muted:   #5f6673;
+    --faint:   #8b919e;
+
+    --intake: #1f6feb;
+    --gen:    #7c3aed;
+    --auto:   #d2600a;
+    --exec:   #15803d;
+    --anal:   #be185d;
+
+    --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --step: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:  #0f1115;
+      --surface: #171a21;
+      --raised:  #1e222b;
+      --line:    #2a2f3a;
+      --ink:     #e8eaed;
+      --muted:   #98a0ae;
+      --faint:   #6b7280;
+
+      --intake: #6ea8ff;
+      --gen:    #b79bff;
+      --auto:   #ff9b52;
+      --exec:   #56d98a;
+      --anal:   #ff7cb8;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:  #0f1115;
+    --surface: #171a21;
+    --raised:  #1e222b;
+    --line:    #2a2f3a;
+    --ink:     #e8eaed;
+    --muted:   #98a0ae;
+    --faint:   #6b7280;
+
+    --intake: #6ea8ff;
+    --gen:    #b79bff;
+    --auto:   #ff9b52;
+    --exec:   #56d98a;
+    --anal:   #ff7cb8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4.5rem) clamp(1.1rem, 4vw, 2.5rem) 5rem;
+  }
+
+  /* ---- masthead ---- */
+
+  header { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0 0 1rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5.5vw, 3.1rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
+    text-wrap: balance;
+    margin: 0 0 1rem;
+  }
+
+  .standfirst {
+    font-size: clamp(1rem, 2vw, 1.13rem);
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0 0 2rem;
+  }
+
+  .chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.7rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .chain span { color: var(--ink); }
+  .chain i { color: var(--faint); font-style: normal; }
+
+  /* ---- stages ---- */
+
+  .stages {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 3.4rem 1fr;
+    gap: 0 1.4rem;
+    position: relative;
+    padding-bottom: var(--step);
+  }
+
+  /* the spine */
+  .stage::before {
+    content: "";
+    position: absolute;
+    left: 1.68rem;
+    top: 3.4rem;
+    bottom: 0;
+    width: 2px;
+    background: var(--line);
+  }
+  .stage:last-child::before { display: none; }
+
+  .marker {
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 1rem;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    position: relative;
+    z-index: 1;
+  }
+
+  .body { padding-top: 0.35rem; min-width: 0; }
+
+  .lane {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.35rem;
+  }
+
+  h2 {
+    font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.6rem;
+    text-wrap: balance;
+  }
+
+  .body p {
+    margin: 0 0 0.9rem;
+    color: var(--muted);
+    max-width: 64ch;
+  }
+
+  .io {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.85rem;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.28rem 0.6rem;
+    border-radius: 4px;
+    background: var(--raised);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .chip b {
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 0.4rem;
+  }
+
+  .stage[data-lane="intake"] { --accent: var(--intake); }
+  .stage[data-lane="gen"]    { --accent: var(--gen); }
+  .stage[data-lane="auto"]   { --accent: var(--auto); }
+  .stage[data-lane="exec"]   { --accent: var(--exec); }
+  .stage[data-lane="anal"]   { --accent: var(--anal); }
+
+  /* ---- rag callout ---- */
+
+  .aside {
+    margin: 0.4rem 0 0;
+    padding: 0.9rem 1.1rem;
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 6px 6px 0;
+  }
+  .aside p { margin: 0; font-size: 0.9rem; }
+  .aside strong { color: var(--ink); font-weight: 600; }
+
+  /* ---- outcome ---- */
+
+  .outcome {
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .outcome h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); margin-bottom: 1.4rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0.7rem;
+  }
+
+  .cap {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.9rem 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    gap: 0.7rem;
+    align-items: baseline;
+  }
+  .cap em {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 0.72rem;
+    color: var(--faint);
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
+
+  @media (max-width: 560px) {
+    .stage { grid-template-columns: 2.6rem 1fr; gap: 0 1rem; }
+    .stage::before { left: 1.28rem; top: 2.6rem; }
+    .marker { width: 2.6rem; height: 2.6rem; font-size: 0.85rem; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Pipeline architecture</p>
+    <h1>From a Jira story to a triaged test run, without a human in the middle</h1>
+    <p class="standfirst">
+      Eight stages carry one ticket all the way through: an agent reads it, drafts the plan and
+      cases against everything the team has tested before, writes the automation, runs it, and
+      hands back a root-cause analysis of whatever broke.
+    </p>
+    <div class="chain">
+      <span>JQL</span><i>→</i>
+      <span>Test plan</span><i>→</i>
+      <span>Test cases</span><i>→</i>
+      <span>Flow files</span><i>→</i>
+      <span>Execution</span><i>→</i>
+      <span>RCA</span>
+    </div>
+  </header>
+
+  <div class="stages">
+
+    <section class="stage" data-lane="intake">
+      <div class="marker">1</div>
+      <div class="body">
+        <p class="lane">Intake</p>
+        <h2>Fetch the stories a JQL query returns</h2>
+        <p>
+          A LangChain or CrewAI agent runs the query and collects every story, feature, or ticket
+          waiting to be covered.
+        </p>
+        <div class="io">
+          <span class="chip"><b>in</b>JQL query</span>
+          <span class="chip"><b>out</b>story list</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="intake">
+      <div class="marker">2</div>
+      <div class="body">
+        <p class="lane">Intake</p>
+        <h2>Take one story at a time</h2>
+        <p>
+          The agent works the list in sequence. Everything downstream is scoped to a single
+          ticket — <code>VWO-109</code>, say — so artifacts never blur across stories.
+        </p>
+        <div class="io">
+          <span class="chip"><b>in</b>story list</span>
+          <span class="chip"><b>out</b>VWO-109</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="gen">
+      <div class="marker">3</div>
+      <div class="body">
+        <p class="lane">Generation</p>
+        <h2>Draft a test plan against prior art</h2>
+        <p>
+          The agent queries the RAG pipeline, which already holds the team's earlier test plans
+          and testing documentation, and writes a plan for this story that follows the house
+          shape rather than inventing one.
+        </p>
+        <div class="io">
+          <span class="chip"><b>in</b>VWO-109</span>
+          <span class="chip"><b>in</b>RAG: past plans</span>
+          <span class="chip"><b>out</b>test plan</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="gen">
+      <div class="marker">4</div>
+      <div class="body">
+        <p class="lane">Generation</p>
+        <h2>Generate the cases</h2>
+        <p>
+          A second pass over the RAG store — this time for prior test cases, reusable patterns,
+          and domain knowledge — produces the cases that cover the plan.
+        </p>
+        <div class="aside">
+          <p>
+            <strong>Decide the oracle.</strong> Retrieved cases say what was tested before; the
+            story's acceptance criteria say what must be true now. When they disagree, the
+            criteria win — otherwise a bug encoded in an old case propagates as expected
+            behaviour.
+          </p>
+        </div>
+        <div class="io">
+          <span class="chip"><b>in</b>test plan</span>
+          <span class="chip"><b>in</b>RAG: past cases</span>
+          <span class="chip"><b>out</b>test cases</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="auto">
+      <div class="marker">5</div>
+      <div class="body">
+        <p class="lane">Automation</p>
+        <h2>Turn cases into flow files</h2>
+        <p>
+          Another agent reads the generated cases and writes <code>.md</code> automation flows,
+          using the Playwright framework as its reference for structure and conventions.
+        </p>
+        <div class="io">
+          <span class="chip"><b>in</b>test cases</span>
+          <span class="chip"><b>ref</b>Playwright framework</span>
+          <span class="chip"><b>out</b>.md flow files</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="exec">
+      <div class="marker">6</div>
+      <div class="body">
+        <p class="lane">Execution</p>
+        <h2>Run them through Browser Bash</h2>
+        <p>
+          A CLI runner executes the flow files unattended. It can drive a cheaper model — DeepSeek
+          or similar — since this stage follows written steps rather than authoring them.
+        </p>
+        <div class="io">
+          <span class="chip"><b>in</b>.md flow files</span>
+          <span class="chip"><b>out</b>live run</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="exec">
+      <div class="marker">7</div>
+      <div class="body">
+        <p class="lane">Execution</p>
+        <h2>Emit the run as data</h2>
+        <p>
+          The run lands as <code>result.json</code> — pass and fail status, errors, logs, and the
+          rest of the execution detail.
+        </p>
+        <div class="io">
+          <span class="chip"><b>out</b>result.json</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" data-lane="anal">
+      <div class="marker">8</div>
+      <div class="body">
+        <p class="lane">Analysis</p>
+        <h2>Analyse, triage, publish</h2>
+        <p>
+          The results go back to a LangChain agent, which checks for flakiness, performs root
+          cause analysis, triages the failures through an RCA bot, and pushes the outcome to the
+          dashboard.
+        </p>
+        <div class="io">
+          <span class="chip"><b>in</b>result.json</span>
+          <span class="chip"><b>out</b>flakiness</span>
+          <span class="chip"><b>out</b>RCA</span>
+          <span class="chip"><b>out</b>dashboard</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="outcome">
+    <h2>What the pipeline delivers</h2>
+    <div class="grid">
+      <div class="cap"><em>01</em><span>Reads Jira stories straight from a JQL query</span></div>
+      <div class="cap"><em>02</em><span>Writes test plans grounded in earlier ones</span></div>
+      <div class="cap"><em>03</em><span>Generates cases from historical coverage</span></div>
+      <div class="cap"><em>04</em><span>Converts cases into Playwright flow files</span></div>
+      <div class="cap"><em>05</em><span>Executes the flows through Browser Bash</span></div>
+      <div class="cap"><em>06</em><span>Produces machine-readable run results</span></div>
+      <div class="cap"><em>07</em><span>Analyses failures, flakiness, and root cause</span></div>
+      <div class="cap"><em>08</em><span>Publishes everything to a reporting dashboard</span></div>
+    </div>
+  </section>
+
+  <footer>
+    Source: ai-e2e-qa-pipeline-flow.md · editable diagram: ai-e2e-qa-pipeline.excalidraw
+  </footer>
+
+</div>

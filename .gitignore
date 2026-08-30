@@ -46,3 +46,22 @@ RAG/**/chroma_db/
 RAG/**/__pycache__/
 RAG/**/node_modules/
 RAG/**/dist/
+
+# --- push-everything pass (2026-08-30) ---
+# Nested git repos: `git add` would store these as empty gitlinks, so a clone
+# gets empty folders. They have their own remotes - push them there instead.
+/Advance-Playwright-Framework/
+/agent-factory-cli/
+/agent-skills/
+/andrej-karpathy-skills/
+/qa-assistant/
+/qabuddy/
+/RAG/Basic_Rag/app/
+# Local worktrees + backups: machine-specific, 200MB+
+/.claude/worktrees/
+.claude/settings.json.bak-*
+# Installed applications: multi-GB, reinstallable from npm/pip, GitHub rejects this size
+/langflow/
+/n8n-local/
+# Playwright DOM snapshot that captured a Pinecone credential modal with the key visible
+/before-save.yml

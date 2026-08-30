@@ -188,3 +188,18 @@ Two suspected defects surfaced during exploration, NOT filed (explore discovers 
 **Elements Found:** 12 total (3 inputs, 2 buttons, 1 link, 3 error nodes, 1 toast, 2 static text)
 **Locators Verified:** 12/12 resolved to exactly 1 element in a live headed run | 0 marked VERIFICATION REQUIRED
 **Notes:** No reCAPTCHA, no iframes. Error nodes + #toast are display:none at rest — absent from the at-rest a11y snapshot, need waitFor(). #toast is a shared channel (forgot-password AND OTP success) with a 3s auto-dismiss. Successful login navigates to blinkit-products.html — different URL, out of scope (AH Rule 27). Source review found a THIRD seeded defect not in CLAUDE.md: mobile regex is /^\d{9,10}$/, so a 9-digit number passes validation (violates AC-1/AC-4). Reported as an observation for /test-case-creation; explore writes no assertions.
+
+## 2026-08-25 — /explore https://blinkit-demo-qa.vercel.app
+
+**POM Generated:** `ClientDemo-25Aug/src/pages/blinkitLoginPage.ts`
+**Elements Found:** 11 total (3 inputs, 2 buttons, 1 link, 3 error spans, 1 toast, 1 form)
+**Locators Verified:** 11 confirmed via live count()==1 | 0 marked VERIFICATION REQUIRED
+**States Captured:** default, empty-submit validation, forgot-password toast (all same-URL, no nav)
+**Notes:** No reCAPTCHA, no iframes. Observations for /test-case-creation: mobile validation regex is `/^\d{9,10}$/`; listeners bound only to loginForm/mobile/forgotBtn (none on signupBtn); page has 0 aria-describedby, 0 role="alert", 0 aria-live; forgot-password toast reads "email" on a mobile-only login. All are DOM facts, not verdicts — the SCRUM-741 ACs decide.
+
+## 2026-08-26 — /explore https://blinkit-demo-qa.vercel.app
+
+**POM Generated:** `QuickDemo/src/pages/blinkitLoginPage.ts`
+**Elements Found:** 12 total (3 inputs, 2 buttons, 1 link, 3 error spans, 1 toast, 2 containers)
+**Locators Verified:** 12 confirmed live via count()==1 | 0 marked VERIFICATION REQUIRED
+**Notes:** No reCAPTCHA, no iframes, no dropdowns. Console error is favicon.ico 404 only (cosmetic). Form is `novalidate` — JS-only validation. Same-URL states captured: empty-submit errors, forgot-password toast, OTP success toast; no click leaves the URL. Live a11y read: 0 aria-describedby / 0 role="alert" / 0 aria-live. Four documented defects observed live and annotated as comments (SCRUM-645 9-digit accepted, SCRUM-716 toast says "email", SCRUM-718 #signupBtn no nav, SCRUM-721 errors unannounced) — comments only, no assertions.

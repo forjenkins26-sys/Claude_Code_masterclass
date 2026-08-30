@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare Pharmacy — Login</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background:#f4f7f6; display:flex; align-items:center; justify-content:center;
+    min-height:100vh; color:#1f2937;
+  }
+  .wrapper {
+    display:flex; background:#fff; border-radius:16px; overflow:hidden;
+    box-shadow:0 12px 40px rgba(0,0,0,.10); max-width:880px; width:94%;
+  }
+  .left-panel {
+    background:linear-gradient(140deg,#0b7a5a,#0f9d76); color:#fff;
+    padding:48px 40px; width:44%; display:flex; flex-direction:column; justify-content:center;
+  }
+  .left-panel .logo { font-size:30px; font-weight:800; margin-bottom:10px; letter-spacing:-.5px; }
+  .left-panel .tag { font-size:15px; opacity:.92; line-height:1.6; margin-bottom:26px; }
+  .left-panel ul { list-style:none; font-size:14px; }
+  .left-panel li { margin-bottom:10px; opacity:.94; }
+  .right-panel { padding:44px 40px; width:56%; }
+  h2 { font-size:22px; margin-bottom:6px; }
+  .sub { color:#6b7280; font-size:14px; margin-bottom:26px; }
+  .form-group { margin-bottom:18px; }
+  label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; color:#374151; }
+  input {
+    width:100%; padding:12px 14px; border:1px solid #d7dee5; border-radius:8px;
+    font-size:14px; outline:none; transition:border-color .15s;
+  }
+  input:focus { border-color:#0f9d76; }
+  input.error { border-color:#dc2626; }
+  .err { color:#dc2626; font-size:12px; margin-top:5px; display:none; }
+  .err.show { display:block; }
+  .btn {
+    width:100%; padding:13px; border:none; border-radius:8px; font-size:15px;
+    font-weight:600; cursor:pointer; transition:opacity .15s;
+  }
+  .btn-login { background:#0f9d76; color:#fff; margin-top:6px; }
+  .btn-login:hover { opacity:.9; }
+  .btn-register {
+    background:#fff; color:#0f9d76; border:1.5px solid #0f9d76; margin-top:12px;
+  }
+  .links { text-align:center; margin-top:16px; }
+  .links a { color:#0f9d76; font-size:13px; text-decoration:none; }
+  .links a:hover { text-decoration:underline; }
+  .divider {
+    display:flex; align-items:center; margin:20px 0 4px; color:#9ca3af; font-size:12px;
+  }
+  .divider::before, .divider::after {
+    content:""; flex:1; height:1px; background:#e5e7eb;
+  }
+  .divider span { padding:0 12px; }
+  .toast {
+    position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-120px);
+    background:#111827; color:#fff; padding:13px 22px; border-radius:8px;
+    font-size:14px; transition:transform .35s; z-index:99;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  @media(max-width:720px){
+    .wrapper{ flex-direction:column; }
+    .left-panel,.right-panel{ width:100%; }
+    .left-panel{ padding:32px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="wrapper">
+  <div class="left-panel">
+    <div class="logo">MediCare</div>
+    <div class="tag">Your trusted online pharmacy.<br>Medicines delivered in 30 minutes.</div>
+    <ul>
+      <li>✓ 100% genuine medicines</li>
+      <li>✓ Licensed pharmacists on call</li>
+      <li>✓ Free delivery above ₹499</li>
+      <li>✓ Upload prescription in seconds</li>
+    </ul>
+  </div>
+
+  <div class="right-panel">
+    <h2>Sign in to your account</h2>
+    <p class="sub">Enter your registered details to continue</p>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="off">
+        <span class="err" id="emailErr">Enter a valid email address</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter password" maxlength="20" autocomplete="off">
+        <span class="err" id="passwordErr">Password must be at least 8 characters</span>
+      </div>
+
+      <div class="form-group">
+        <label for="pincode">Delivery Pincode</label>
+        <input type="text" id="pincode" name="pincode" placeholder="6-digit pincode" maxlength="6" autocomplete="off">
+        <span class="err" id="pincodeErr">Enter valid 6-digit pincode</span>
+      </div>
+
+      <button type="submit" class="btn btn-login" id="loginBtn">Sign In</button>
+    </form>
+
+    <div class="links">
+      <a href="#" id="forgotLink">Forgot Password?</a>
+    </div>
+
+    <div class="divider"><span>New to MediCare?</span></div>
+
+    <button class="btn btn-register" id="registerBtn">Create New Account</button>
+  </div>
+</div>
+
+<script>
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  }
+
+  function setError(fieldId, errId, show) {
+    document.getElementById(fieldId).classList.toggle('error', show);
+    document.getElementById(errId).classList.toggle('show', show);
+  }
+
+  function validateEmail(v) {
+    return v.indexOf('@') !== -1;
+  }
+
+  function validatePassword(v) {
+    return v.length >= 8;
+  }
+
+  function validatePincode(v) {
+    return /^[0-9]{6}$/.test(v);
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var email    = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var pincode  = document.getElementById('pincode').value.trim();
+
+    var emailBad    = !validateEmail(email);
+    var passwordBad = !validatePassword(password);
+    var pincodeBad  = !validatePincode(pincode);
+
+    setError('email', 'emailErr', emailBad);
+    setError('password', 'passwordErr', passwordBad);
+    setError('pincode', 'pincodeErr', pincodeBad);
+
+    if (emailBad || passwordBad || pincodeBad) return;
+
+    sessionStorage.setItem('medicareUser', JSON.stringify({ email: email, pincode: pincode }));
+    showToast('✅ OTP sent to your registered mobile number');
+  });
+
+  document.getElementById('forgotLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    showToast('📧 Password reset link sent to your email');
+  });
+</script>
+
+</body>
+</html>

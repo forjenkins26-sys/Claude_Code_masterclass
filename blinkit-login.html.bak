@@ -373,13 +373,7 @@
       valid = false;
     }
 
-    // ╔══════════════════════════════════════════════════════════════════════╗
-    // ║  INTENTIONAL BUG: mobile number length not enforced correctly       ║
-    // ║  Requirement (AC-4): must be EXACTLY 10 digits.                     ║
-    // ║  Bug: regex is {9,10} — a 9-digit number passes validation and      ║
-    // ║       the user is logged in with an invalid mobile number.          ║
-    // ╚══════════════════════════════════════════════════════════════════════╝
-    if (!/^\d{9,10}$/.test(mobile.value.trim())) {
+    if (!/^\d{10}$/.test(mobile.value.trim())) {
       mobile.classList.add('input-error');
       document.getElementById('mobileErr').style.display = 'block';
       valid = false;
@@ -402,16 +396,9 @@
   });
 
   // Forgot password
-  // ╔══════════════════════════════════════════════════════════════════════╗
-  // ║  INTENTIONAL BUG: wrong Forgot Password confirmation message        ║
-  // ║  Requirement (AC-7): toast must read                                ║
-  // ║       "Password reset link sent to your mobile"                     ║
-  // ║  Bug: toast says "email" instead of "mobile" — misleads the user    ║
-  // ║       into checking an inbox for a link that went to their phone.   ║
-  // ╚══════════════════════════════════════════════════════════════════════╝
   document.getElementById('forgotBtn').addEventListener('click', function(e) {
     e.preventDefault();
-    showToast('📧 Password reset link sent to your email');
+    showToast('📱 Password reset link sent to your mobile');
   });
 
   // ⚠️ INTENTIONAL BUG: signup button has no event listener — click does nothing

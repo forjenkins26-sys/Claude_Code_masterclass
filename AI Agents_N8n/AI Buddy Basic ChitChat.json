@@ -1,0 +1,95 @@
+{
+  "name": "AI Buddy Basic ChitChat",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Anand Soni and AI agent. How can I assist you today?\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -480,
+        -64
+      ],
+      "id": "7e9ca840-e1c1-4a5d-a27d-88aad50da896",
+      "name": "When chat message received",
+      "webhookId": "ee245f99-1551-4eb6-96fe-d38a329d7c3c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a QA Assistant, You will only answer the queries related to QA. Expected answer wiill be in a technical answer which is related to QA only."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "08a391e2-ec49-40a0-a3e3-2e0dc2bfe7ce",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        160
+      ],
+      "id": "9fc870f0-91ef-4f5a-ab9c-529259171b7c",
+      "name": "Qwen Brian",
+      "credentials": {
+        "groqApi": {
+          "id": "bm61GMhNT6qeU66K",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qwen Brian": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d0fc3b31-3c86-4402-b9a3-c15d483f9225",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "446a7c7e8db081d6294168509ab3cd9a1c1de7cc1cd169a9e718fbaaa7bd35ff"
+  },
+  "nodeGroups": [],
+  "id": "giREyKeclXfE8bZo",
+  "tags": []
+}

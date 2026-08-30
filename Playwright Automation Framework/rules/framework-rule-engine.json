@@ -1,0 +1,79 @@
+{
+  "sourceRoots": [
+    "src/pages",
+    "src/utils",
+    "src/fixtures",
+    "src/data",
+    "tests/ui",
+    "tests/setup"
+  ],
+  "placementRules": [
+    {
+      "id": "page-placement",
+      "fileRegex": "Page\\.ts$",
+      "mustBeUnder": "src/pages",
+      "message": "Page objects must live in src/pages"
+    },
+    {
+      "id": "util-placement",
+      "fileRegex": "helpers\\.ts$",
+      "mustBeUnder": "src/utils",
+      "message": "Utility helpers must live in src/utils"
+    },
+    {
+      "id": "spec-placement",
+      "fileRegex": "\\.spec\\.ts$",
+      "mustBeUnder": "tests",
+      "message": "Spec files must live under tests/"
+    }
+  ],
+  "folderNamingRules": [
+    {
+      "id": "pages-filename",
+      "folder": "src/pages",
+      "allowedFileRegex": [
+        "^[A-Z][A-Za-z0-9]*Page\\.ts$"
+      ],
+      "message": "Only *Page.ts files are allowed in src/pages"
+    },
+    {
+      "id": "tests-filename",
+      "folder": "tests/ui",
+      "allowedFileRegex": [
+        "^[a-z0-9-]+\\.spec\\.ts$"
+      ],
+      "message": "Tests in tests/ui must use lower-case *.spec.ts naming"
+    }
+  ],
+  "contentRules": [
+    {
+      "id": "tests-use-describe",
+      "folder": "tests/ui",
+      "fileRegex": "\\.spec\\.ts$",
+      "requireRegex": [
+        "test\\.describe\\("
+      ],
+      "message": "Specs should group scenarios with test.describe"
+    },
+    {
+      "id": "tests-tags",
+      "folder": "tests/ui",
+      "fileRegex": "\\.spec\\.ts$",
+      "requireRegex": [
+        "@smoke|@regression|@P0|@P1|@P2"
+      ],
+      "message": "Add tags (@smoke/@regression/@P0/@P1/@P2) in describe titles"
+    }
+  ],
+  "warningRules": [
+    {
+      "id": "no-console-log",
+      "folder": "src",
+      "fileRegex": "\\.ts$",
+      "forbidRegex": [
+        "console\\.log\\("
+      ],
+      "message": "Use helpers.ts utilities instead of console.log"
+    }
+  ]
+}

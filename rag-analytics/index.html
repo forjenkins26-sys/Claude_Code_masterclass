@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>RAG Explorer Usage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root {
+    --ground:#0f1115; --surface:#171a21; --raised:#1e222b; --line:#2a2f3a;
+    --ink:#e8eaed; --muted:#98a0ae; --faint:#6b7280;
+    --good:#56d98a; --act:#ff9b52; --bad:#ff7b7b; --seed:#b79bff;
+    --mono:"Space Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:clamp(1.5rem,4vw,3rem) clamp(1rem,4vw,2rem) 4rem}
+
+  header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.75rem;margin-bottom:.35rem}
+  h1{font-size:clamp(1.4rem,3.5vw,1.9rem);font-weight:600;letter-spacing:-.02em;margin:0}
+  .sub{color:var(--muted);font-size:.95rem;margin:0 0 2rem}
+  .sub a{color:var(--muted)}
+
+  .live{font-family:var(--mono);font-size:.72rem;color:var(--faint);display:flex;align-items:center;gap:.45rem}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+  .dot.on{background:var(--good);box-shadow:0 0 0 3px rgba(86,217,138,.15)}
+
+  /* token gate */
+  .gate{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1.25rem;margin-bottom:1.5rem}
+  .gate h2{font-size:1rem;font-weight:600;margin:0 0 .4rem}
+  .gate p{color:var(--muted);font-size:.88rem;margin:0 0 1rem;max-width:62ch}
+  .row{display:flex;flex-wrap:wrap;gap:.6rem}
+  input[type=password],input[type=text]{
+    flex:1;min-width:240px;background:var(--raised);border:1px solid var(--line);
+    border-radius:6px;padding:.6rem .75rem;color:var(--ink);font-family:var(--mono);font-size:.85rem;
+  }
+  input:focus{outline:2px solid var(--act);outline-offset:1px;border-color:transparent}
+  button{
+    font-family:var(--sans);font-size:.85rem;font-weight:600;cursor:pointer;
+    border-radius:6px;padding:.6rem 1.1rem;border:1px solid transparent;transition:background .15s,border-color .15s;
+  }
+  .primary{background:var(--act);color:#14171c}
+  .primary:hover{background:#ffab6b}
+  .ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+  .ghost:hover{border-color:var(--muted);color:var(--ink)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+
+  /* headline metric */
+  .headline{
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:1.5rem;margin-bottom:.75rem;display:flex;flex-wrap:wrap;
+    align-items:baseline;gap:.4rem 1.25rem;
+  }
+  .headline .big{font-family:var(--mono);font-weight:700;font-size:clamp(2.2rem,7vw,3.2rem);line-height:1;color:var(--good);font-variant-numeric:tabular-nums}
+  .headline .cap{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .headline .note{color:var(--muted);font-size:.9rem;flex-basis:100%;margin:0}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-bottom:1.5rem}
+  .tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1rem}
+  .tile .n{font-family:var(--mono);font-weight:700;font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.1}
+  .tile .l{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:.3rem}
+  .tile.seed .n{color:var(--seed)}
+
+  .msg{border-radius:8px;padding:.85rem 1rem;font-size:.88rem;margin-bottom:1.25rem;display:none}
+  .msg.show{display:block}
+  .msg.err{background:rgba(255,123,123,.08);border:1px solid rgba(255,123,123,.35);color:var(--bad)}
+  .msg.err code{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+  .msg.err a{color:var(--bad)}
+
+  footer{border-top:1px solid var(--line);padding-top:1.1rem;margin-top:2rem;font-family:var(--mono);font-size:.72rem;color:var(--faint);display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;justify-content:space-between}
+
+  .hidden{display:none!important}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>RAG Explorer Usage</h1>
+    <span class="live"><span class="dot" id="dot"></span><span id="liveLabel">not connected</span></span>
+  </header>
+  <p class="sub">
+    How many people opened a private workspace on
+    <a href="https://frontend-six-alpha-35.vercel.app" target="_blank" rel="noopener">the demo</a>,
+    and how many actually ingested a document.
+  </p>
+
+  <div class="msg err" id="err"></div>
+
+  <section class="gate" id="gate">
+    <h2>Admin token</h2>
+    <p>
+      Stored in this browser only, and sent straight to the API — it is never part of this
+      page's code, so publishing the dashboard does not publish the token.
+    </p>
+    <div class="row">
+      <input type="password" id="token" placeholder="ADMIN_TOKEN" autocomplete="off" spellcheck="false">
+      <button class="primary" id="connect">Connect</button>
+    </div>
+  </section>
+
+  <div id="panel" class="hidden">
+    <div class="headline">
+      <span class="big" id="conv">—</span>
+      <span class="cap">of visitors ingested a document</span>
+      <p class="note" id="convNote">&nbsp;</p>
+    </div>
+
+    <div class="grid">
+      <div class="tile"><div class="n" id="workspaces">—</div><div class="l">Workspaces</div></div>
+      <div class="tile"><div class="n" id="withDocs">—</div><div class="l">Ingested</div></div>
+      <div class="tile"><div class="n" id="docs">—</div><div class="l">Documents</div></div>
+      <div class="tile"><div class="n" id="chunks">—</div><div class="l">Chunks</div></div>
+      <div class="tile"><div class="n" id="chars">—</div><div class="l">Characters</div></div>
+      <div class="tile"><div class="n" id="maxDocs">—</div><div class="l">Most by one</div></div>
+      <div class="tile seed"><div class="n" id="seed">—</div><div class="l">Seed corpus</div></div>
+    </div>
+
+    <div class="row">
+      <button class="ghost" id="refresh">Refresh now</button>
+      <button class="ghost" id="forget">Forget token</button>
+    </div>
+  </div>
+
+  <footer>
+    <span id="updated">never updated</span>
+    <span>auto-refreshes every 60s · counts reset when Render redeploys</span>
+  </footer>
+</div>
+
+<script>
+  const API = "https://rag-explorer-api.onrender.com";
+  const KEY = "rag-analytics:token";
+
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get() { try { return localStorage.getItem(KEY); } catch { return null; } },
+    set(v) { try { localStorage.setItem(KEY, v); } catch {} },
+    clear() { try { localStorage.removeItem(KEY); } catch {} },
+  };
+
+  let timer = null;
+
+  function showError(html) {
+    $("err").innerHTML = html;
+    $("err").classList.add("show");
+  }
+  function clearError() { $("err").classList.remove("show"); }
+
+  function setLive(on, label) {
+    $("dot").classList.toggle("on", on);
+    $("liveLabel").textContent = label;
+  }
+
+  function render(d) {
+    const n = (v) => Number(v || 0).toLocaleString();
+    $("workspaces").textContent = n(d.visitor_workspaces);
+    $("withDocs").textContent   = n(d.visitors_with_documents);
+    $("docs").textContent       = n(d.documents_total);
+    $("chunks").textContent     = n(d.chunks_total);
+    $("chars").textContent      = n(d.chars_total);
+    $("maxDocs").textContent    = n(d.documents_max);
+    $("seed").textContent       = n(d.seed_chunks);
+
+    const total = d.visitor_workspaces || 0;
+    const acted = d.visitors_with_documents || 0;
+    $("conv").textContent = total ? Math.round((acted / total) * 100) + "%" : "—";
+    $("convNote").textContent = total
+      ? `${acted} of ${total} ${total === 1 ? "person" : "people"} who opened a workspace ingested at least one document.`
+      : "No workspaces yet. The count starts when someone opens the demo and ingests a file.";
+
+    $("updated").textContent = "updated " + new Date().toLocaleTimeString();
+  }
+
+  async function load(token) {
+    try {
+      const res = await fetch(`${API}/api/admin/usage`, {
+        headers: { "X-Admin-Token": token },
+      });
+
+      if (res.status === 401) {
+        setLive(false, "rejected");
+        showError("That token was rejected. Check it against <code>ADMIN_TOKEN</code> in the Render dashboard — a trailing space is the usual cause.");
+        return false;
+      }
+      if (res.status === 404) {
+        setLive(false, "disabled");
+        showError("The usage route is disabled. Set <code>ADMIN_TOKEN</code> on the Render service and save.");
+        return false;
+      }
+      if (!res.ok) {
+        setLive(false, "error");
+        showError(`The API returned HTTP ${res.status}.`);
+        return false;
+      }
+
+      clearError();
+      setLive(true, "live");
+      render(await res.json());
+      return true;
+    } catch {
+      // A CORS rejection and a dead host are indistinguishable to fetch, so the
+      // message has to name both rather than guess.
+      setLive(false, "unreachable");
+      showError(
+        "Could not reach the API. Either it is asleep — a free Render service takes up to 90 seconds to wake, so try again — " +
+        "or this page's origin is missing from <code>CORS_ORIGINS</code> on the Render service. " +
+        "Add this exact origin: <code>" + location.origin + "</code>"
+      );
+      return false;
+    }
+  }
+
+  function startPolling(token) {
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => load(token), 60000);
+  }
+
+  async function connect(token) {
+    if (!token) return;
+    $("connect").disabled = true;
+    $("connect").textContent = "Connecting…";
+    const ok = await load(token);
+    $("connect").disabled = false;
+    $("connect").textContent = "Connect";
+    if (ok) {
+      store.set(token);
+      $("gate").classList.add("hidden");
+      $("panel").classList.remove("hidden");
+      startPolling(token);
+    }
+  }
+
+  $("connect").addEventListener("click", () => connect($("token").value.trim()));
+  $("token").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") connect($("token").value.trim());
+  });
+  $("refresh").addEventListener("click", () => load(store.get()));
+  $("forget").addEventListener("click", () => {
+    store.clear();
+    if (timer) clearInterval(timer);
+    $("panel").classList.add("hidden");
+    $("gate").classList.remove("hidden");
+    $("token").value = "";
+    setLive(false, "not connected");
+    $("updated").textContent = "never updated";
+  });
+
+  const saved = store.get();
+  if (saved) connect(saved);
+</script>
+</body>
+</html>

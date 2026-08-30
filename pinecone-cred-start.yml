@@ -1,0 +1,210 @@
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - radiogroup [ref=e71]:
+          - radio "Editor" [checked] [ref=e72]
+          - radio "Executions" [ref=e74]
+          - radio "Evaluations" [ref=e76]
+        - complementary [ref=e78]:
+          - generic [ref=e79]:
+            - generic [ref=e81]:
+              - menubar [ref=e82]:
+                - menuitem [ref=e83]:
+                  - button "Add new item" [ref=e85] [cursor=pointer]
+              - button "Open command palette" [ref=e90] [cursor=pointer]
+              - button "Toggle sidebar" [ref=e97] [cursor=pointer]
+            - generic [ref=e107]:
+              - menuitem "Overview" [ref=e110] [cursor=pointer]
+              - menuitem "Personal" [ref=e118] [cursor=pointer]
+              - menuitem "Chat" [ref=e126] [cursor=pointer]
+            - generic [ref=e132]:
+              - menuitem "Templates" [ref=e135] [cursor=pointer]
+              - menuitem "Insights" [ref=e144] [cursor=pointer]
+              - menuitem "Help" [ref=e150] [cursor=pointer]
+              - menuitem "Settings" [ref=e158] [cursor=pointer]
+        - main [ref=e164]:
+          - generic [ref=e167]:
+            - generic [ref=e169]:
+              - generic [ref=e171]:
+                - generic:
+                  - img:
+                    - group "Edge from 12602a1e-0561-43f3-ae97-3c1369b52559 to 5417be22-d32b-44ee-9fba-62f0bac454a4"
+                  - img:
+                    - group "Edge from 77414ee5-5461-48b7-87b5-6ec2586f0f9e to 5417be22-d32b-44ee-9fba-62f0bac454a4" [ref=e172] [cursor=pointer]
+                  - img:
+                    - group "Edge from e91b7979-02ba-46ea-a8be-24c5bb572896 to 5417be22-d32b-44ee-9fba-62f0bac454a4" [ref=e176] [cursor=pointer]
+                  - img:
+                    - group "Edge from bde15839-2027-4f04-9edc-80f7ece6d20c to e91b7979-02ba-46ea-a8be-24c5bb572896" [ref=e951] [cursor=pointer]
+                  - generic:
+                    - group [ref=e180] [cursor=pointer]:
+                      - generic [ref=e181]:
+                        - generic [ref=e182]:
+                          - button "Delete" [ref=e183]
+                          - generic [ref=e187]:
+                            - generic "Change color" [ref=e188]
+                            - textbox: "#000000"
+                          - button "More actions" [ref=e196]
+                        - generic [ref=e211]:
+                          - paragraph [ref=e212]: Objective
+                          - paragraph [ref=e213]: "Build a basic RAG (Retrieval-Augmented Generation) system that can:"
+                          - paragraph [ref=e214]: Ingest text or PDF documents. Convert the content into embeddings. Store the embeddings in a database. Retrieve relevant information from the database. Allow users to query the data through a chat interface.
+                    - group [ref=e215] [cursor=pointer]:
+                      - generic [ref=e216]:
+                        - generic [ref=e221]:
+                          - button "Execute step" [ref=e222]
+                          - button "Deactivate" [ref=e226]
+                          - button "Delete" [ref=e231]
+                          - button "More actions" [ref=e235]
+                        - generic [ref=e239]: On form submission
+                        - generic:
+                          - generic:
+                            - button "Execute workflow"
+                    - group [ref=e247] [cursor=pointer]:
+                      - generic [ref=e248]:
+                        - generic [ref=e262]: Embedding*
+                        - generic [ref=e267]: Document*
+                        - generic [ref=e272]:
+                          - button "Execute step" [ref=e273]
+                          - button "Deactivate" [ref=e277]
+                          - button "Delete" [ref=e282]
+                          - button "More actions" [ref=e286]
+                        - generic [ref=e290]: Pinecone Vector Store
+                    - group [ref=e298] [cursor=pointer]:
+                      - generic [ref=e299]:
+                        - generic [ref=e300]: Embeddings
+                        - generic [ref=e305]:
+                          - button "Deactivate" [ref=e306]
+                          - button "Delete" [ref=e311]
+                          - button "More actions" [ref=e315]
+                        - generic [ref=e319]: Embeddings Google Gemini
+                    - group [ref=e323] [cursor=pointer]:
+                      - generic [ref=e324]:
+                        - generic [ref=e325]: Document
+                        - generic [ref=e330]: Text Splitter*
+                        - generic [ref=e340]:
+                          - button "Deactivate" [ref=e341]
+                          - button "Delete" [ref=e346]
+                          - button "More actions" [ref=e350]
+                        - generic [ref=e354]: Default Data Loader
+                    - group [ref=e955] [cursor=pointer]:
+                      - generic [ref=e956]:
+                        - generic [ref=e957]: Text Splitter
+                        - generic [ref=e962]:
+                          - button "Deactivate" [ref=e963]
+                          - button "Delete" [ref=e968]
+                          - button "More actions" [ref=e972]
+                        - generic [ref=e976]: Recursive Character Text Splitter
+              - generic [ref=e365]:
+                - button "Zoom to Fit" [ref=e367] [cursor=pointer]
+                - button "Zoom In" [ref=e372] [cursor=pointer]
+                - button "Zoom Out" [ref=e379] [cursor=pointer]
+                - button "Reset Zoom" [ref=e386] [cursor=pointer]
+                - button "Tidy Up" [ref=e393] [cursor=pointer]
+            - button "Execute workflow" [ref=e400] [cursor=pointer]
+            - generic [ref=e980]:
+              - button "Open nodes panel" [ref=e982] [cursor=pointer]
+              - button "Command bar" [ref=e987] [cursor=pointer]
+              - button "Add sticky note" [ref=e994] [cursor=pointer]
+              - button "Open side panel" [ref=e1001] [cursor=pointer]
+            - generic:
+              - complementary
+          - generic [ref=e440] [cursor=pointer]:
+            - generic [ref=e441]: Logs
+            - generic [ref=e442]:
+              - button [ref=e888]
+              - generic [ref=e443]:
+                - button "Pop out panel" [ref=e445]
+                - button "Open panel" [ref=e450]
+      - dialog [ref=e1207]:
+        - complementary:
+          - list
+          - list
+          - list:
+            - listitem [ref=e1208] [cursor=pointer]
+        - generic [ref=e1212]:
+          - generic [ref=e1213]:
+            - generic "Pinecone Vector Store" [ref=e1220]
+            - generic [ref=e1223]:
+              - link "Docs" [ref=e1224] [cursor=pointer]:
+                - /url: https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.vectorstorepinecone/?utm_source=n8n_app&utm_medium=node_settings_modal-credential_link&utm_campaign=%40n8n%2Fn8n-nodes-langchain.vectorStorePinecone
+              - button [ref=e1232] [cursor=pointer]
+          - main [ref=e1236]:
+            - generic [ref=e1238]:
+              - generic [ref=e1239]: Input
+              - article [ref=e1246]:
+                - heading "No input data" [level=1] [ref=e1249]
+                - paragraph [ref=e1250]:
+                  - generic [ref=e1251]:
+                    - button "Execute previous nodes" [ref=e1253] [cursor=pointer]
+                    - text: to view input data
+            - generic [ref=e1259]:
+              - button [active] [ref=e1261]
+              - generic [ref=e1268]:
+                - generic [ref=e1269]:
+                  - generic [ref=e1271]:
+                    - generic [ref=e1272]: Parameters
+                    - generic [ref=e1275]: Settings
+                  - button "Execute step" [ref=e1278] [cursor=pointer]
+                - generic [ref=e1283]:
+                  - generic [ref=e1285]:
+                    - alert [ref=e1287]:
+                      - generic [ref=e1295]:
+                        - text: "Tip: Get a feel for vector stores in n8n with our"
+                        - generic [ref=e1296] [cursor=pointer]: RAG starter template
+                    - generic [ref=e1301]:
+                      - generic [ref=e1304]:
+                        - generic [ref=e1305]: Credential
+                        - generic [ref=e1310]:
+                          - combobox "No credentials yet" [disabled] [ref=e1316]
+                          - button "Set up credential" [ref=e1321] [cursor=pointer]
+                      - generic [ref=e1324]:
+                        - generic [ref=e1326]:
+                          - generic [ref=e1327]: Operation Mode
+                          - button [ref=e1337] [cursor=pointer]
+                        - 'generic "Parameter: \"mode\"" [ref=e1348]':
+                          - combobox "Select" [ref=e1353] [cursor=pointer]: Insert Documents
+                    - generic [ref=e1360]:
+                      - generic [ref=e1362]:
+                        - generic [ref=e1363]: Pinecone Index
+                        - generic [ref=e1369]:
+                          - button [ref=e1373] [cursor=pointer]
+                          - radiogroup [ref=e1379]:
+                            - radio "Fixed" [checked] [ref=e1380]
+                            - radio "Expression" [ref=e1382]
+                      - generic [ref=e1390]:
+                        - combobox "Mode..." [ref=e1397] [cursor=pointer]: From list
+                        - 'textbox "Parameter: \"pineconeIndex\" has issues" [ref=e1407]':
+                          - /placeholder: Choose...
+                    - generic [ref=e1417]:
+                      - generic [ref=e1419]:
+                        - generic [ref=e1420]: Embedding Batch Size
+                        - generic [ref=e1432]:
+                          - button [ref=e1436] [cursor=pointer]
+                          - radiogroup [ref=e1442]:
+                            - radio "Fixed" [checked] [ref=e1443]
+                            - radio "Expression" [ref=e1445]
+                      - 'generic "Parameter: \"embeddingBatchSize\"" [ref=e1452]':
+                        - spinbutton [ref=e1455]: "200"
+                    - generic [ref=e1459]:
+                      - generic [ref=e1460]:
+                        - generic [ref=e1461]: Options
+                        - button "Add Option" [ref=e1465] [cursor=pointer]
+                      - button "Add Option" [ref=e1471] [cursor=pointer]
+                  - generic [ref=e1476]: I wish this node would...
+                - generic [ref=e1481]:
+                  - generic [ref=e1482]: Embedding *
+                  - generic [ref=e1494]: Document *
+            - generic [ref=e1507]:
+              - generic [ref=e1508]:
+                - radiogroup [ref=e1511]:
+                  - radio "Output" [checked] [ref=e1512]
+                  - radio "Logs" [ref=e1514]
+                - button "Edit Output" [ref=e1517] [cursor=pointer]
+              - article [ref=e1525]:
+                - heading "No output data" [level=1] [ref=e1528]
+                - paragraph [ref=e1529]:
+                  - button "Execute step" [ref=e1530] [cursor=pointer]
+                  - text: or
+                  - generic [ref=e1533] [cursor=pointer]: set mock data
+  - complementary

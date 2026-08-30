@@ -1,0 +1,54 @@
+
+Playwright Questions
+Explain Playwright’s architecture and how it communicates with browsers.
+Ans. 
+
+Playwright uses a Node.js-based architecture and communicates directly with browsers through browser-specific protocols like CDP, enabling fast and reliable automation.
+
+What are Playwright fixtures and why are they useful?
+Ans. Diff fixtures are Default and Custom
+
+Default fixtures like browser, context, and page are provided by Playwright for setup and teardown, while custom fixtures are user-defined reusable setups created to share logic across tests. 
+
+Explain Browser, Context and Page. - What are Playwright fixtures and why are they useful?
+
+Ans.
+Browser: Represents a single browser instance (Chromium, Firefox, or WebKit) launched by Playwright.
+Context: Represents an isolated browser session with its own cookies, cache, and storage.
+Page: Represents a single tab or window within a browser context where test actions are performed.
+
+How do you deal with dynamic elements or delayed rendering?
+Ans. Dynamic elements are handled using stable locators and Playwright auto-waiting with assertions like expect(locator).toBeVisible().
+How do you handle file downloads and uploads in Playwright?
+Ans.
+In Playwright, file uploads are handled using setInputFiles(), and file downloads are managed using the page.waitForEvent('download') API to capture and validate the downloaded file.
+await page.setInputFiles('#uploadFile', 'tests/data/sample.pdf');
+const download = await Promise.all([
+  page.waitForEvent('download'),
+  page.click('#downloadBtn')
+]);
+
+await download[0].saveAs('downloads/report.pdf');
+
+Note : setinputfile(), for uploading, locator and path
+For downloading page.waitforEvent(download), locator and path where to save
+
+How do you run Playwright tests in parallel?
+Ans. Playwright runs test files in parallel by default, and workers control the maximum number of parallel executions.
+How do you handle authentication flows (e.g., login sessions) in Playwright?
+Ans.  Authentication is handled using storageState to reuse login sessions instead of logging in for every test.
+Why Playwright Uses Asynchronous Functions?
+Ans. Playwright APIs are asynchronous and return promises, so async/await ensures proper execution order and prevents race conditions.
+what is asynch and await in typescript?
+Ans. Async defines an asynchronous function, and await pauses execution until a promise is resolved.
+
+Explain Test Config
+Ans. Playwright config is used to define global settings like browser, timeouts, reporters, screenshots, traces, videos, and environment configuration.
+Explain Test Hooks
+Ans. Playwright provides hooks like beforeAll, beforeEach, afterEach, and afterAll to manage setup and teardown.
+How we can handle download functionality in playwright?
+Ans.    Using page.waitforEvent(download)
+Handling frame in playwright
+Ans. Using framelocator() method
+How do you handle waits in Playwright?”
+Ans. Playwright handles waits using built-in auto-waiting and async/await, avoiding the need for hard waits.
