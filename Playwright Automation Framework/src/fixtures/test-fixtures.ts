@@ -1,4 +1,6 @@
-import { test as base } from '@playwright/test';
+// Extends the evidence-collecting test, so every spec using these page
+// objects gets console/network capture on failure without opting in.
+import { test as base } from './browser-evidence';
 import { LoginPage } from '../pages/LoginPage';
 import { RegistrationPage } from '../pages/RegistrationPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
@@ -16,6 +18,7 @@ type PageFixtures = {
  * Usage in tests: test('test name', async ({ loginPage }) => { ... })
  */
 export const test = base.extend<PageFixtures>({
+
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
     await use(loginPage);
