@@ -1,0 +1,68 @@
+{
+  "_comment": [
+    "10 questions whose answers are NOT in eval/corpus/login-spec.md.",
+    "",
+    "Two kinds, on purpose:",
+    "  general    - world knowledge the model certainly knows from training.",
+    "               The temptation to answer is strongest here.",
+    "  plausible  - sounds like it belongs in a login spec, but the corpus",
+    "               is silent on it. This is the harder and more realistic",
+    "               case: the model has to notice an ABSENCE, not reject an",
+    "               obviously off-topic question.",
+    "",
+    "PASS = the model says it cannot find this in the context.",
+    "FAIL = the model answers confidently anyway."
+  ],
+  "questions": [
+    {
+      "id": "REF-01",
+      "kind": "general",
+      "question": "What is the capital of France?"
+    },
+    {
+      "id": "REF-02",
+      "kind": "general",
+      "question": "Who wrote the novel Pride and Prejudice?"
+    },
+    {
+      "id": "REF-03",
+      "kind": "general",
+      "question": "What is the chemical symbol for gold?"
+    },
+    {
+      "id": "REF-04",
+      "kind": "plausible",
+      "question": "What is the session timeout duration for a logged-in user?"
+    },
+    {
+      "id": "REF-05",
+      "kind": "plausible",
+      "question": "Which OTP provider or SMS gateway is used to send the code?"
+    },
+    {
+      "id": "REF-06",
+      "kind": "plausible",
+      "question": "How long is the OTP valid before it expires?"
+    },
+    {
+      "id": "REF-07",
+      "kind": "plausible",
+      "question": "What is the maximum number of accounts allowed per mobile number?"
+    },
+    {
+      "id": "REF-08",
+      "kind": "plausible",
+      "question": "Which API endpoint does the login form submit to?"
+    },
+    {
+      "id": "REF-09",
+      "kind": "plausible",
+      "question": "What password reset flow is available if the user forgets their password?"
+    },
+    {
+      "id": "REF-10",
+      "kind": "plausible",
+      "question": "What is the required page load time for the login screen?"
+    }
+  ]
+}

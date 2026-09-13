@@ -1,0 +1,500 @@
+{
+  "run_at_utc": "2026-09-13T23:27:33.287375+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "rag_provider": "groq",
+  "judge_model": "gemini-3.6-flash",
+  "judge_samples_per_case": 1,
+  "calibration": {
+    "correct": 6,
+    "total": 7,
+    "rate": 0.8571,
+    "details": [
+      {
+        "name": "perfect answer",
+        "dimension": "completeness",
+        "got": 2,
+        "want": 2,
+        "ok": true,
+        "reason": "Fully meets all criteria—exact digit count, minimal word count, and proper citation—while omitting no requested detail."
+      },
+      {
+        "name": "perfect answer",
+        "dimension": "citation_discipline",
+        "got": 2,
+        "want": 2,
+        "ok": true,
+        "reason": "Fully meets all criteria—exact digit count, minimal word count, and proper citation—while omitting no requested detail."
+      },
+      {
+        "name": "perfect answer",
+        "dimension": "precision",
+        "got": 2,
+        "want": 2,
+        "ok": true,
+        "reason": "Fully meets all criteria—exact digit count, minimal word count, and proper citation—while omitting no requested detail."
+      },
+      {
+        "name": "hallucinated fact",
+        "dimension": "factual_grounding",
+        "got": 0,
+        "want": 0,
+        "ok": true,
+        "reason": "The answer incorrectly states the digit count (four instead of six) and adds unrelated expiration info, despite citing the correct chunk."
+      },
+      {
+        "name": "phantom citation",
+        "dimension": "citation_discipline",
+        "got": 0,
+        "want": 0,
+        "ok": true,
+        "reason": "Answer is factually correct and precise but incorrectly cites [Chunk #7] instead of the verified [Chunk #1]."
+      },
+      {
+        "name": "incomplete, two-part question",
+        "dimension": "completeness",
+        "got": 0,
+        "want": 1,
+        "ok": false,
+        "reason": "The answer omits the validity duration (10 minutes) despite the context explicitly providing it, rendering it incomplete."
+      },
+      {
+        "name": "over-answering",
+        "dimension": "precision",
+        "got": 0,
+        "want": 0,
+        "ok": true,
+        "reason": "Volunteers unnecessary details (expiry, resend window, toast) despite criteria prohibiting them, though the digit count and grounding are correct."
+      }
+    ]
+  },
+  "retry_config": {
+    "max_retries": 4,
+    "backoff_base": 4.0,
+    "backoff_cap": 60.0
+  },
+  "evaluated": 12,
+  "unavailable": 0,
+  "unavailable_cases": [],
+  "comparisons": [
+    {
+      "id": "AQ-01",
+      "question": "How many digits is the OTP?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly matches the question’s requirement (six digits) without extraneous details, citing [Chunk #1] explicitly.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly matches the question’s requirement (six digits) without extraneous details, citing [Chunk #1] explicitly."
+          }
+        ]
+      },
+      "delta": 0.25,
+      "disagreement": true,
+      "answer": "The OTP consists of six digits."
+    },
+    {
+      "id": "AQ-02",
+      "question": "What is the minimum password length?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 6,
+        "composite": 0.6,
+        "reason": "Fully answers the question with the exact required detail but lacks citations despite being fully supported by [Chunk #1].",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 6,
+            "reason": "Fully answers the question with the exact required detail but lacks citations despite being fully supported by [Chunk #1]."
+          }
+        ]
+      },
+      "delta": -0.15,
+      "disagreement": false,
+      "answer": "The minimum password length is 8 characters."
+    },
+    {
+      "id": "AQ-03",
+      "question": "How long is the lockout period?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 0.6667,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.6667,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly meets all criteria by stating the lockout duration (15 minutes) without unnecessary details, citing [Chunk #1], and fitting concisely.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly meets all criteria by stating the lockout duration (15 minutes) without unnecessary details, citing [Chunk #1], and fitting concisely."
+          }
+        ]
+      },
+      "delta": 0.3333,
+      "disagreement": true,
+      "answer": "The lockout period is 15 minutes from the fifth failed attempt."
+    },
+    {
+      "id": "AQ-04",
+      "question": "What is the retention period for audit entries?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly matches the question’s core requirement (retention period) while strictly adhering to word count and avoiding all excluded details.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly matches the question’s core requirement (retention period) while strictly adhering to word count and avoiding all excluded details."
+          }
+        ]
+      },
+      "delta": 0.25,
+      "disagreement": true,
+      "answer": "The audit entries are retained for **90 days**."
+    },
+    {
+      "id": "AQ-05",
+      "question": "What is the session idle timeout?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer is concise, factually accurate, directly cites the context (Chunk #1), and strictly adheres to the question without extraneous details.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer is concise, factually accurate, directly cites the context (Chunk #1), and strictly adheres to the question without extraneous details."
+          }
+        ]
+      },
+      "delta": 0.25,
+      "disagreement": true,
+      "answer": "The session idle timeout is 30 minutes of inactivity."
+    },
+    {
+      "id": "AQ-06",
+      "question": "Where do field errors appear on the page?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 1.0,
+        "conciseness": 1.0,
+        "composite": 1.0,
+        "status": "PASS"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer precisely states the required placement of field errors without adding extraneous details, fully grounded in the context and properly cited.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer precisely states the required placement of field errors without adding extraneous details, fully grounded in the context and properly cited."
+          }
+        ]
+      },
+      "delta": 0.0,
+      "disagreement": false,
+      "answer": "Field errors are displayed directly beneath the corresponding input field. [Chunk #1]"
+    },
+    {
+      "id": "AQ-07",
+      "question": "How many digits is the OTP, and how long is it valid for?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly matches the question’s requirements, citing [Chunk #1] for both digit count and validity duration while strictly adhering to word count and avoiding extraneous details.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly matches the question’s requirements, citing [Chunk #1] for both digit count and validity duration while strictly adhering to word count and avoiding extraneous details."
+          }
+        ]
+      },
+      "delta": 0.25,
+      "disagreement": true,
+      "answer": "The OTP consists of six digits and remains valid for 10 minutes after it is issued."
+    },
+    {
+      "id": "AQ-08",
+      "question": "How many failed attempts trigger a lockout, how long does it last, and what resets the counter?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly covers all required elements (threshold, duration, reset condition) without extraneous details, is fully supported by Chunk #1, and cites the source implicitly via context alignment.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly covers all required elements (threshold, duration, reset condition) without extraneous details, is fully supported by Chunk #1, and cites the source implicitly via context alignment."
+          }
+        ]
+      },
+      "delta": 0.25,
+      "disagreement": true,
+      "answer": "The account locks after **five consecutive failed login attempts**. The lockout remains in effect for **15 minutes** from the fifth failed attempt. The failed‑attempt counter is reset to zero when a **successful login** occurs."
+    },
+    {
+      "id": "AQ-09",
+      "question": "What are the password character requirements, and is there an upper limit on length?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 1.0,
+        "conciseness": 1.0,
+        "composite": 1.0,
+        "status": "PASS"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "Fully addresses character requirements, upper limit, and cites the exact relevant chunk without unnecessary detail.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "Fully addresses character requirements, upper limit, and cites the exact relevant chunk without unnecessary detail."
+          }
+        ]
+      },
+      "delta": 0.0,
+      "disagreement": false,
+      "answer": "The password must be **at least 8 characters long** and must include **at least one number and one symbol**. There is **no maximum length**—the field has no upper limit. [Chunk #1]"
+    },
+    {
+      "id": "AQ-10",
+      "question": "What happens to a session token when a user logs out, and what status is returned if it is replayed?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 1.0,
+        "conciseness": 1.0,
+        "composite": 1.0,
+        "status": "PASS"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly covers the core question (invalidation and replay status) without extraneous details, is fully grounded in Chunk #1, and cites it appropriately.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly covers the core question (invalidation and replay status) without extraneous details, is fully grounded in Chunk #1, and cites it appropriately."
+          }
+        ]
+      },
+      "delta": 0.0,
+      "disagreement": false,
+      "answer": "When a user logs out, the session token is invalidated right away. If that same token is presented again after logout, the request is rejected with a **401 Unauthorized** response. [Chunk #1]"
+    },
+    {
+      "id": "AQ-11",
+      "question": "What does the Forgot Password link do?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly matches the question’s core requirement (destination) while strictly adhering to word count and avoiding all prohibited details, with full contextual grounding and proper citation discipline.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly matches the question’s core requirement (destination) while strictly adhering to word count and avoiding all prohibited details, with full contextual grounding and proper citation discipline."
+          }
+        ]
+      },
+      "delta": 0.25,
+      "disagreement": true,
+      "answer": "The “Forgot Password” link opens the password‑recovery page."
+    },
+    {
+      "id": "AQ-12",
+      "question": "What is the exact error message for a mobile number that is too short, and what is the field's maxlength?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 1.0,
+        "conciseness": 1.0,
+        "composite": 1.0,
+        "status": "PASS"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer perfectly matches the question’s requirements, cites the exact context chunk, and avoids unnecessary details.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer perfectly matches the question’s requirements, cites the exact context chunk, and avoids unnecessary details."
+          }
+        ]
+      },
+      "delta": 0.0,
+      "disagreement": false,
+      "answer": "The error shown when a mobile number is shorter than 10 digits is:\n\n**“Enter valid 10-digit mobile number”**\n\nThe mobile‑number field enforces a **maxlength of 10** at the browser level. \n\n[Chunk #1]"
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "_comment": [
+    "Answer quality. Milestone 4.",
+    "",
+    "DIFFERENT AXIS FROM MILESTONE 3. M3 asked 'is it true?'. M4 asks 'is it a",
+    "good answer?'. An answer can be perfectly grounded and still be a poor",
+    "answer: it can miss half the question, volunteer facts nobody asked for,",
+    "skip its citations, or bury one sentence of content in a page of prose.",
+    "",
+    "HOW EACH DIMENSION IS MADE DETERMINISTIC:",
+    "",
+    "  required_parts    the distinct things the question asks for. Each part",
+    "                    lists alternative strings that count as answering it,",
+    "                    because the model paraphrases freely. COMPLETENESS is",
+    "                    the fraction of parts covered.",
+    "",
+    "  off_topic_facts   facts that ARE in the corpus but are NOT what this",
+    "                    question asked for. This is the whole trick of",
+    "                    measuring PRECISION without a judge: if one of these",
+    "                    appears, the model over-answered. They are real facts,",
+    "                    so M3 would score them as perfectly grounded.",
+    "",
+    "  expect_citation   whether a factual claim here should carry [Chunk #N].",
+    "",
+    "  max_words         a hand-set ceiling for a direct answer to THIS",
+    "                    question, sized to the number of parts. CONCISENESS",
+    "                    degrades past it rather than failing at a cliff.",
+    "",
+    "CASE DESIGN — deliberately mixed so the suite can discriminate:",
+    "  AQ-01..03   single-part, tight budget. Baseline.",
+    "  AQ-04..06   OVER-ANSWERING TRAPS. The source document holds several",
+    "              facts; only one was asked for. GND-04 in milestone 3 showed",
+    "              the model doing exactly this and scoring 1.00.",
+    "  AQ-07..09   MULTI-PART. Two or three things asked at once; completeness",
+    "              is the point.",
+    "  AQ-10..12   cross-document and precision-under-pressure.",
+    "",
+    "Every fact below was read from eval/corpus_retrieval/*.md by hand. No fact",
+    "is invented, including the off-topic ones."
+  ],
+  "questions": [
+    {
+      "id": "AQ-01",
+      "question": "How many digits is the OTP?",
+      "required_parts": [
+        { "name": "digit count", "any_of": ["six", "6"] }
+      ],
+      "off_topic_facts": [
+        { "name": "OTP expiry", "any_of": ["10 minutes", "expires"] },
+        { "name": "resend window", "any_of": ["60 seconds"] },
+        { "name": "OTP toast", "any_of": ["OTP sent"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "single fact, but 02-otp-delivery.md holds three others. Tight budget."
+    },
+    {
+      "id": "AQ-02",
+      "question": "What is the minimum password length?",
+      "required_parts": [
+        { "name": "minimum length", "any_of": ["8 characters", "at least 8", "8"] }
+      ],
+      "off_topic_facts": [
+        { "name": "masking", "any_of": ["mask", "plain text"] },
+        { "name": "character classes", "any_of": ["symbol", "at least one number"] },
+        { "name": "no maximum", "any_of": ["no maximum"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "OVER-ANSWER TRAP. In milestone 3 this exact document produced an answer covering length, classes, masking AND max length — all grounded, none asked for."
+    },
+    {
+      "id": "AQ-03",
+      "question": "How long is the lockout period?",
+      "required_parts": [
+        { "name": "lockout duration", "any_of": ["15 minutes", "15 minute"] }
+      ],
+      "off_topic_facts": [
+        { "name": "attempt threshold", "any_of": ["five consecutive", "five failed", "fifth failed", "fifth attempt", "5 failed"] },
+        { "name": "lockout message", "any_of": ["Too many attempts"] },
+        { "name": "counter reset", "any_of": ["resets", "counter to zero"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "single fact; the threshold is the tempting extra"
+    },
+    {
+      "id": "AQ-04",
+      "question": "What is the retention period for audit entries?",
+      "required_parts": [
+        { "name": "retention", "any_of": ["90 days"] }
+      ],
+      "off_topic_facts": [
+        { "name": "who can read", "any_of": ["auditor role", "auditor"] },
+        { "name": "what is recorded", "any_of": ["timestamp", "source IP", "IP address"] },
+        { "name": "what triggers a log", "any_of": ["failed login attempt is written"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "OVER-ANSWER TRAP. 'Who can read them' is the natural companion fact and was NOT asked."
+    },
+    {
+      "id": "AQ-05",
+      "question": "What is the session idle timeout?",
+      "required_parts": [
+        { "name": "timeout", "any_of": ["30 minutes"] }
+      ],
+      "off_topic_facts": [
+        { "name": "logout behaviour", "any_of": ["invalidates", "logging out"] },
+        { "name": "replay status", "any_of": ["401"] },
+        { "name": "profile sharing", "any_of": ["browser profiles"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "OVER-ANSWER TRAP. 06-session-handling.md has four facts; one was asked for."
+    },
+    {
+      "id": "AQ-06",
+      "question": "Where do field errors appear on the page?",
+      "required_parts": [
+        { "name": "placement", "any_of": ["below the field", "directly below", "beneath", "under the field", "underneath"] }
+      ],
+      "off_topic_facts": [
+        { "name": "colour and contrast", "any_of": ["red", "4.5"] },
+        { "name": "all-at-once behaviour", "any_of": ["at once", "every applicable error"] },
+        { "name": "clearing", "any_of": ["clear as soon", "becomes valid"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "OVER-ANSWER TRAP. Styling is the obvious thing to volunteer."
+    },
+    {
+      "id": "AQ-07",
+      "question": "How many digits is the OTP, and how long is it valid for?",
+      "required_parts": [
+        { "name": "digit count", "any_of": ["six", "6"] },
+        { "name": "validity", "any_of": ["10 minutes"] }
+      ],
+      "off_topic_facts": [
+        { "name": "resend window", "any_of": ["60 seconds"] },
+        { "name": "OTP toast", "any_of": ["OTP sent"] }
+      ],
+      "expect_citation": true,
+      "max_words": 45,
+      "note": "MULTI-PART, two parts. Same source document as AQ-01 — the difference is that the second fact is now REQUIRED rather than off-topic."
+    },
+    {
+      "id": "AQ-08",
+      "question": "How many failed attempts trigger a lockout, how long does it last, and what resets the counter?",
+      "required_parts": [
+        { "name": "threshold", "any_of": ["five", "5"] },
+        { "name": "duration", "any_of": ["15 minutes", "15 minute"] },
+        { "name": "reset condition", "any_of": ["successful login", "successful sign", "logging in successfully", "successfully logs in", "successfully log in", "successfully signs in"] }
+      ],
+      "off_topic_facts": [
+        { "name": "lockout message text", "any_of": ["Too many attempts"] }
+      ],
+      "expect_citation": true,
+      "max_words": 70,
+      "note": "MULTI-PART, three parts. Tests whether the third part gets dropped."
+    },
+    {
+      "id": "AQ-09",
+      "question": "What are the password character requirements, and is there an upper limit on length?",
+      "required_parts": [
+        { "name": "character classes", "any_of": ["number", "symbol"] },
+        { "name": "no upper limit", "any_of": ["no maximum", "no upper", "any length", "not limited", "not impose a maximum", "does not impose", "without a maximum", "no limit"] }
+      ],
+      "off_topic_facts": [
+        { "name": "masking", "any_of": ["mask", "plain text"] }
+      ],
+      "expect_citation": true,
+      "max_words": 55,
+      "note": "MULTI-PART. Minimum length is intentionally NOT required here and NOT off-topic — it sits adjacent to both parts, so penalising it would be unfair."
+    },
+    {
+      "id": "AQ-10",
+      "question": "What happens to a session token when a user logs out, and what status is returned if it is replayed?",
+      "required_parts": [
+        { "name": "invalidation", "any_of": ["invalidat", "immediately"] },
+        { "name": "replay status", "any_of": ["401"] }
+      ],
+      "off_topic_facts": [
+        { "name": "idle timeout", "any_of": ["30 minutes"] },
+        { "name": "profile sharing", "any_of": ["browser profiles"] }
+      ],
+      "expect_citation": true,
+      "max_words": 55,
+      "note": "MULTI-PART within one document, with two in-document distractors"
+    },
+    {
+      "id": "AQ-11",
+      "question": "What does the Forgot Password link do?",
+      "required_parts": [
+        { "name": "destination", "any_of": ["password recovery", "recovery page"] }
+      ],
+      "off_topic_facts": [
+        { "name": "create account button", "any_of": ["Create New Account"] },
+        { "name": "logo behaviour", "any_of": ["home page", "logo"] },
+        { "name": "discarded form data", "any_of": ["discards", "partially entered"] }
+      ],
+      "expect_citation": true,
+      "max_words": 25,
+      "note": "single part; 05-navigation.md holds three other navigation facts"
+    },
+    {
+      "id": "AQ-12",
+      "question": "What is the exact error message for a mobile number that is too short, and what is the field's maxlength?",
+      "required_parts": [
+        { "name": "error text", "any_of": ["Enter valid 10-digit mobile number", "Enter valid 10 digit mobile number"] },
+        { "name": "maxlength", "any_of": ["maxlength of 10", "maxlength 10", "10 at the browser", "maximum length of 10"] }
+      ],
+      "off_topic_facts": [
+        { "name": "non-numeric rejection", "any_of": ["letters typed", "non-numeric"] }
+      ],
+      "expect_citation": true,
+      "max_words": 55,
+      "note": "MULTI-PART, one exact string plus one technical attribute"
+    }
+  ]
+}

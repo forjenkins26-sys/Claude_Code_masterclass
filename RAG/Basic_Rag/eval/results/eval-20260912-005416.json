@@ -1,0 +1,102 @@
+{
+  "run_at_utc": "2026-09-12T00:54:16.793567+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "visitor_id": "eval-harness-milestone-1",
+  "suites": {
+    "citation_accuracy": {
+      "summary": null,
+      "results": null
+    },
+    "refusal": {
+      "summary": {
+        "PASS": 10,
+        "FAIL": 0,
+        "WARN": 0,
+        "ERROR": 0,
+        "total": 10
+      },
+      "results": [
+        {
+          "id": "REF-01",
+          "kind": "general",
+          "question": "What is the capital of France?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not contain any information about the capital of France."
+        },
+        {
+          "id": "REF-02",
+          "kind": "general",
+          "question": "Who wrote the novel Pride and Prejudice?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not contain any information about the author of *Pride and Prejudice*."
+        },
+        {
+          "id": "REF-03",
+          "kind": "general",
+          "question": "What is the chemical symbol for gold?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not contain any information about the chemical symbol for gold."
+        },
+        {
+          "id": "REF-04",
+          "kind": "plausible",
+          "question": "What is the session timeout duration for a logged-in user?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not mention a session timeout duration for a logged‑in user, so that information is not available in the given context. [Chunk #1, Chunk #2]"
+        },
+        {
+          "id": "REF-05",
+          "kind": "plausible",
+          "question": "Which OTP provider or SMS gateway is used to send the code?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not mention which OTP provider or SMS gateway is used to send the code. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-06",
+          "kind": "plausible",
+          "question": "How long is the OTP valid before it expires?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not state how long the OTP remains valid before it expires. It only mentions that a toast saying “OTP sent” is shown after submitting a valid 10‑digit mobile number, but no expiration time is given."
+        },
+        {
+          "id": "REF-07",
+          "kind": "plausible",
+          "question": "What is the maximum number of accounts allowed per mobile number?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not specify a maximum number of accounts allowed per mobile number."
+        },
+        {
+          "id": "REF-08",
+          "kind": "plausible",
+          "question": "Which API endpoint does the login form submit to?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not mention any API endpoint that the login form submits to. No such information appears in either of the context chunks. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-09",
+          "kind": "plausible",
+          "question": "What password reset flow is available if the user forgets their password?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not describe any password‑reset flow for users who forget their password. No such information appears in the given context."
+        },
+        {
+          "id": "REF-10",
+          "kind": "plausible",
+          "question": "What is the required page load time for the login screen?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not include any requirement for the login screen’s page‑load time. In fact, performance is listed as explicitly out of scope for this document."
+        }
+      ]
+    }
+  }
+}

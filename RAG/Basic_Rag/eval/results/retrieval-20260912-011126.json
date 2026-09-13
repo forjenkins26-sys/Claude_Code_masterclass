@@ -1,0 +1,320 @@
+{
+  "run_at_utc": "2026-09-12T01:11:26.462401+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "visitor_id": "eval-harness-milestone-2",
+  "top_k": 4,
+  "corpus_chunks": 8,
+  "summary": {
+    "questions": 12,
+    "hit_rate_at_4": 1.0,
+    "mean_precision_at_4": 0.2917,
+    "mrr": 1.0,
+    "ranked_first": 12,
+    "missed": 0,
+    "errors": 0
+  },
+  "results": [
+    {
+      "id": "RET-01",
+      "question": "How many digits must the mobile number field accept?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "01-mobile-validation.md"
+      ],
+      "retrieved_sources": [
+        "01-mobile-validation.md",
+        "02-otp-delivery.md",
+        "04-password-rules.md",
+        "07-error-messages.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.8857,
+        0.6981,
+        0.6765,
+        0.6291
+      ]
+    },
+    {
+      "id": "RET-02",
+      "question": "How long is the OTP valid before it expires?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "02-otp-delivery.md"
+      ],
+      "retrieved_sources": [
+        "02-otp-delivery.md",
+        "06-session-handling.md",
+        "03-account-lockout.md",
+        "01-mobile-validation.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.8183,
+        0.6635,
+        0.5988,
+        0.5846
+      ]
+    },
+    {
+      "id": "RET-03",
+      "question": "After how many failed attempts does the account lock?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "03-account-lockout.md"
+      ],
+      "retrieved_sources": [
+        "03-account-lockout.md",
+        "08-audit-logging.md",
+        "05-navigation.md",
+        "06-session-handling.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.8887,
+        0.6795,
+        0.6447,
+        0.6167
+      ]
+    },
+    {
+      "id": "RET-04",
+      "question": "What is the minimum password length?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "04-password-rules.md"
+      ],
+      "retrieved_sources": [
+        "04-password-rules.md",
+        "03-account-lockout.md",
+        "05-navigation.md",
+        "02-otp-delivery.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7722,
+        0.6308,
+        0.6073,
+        0.6007
+      ]
+    },
+    {
+      "id": "RET-05",
+      "question": "Where does the Forgot Password link take the user?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "05-navigation.md"
+      ],
+      "retrieved_sources": [
+        "05-navigation.md",
+        "08-audit-logging.md",
+        "03-account-lockout.md",
+        "06-session-handling.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7692,
+        0.6244,
+        0.6223,
+        0.5806
+      ]
+    },
+    {
+      "id": "RET-06",
+      "question": "How long until an idle session expires?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "06-session-handling.md"
+      ],
+      "retrieved_sources": [
+        "06-session-handling.md",
+        "02-otp-delivery.md",
+        "03-account-lockout.md",
+        "08-audit-logging.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.8069,
+        0.6603,
+        0.6471,
+        0.6179
+      ]
+    },
+    {
+      "id": "RET-07",
+      "question": "Where on the page are field errors displayed?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "07-error-messages.md"
+      ],
+      "retrieved_sources": [
+        "07-error-messages.md",
+        "01-mobile-validation.md",
+        "05-navigation.md",
+        "08-audit-logging.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7882,
+        0.61,
+        0.545,
+        0.5409
+      ]
+    },
+    {
+      "id": "RET-08",
+      "question": "How long are audit log entries retained?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "08-audit-logging.md"
+      ],
+      "retrieved_sources": [
+        "08-audit-logging.md",
+        "06-session-handling.md",
+        "03-account-lockout.md",
+        "05-navigation.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.8544,
+        0.6467,
+        0.6359,
+        0.5718
+      ]
+    },
+    {
+      "id": "RET-09",
+      "question": "What happens to the session token after a user logs out, and is that event recorded anywhere?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.50)",
+      "relevant_sources": [
+        "06-session-handling.md",
+        "08-audit-logging.md"
+      ],
+      "retrieved_sources": [
+        "06-session-handling.md",
+        "08-audit-logging.md",
+        "05-navigation.md",
+        "03-account-lockout.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.5,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7724,
+        0.6798,
+        0.6201,
+        0.6102
+      ]
+    },
+    {
+      "id": "RET-10",
+      "question": "Which rules govern what a user types into the password and mobile fields?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.50)",
+      "relevant_sources": [
+        "01-mobile-validation.md",
+        "04-password-rules.md"
+      ],
+      "retrieved_sources": [
+        "04-password-rules.md",
+        "01-mobile-validation.md",
+        "05-navigation.md",
+        "07-error-messages.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.5,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7557,
+        0.7243,
+        0.6801,
+        0.6389
+      ]
+    },
+    {
+      "id": "RET-11",
+      "question": "What error message is shown for an invalid mobile number?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "01-mobile-validation.md"
+      ],
+      "retrieved_sources": [
+        "01-mobile-validation.md",
+        "07-error-messages.md",
+        "02-otp-delivery.md",
+        "03-account-lockout.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7524,
+        0.733,
+        0.6387,
+        0.5948
+      ]
+    },
+    {
+      "id": "RET-12",
+      "question": "Who is allowed to read the audit log?",
+      "status": "PASS",
+      "reason": "relevant doc ranked #1 (RR 1.00, P@4 0.25)",
+      "relevant_sources": [
+        "08-audit-logging.md"
+      ],
+      "retrieved_sources": [
+        "08-audit-logging.md",
+        "06-session-handling.md",
+        "03-account-lockout.md",
+        "05-navigation.md"
+      ],
+      "hit": true,
+      "first_hit_rank": 1,
+      "precision_at_4": 0.25,
+      "reciprocal_rank": 1.0,
+      "similarities": [
+        0.7477,
+        0.6114,
+        0.5915,
+        0.569
+      ]
+    }
+  ]
+}

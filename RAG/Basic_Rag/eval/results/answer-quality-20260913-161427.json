@@ -1,0 +1,280 @@
+{
+  "run_at_utc": "2026-09-13T16:14:27.909126+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "visitor_id": "eval-harness-milestone-4",
+  "top_k": 4,
+  "summary": {
+    "cases": 12,
+    "scored": 12,
+    "completeness": 0.9167,
+    "precision": 1.0,
+    "citation_discipline": 0.1667,
+    "conciseness": 1.0,
+    "composite_answer_quality": 0.7708,
+    "statuses": {
+      "WARN": 9,
+      "FAIL": 1,
+      "PASS": 2
+    }
+  },
+  "results": [
+    {
+      "id": "AQ-01",
+      "question": "How many digits is the OTP?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "digit count"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "6 words (budget 25)",
+      "word_count": 6,
+      "max_words": 25,
+      "answer": "The OTP consists of six digits."
+    },
+    {
+      "id": "AQ-02",
+      "question": "What is the minimum password length?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "minimum length"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "7 words (budget 25)",
+      "word_count": 7,
+      "max_words": 25,
+      "answer": "The minimum password length is 8 characters."
+    },
+    {
+      "id": "AQ-03",
+      "question": "How long is the lockout period?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "lockout duration"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "12 words (budget 25)",
+      "word_count": 12,
+      "max_words": 25,
+      "answer": "The lockout period lasts **15 minutes** from the fifth failed login attempt."
+    },
+    {
+      "id": "AQ-04",
+      "question": "What is the retention period for audit entries?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "retention"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "8 words (budget 25)",
+      "word_count": 8,
+      "max_words": 25,
+      "answer": "The audit entries are retained for **90 days**."
+    },
+    {
+      "id": "AQ-05",
+      "question": "What is the session idle timeout?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "timeout"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "9 words (budget 25)",
+      "word_count": 9,
+      "max_words": 25,
+      "answer": "The session idle timeout is 30 minutes of inactivity."
+    },
+    {
+      "id": "AQ-06",
+      "question": "Where do field errors appear on the page?",
+      "status": "FAIL",
+      "reason": "incomplete — missed ['placement']",
+      "completeness": 0.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.5,
+      "covered_parts": [],
+      "missed_parts": [
+        "placement"
+      ],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "10 words (budget 25)",
+      "word_count": 10,
+      "max_words": 25,
+      "answer": "Field errors are displayed directly beneath the corresponding input field."
+    },
+    {
+      "id": "AQ-07",
+      "question": "How many digits is the OTP, and how long is it valid for?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "digit count",
+        "validity"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "16 words (budget 45)",
+      "word_count": 16,
+      "max_words": 45,
+      "answer": "The OTP consists of six digits and remains valid for 10 minutes after it is issued."
+    },
+    {
+      "id": "AQ-08",
+      "question": "How many failed attempts trigger a lockout, how long does it last, and what resets the counter?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "threshold",
+        "duration",
+        "reset condition"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "30 words (budget 70)",
+      "word_count": 30,
+      "max_words": 70,
+      "answer": "A lockout occurs after **five consecutive failed login attempts**. The lockout period lasts **15 minutes** from the fifth failed attempt. The counter is reset to zero by a **successful login**."
+    },
+    {
+      "id": "AQ-09",
+      "question": "What are the password character requirements, and is there an upper limit on length?",
+      "status": "PASS",
+      "reason": "complete and focused",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 1.0,
+      "conciseness": 1.0,
+      "composite": 1.0,
+      "covered_parts": [
+        "character classes",
+        "no upper limit"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "cited [1], all retrieved",
+      "conciseness_detail": "28 words (budget 55)",
+      "word_count": 28,
+      "max_words": 55,
+      "answer": "The password must be **at least 8 characters long** and must include **at least one number and one symbol**. There is **no maximum length** for the password field. \n\n[Chunk #1]"
+    },
+    {
+      "id": "AQ-10",
+      "question": "What happens to a session token when a user logs out, and what status is returned if it is replayed?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "invalidation",
+        "replay status"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "30 words (budget 55)",
+      "word_count": 30,
+      "max_words": 55,
+      "answer": "When a user logs out, the session token is invalidated right away. If that same token is presented again after logout, the request is rejected with a **401 Unauthorized** response."
+    },
+    {
+      "id": "AQ-11",
+      "question": "What does the Forgot Password link do?",
+      "status": "WARN",
+      "reason": "complete but no citation — claim is untraceable",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 0.0,
+      "conciseness": 1.0,
+      "composite": 0.75,
+      "covered_parts": [
+        "destination"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "no citation — claim is untraceable",
+      "conciseness_detail": "8 words (budget 25)",
+      "word_count": 8,
+      "max_words": 25,
+      "answer": "The “Forgot Password” link opens the password‑recovery page."
+    },
+    {
+      "id": "AQ-12",
+      "question": "What is the exact error message for a mobile number that is too short, and what is the field's maxlength?",
+      "status": "PASS",
+      "reason": "complete and focused",
+      "completeness": 1.0,
+      "precision": 1.0,
+      "citation_discipline": 1.0,
+      "conciseness": 1.0,
+      "composite": 1.0,
+      "covered_parts": [
+        "error text",
+        "maxlength"
+      ],
+      "missed_parts": [],
+      "off_topic_included": [],
+      "citation_detail": "cited [1], all retrieved",
+      "conciseness_detail": "29 words (budget 55)",
+      "word_count": 29,
+      "max_words": 55,
+      "answer": "The error shown when fewer than 10 digits are entered is:\n\n**“Enter valid 10‑digit mobile number”** \n\nThe mobile number field enforces a **maxlength of 10** at the browser level. \n\n[Chunk #1]"
+    }
+  ]
+}

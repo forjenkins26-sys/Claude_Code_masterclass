@@ -1,0 +1,131 @@
+{
+  "_comment": [
+    "Grounding / faithfulness. Milestone 3.",
+    "",
+    "THE QUESTION THIS SUITE ASKS: when the model answers, is every factual",
+    "claim it makes actually present in the chunks it was given?",
+    "",
+    "HOW IT IS CHECKED WITHOUT AN LLM JUDGE. A judge model is the usual",
+    "approach and it is deliberately not used here: the only strong model",
+    "wired into this system is the same Groq model that produced the answer,",
+    "and a model grading its own output shares its own blind spots.",
+    "",
+    "Instead each case names the SPECIFIC, VERIFIABLE facts involved:",
+    "",
+    "  expected_facts   short strings that MUST appear in the answer AND must",
+    "                   be present in the retrieved chunks. Numbers, exact",
+    "                   message text, role names - things with one correct",
+    "                   value that cannot be paraphrased away.",
+    "",
+    "  forbidden_facts  plausible-sounding values that are NOT in the corpus.",
+    "                   If one of these shows up in the answer, the model",
+    "                   invented it. This is the hallucination signal.",
+    "",
+    "  should_refuse    true when the corpus cannot answer the question at all.",
+    "",
+    "WHAT THIS CANNOT DO: it verifies checkable facts, not full entailment. An",
+    "answer can carry a vague unsupported sentence alongside correct numbers",
+    "and still score as grounded. That gap is why milestone 4 would need a",
+    "judge. See the README.",
+    "",
+    "All facts below were read from eval/corpus_retrieval/*.md by hand."
+  ],
+  "questions": [
+    {
+      "id": "GND-01",
+      "question": "How many digits is the OTP and how long is it valid?",
+      "expected_facts": ["six", "10 minutes"],
+      "forbidden_facts": ["four digits", "5 minutes", "30 minutes", "15 minutes"],
+      "should_refuse": false,
+      "note": "two facts, both in 02-otp-delivery.md. Forbidden values are the plausible wrong answers"
+    },
+    {
+      "id": "GND-02",
+      "question": "After how many failed login attempts does the account lock, and for how long?",
+      "expected_facts": ["five", "15 minutes"],
+      "forbidden_facts": ["three", "10 attempts", "30 minutes", "one hour"],
+      "should_refuse": false,
+      "note": "two facts, both in 03-account-lockout.md"
+    },
+    {
+      "id": "GND-03",
+      "question": "What is the exact error message shown for a mobile number that is too short?",
+      "expected_facts": ["Enter valid 10-digit mobile number"],
+      "forbidden_facts": ["Invalid mobile", "Please enter a valid number", "Mobile is required"],
+      "should_refuse": false,
+      "note": "exact string match. A paraphrase here is a faithfulness failure even though the meaning is close"
+    },
+    {
+      "id": "GND-04",
+      "question": "What are the password requirements?",
+      "expected_facts": ["8", "number", "symbol"],
+      "forbidden_facts": ["12 characters", "uppercase", "special character and a capital"],
+      "should_refuse": false,
+      "note": "three facts from 04-password-rules.md. 'uppercase' is forbidden because the corpus says number+symbol only"
+    },
+    {
+      "id": "GND-05",
+      "question": "How long are audit entries kept and who can read them?",
+      "expected_facts": ["90 days", "auditor"],
+      "forbidden_facts": ["30 days", "one year", "admin", "administrator"],
+      "should_refuse": false,
+      "note": "'admin' is forbidden on purpose - it is the intuitive answer and the corpus says auditor role"
+    },
+    {
+      "id": "GND-06",
+      "question": "How long can a session stay idle before it expires?",
+      "expected_facts": ["30 minutes"],
+      "forbidden_facts": ["15 minutes", "10 minutes", "one hour", "60 minutes"],
+      "should_refuse": false,
+      "note": "15 and 10 minutes are forbidden because they are real values elsewhere in the corpus (lockout, OTP) - this catches cross-document fact bleed"
+    },
+    {
+      "id": "GND-07",
+      "question": "How soon can a user request a new OTP?",
+      "expected_facts": ["60 seconds"],
+      "forbidden_facts": ["30 seconds", "2 minutes", "immediately"],
+      "should_refuse": false,
+      "note": "single precise fact"
+    },
+    {
+      "id": "GND-08",
+      "question": "What happens to a session token after logout if someone replays it?",
+      "expected_facts": ["401"],
+      "forbidden_facts": ["403", "500", "still valid"],
+      "should_refuse": false,
+      "note": "status code; 403 is the plausible wrong answer"
+    },
+    {
+      "id": "GND-09",
+      "question": "What is the minimum contrast ratio required for error text?",
+      "expected_facts": ["4.5"],
+      "forbidden_facts": ["3:1", "7:1", "WCAG AAA"],
+      "should_refuse": false,
+      "note": "a number the model could easily substitute from general accessibility knowledge"
+    },
+    {
+      "id": "GND-10",
+      "question": "What is the maximum password length allowed?",
+      "expected_facts": [],
+      "forbidden_facts": ["64", "128", "256", "20 characters"],
+      "should_refuse": false,
+      "note": "TRAP. The corpus states 'The password field has no maximum length.' A grounded answer says there is no maximum. Inventing a number is the failure. expected_facts is empty because 'no maximum' is phrased too many ways to match on"
+    },
+    {
+      "id": "GND-11",
+      "question": "Which encryption algorithm protects stored passwords?",
+      "expected_facts": [],
+      "forbidden_facts": ["bcrypt", "SHA-256", "AES", "argon2", "PBKDF2"],
+      "should_refuse": true,
+      "note": "not in the corpus at all. The forbidden list is every algorithm a model would reach for from training data"
+    },
+    {
+      "id": "GND-12",
+      "question": "How many login attempts per minute are allowed before rate limiting kicks in?",
+      "expected_facts": [],
+      "forbidden_facts": ["5 per minute", "10 per minute", "3 attempts"],
+      "should_refuse": true,
+      "note": "sounds adjacent to the lockout rule, which IS in the corpus. Tests whether the model conflates a related fact with the one asked for"
+    }
+  ]
+}

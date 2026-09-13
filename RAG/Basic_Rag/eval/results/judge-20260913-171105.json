@@ -1,0 +1,422 @@
+{
+  "run_at_utc": "2026-09-13T17:11:05.499484+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "rag_provider": "groq",
+  "judge_model": "gemini-3.6-flash",
+  "judge_samples_per_case": 1,
+  "calibration": {
+    "correct": 6,
+    "total": 7,
+    "rate": 0.8571,
+    "details": [
+      {
+        "name": "perfect answer",
+        "dimension": "completeness",
+        "got": 2,
+        "want": 2,
+        "ok": true,
+        "reason": "The answer directly and concisely answers the question using only the provided context with accurate citation."
+      },
+      {
+        "name": "perfect answer",
+        "dimension": "citation_discipline",
+        "got": 2,
+        "want": 2,
+        "ok": true,
+        "reason": "The answer directly and concisely answers the question using only the provided context with accurate citation."
+      },
+      {
+        "name": "perfect answer",
+        "dimension": "precision",
+        "got": 2,
+        "want": 2,
+        "ok": true,
+        "reason": "The answer directly and concisely answers the question using only the provided context with accurate citation."
+      },
+      {
+        "name": "hallucinated fact",
+        "dimension": "factual_grounding",
+        "got": 0,
+        "want": 0,
+        "ok": true,
+        "reason": "The answer incorrectly states the OTP is four digits instead of six, hallucinates an expiration time not present in the context, and falsely attributes these claims to Chunk #1."
+      },
+      {
+        "name": "phantom citation",
+        "dimension": "citation_discipline",
+        "got": 0,
+        "want": 0,
+        "ok": true,
+        "reason": "The answer accurately and concisely answers the question, but it cites Chunk #7 which is not in the provided context."
+      },
+      {
+        "name": "incomplete, two-part question",
+        "dimension": "completeness",
+        "got": 1,
+        "want": 1,
+        "ok": true,
+        "reason": "The answer correctly states the digit count with an accurate citation, but omits the second part of the question regarding how long the OTP is valid."
+      },
+      {
+        "name": "over-answering",
+        "dimension": "precision",
+        "got": 1,
+        "want": 0,
+        "ok": false,
+        "reason": "The answer correctly states the digit count with full grounding and proper citation, but includes unnecessary extra details about expiry, resend window, and toast notifications."
+      }
+    ]
+  },
+  "comparisons": [
+    {
+      "id": "AQ-01",
+      "question": "How many digits is the OTP?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer is accurate and concise, directly addressing the question, but fails to include a source citation.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer is accurate and concise, directly addressing the question, but fails to include a source citation."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "The OTP consists of six digits."
+    },
+    {
+      "id": "AQ-02",
+      "question": "What is the minimum password length?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer is direct, completely accurate, and well-focused, but it lacks required inline citations.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer is direct, completely accurate, and well-focused, but it lacks required inline citations."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "The minimum password length is 8 characters."
+    },
+    {
+      "id": "AQ-03",
+      "question": "How long is the lockout period?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 0.6667,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.6667,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 1,
+        "overall": 7,
+        "composite": 0.7,
+        "reason": "The answer accurately states the 15-minute lockout duration, but lacks citations and includes unnecessary detail about the failed attempt threshold.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 1,
+            "overall": 7,
+            "reason": "The answer accurately states the 15-minute lockout duration, but lacks citations and includes unnecessary detail about the failed attempt threshold."
+          }
+        ]
+      },
+      "delta": 0.0333,
+      "disagreement": false,
+      "answer": "The lockout period is 15 minutes from the fifth failed attempt."
+    },
+    {
+      "id": "AQ-04",
+      "question": "What is the retention period for audit entries?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer is accurate, concise, and fully supported by the context, but lacks the required chunk citation.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer is accurate, concise, and fully supported by the context, but lacks the required chunk citation."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "Audit entries are retained for 90 days."
+    },
+    {
+      "id": "AQ-05",
+      "question": "What is the session idle timeout?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer accurately and concisely states the 30-minute session idle timeout, but fails to include a chunk citation.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer accurately and concisely states the 30-minute session idle timeout, but fails to include a chunk citation."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "The session idle timeout is 30 minutes of inactivity."
+    },
+    {
+      "id": "AQ-06",
+      "question": "Where do field errors appear on the page?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 1.0,
+        "conciseness": 1.0,
+        "composite": 1.0,
+        "status": "PASS"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer accurately and concisely identifies where field errors appear, includes the correct citation, and avoids unnecessary details.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer accurately and concisely identifies where field errors appear, includes the correct citation, and avoids unnecessary details."
+          }
+        ]
+      },
+      "delta": 0.0,
+      "disagreement": false,
+      "answer": "Field errors are displayed directly beneath the corresponding input field. [Chunk #1]"
+    },
+    {
+      "id": "AQ-07",
+      "question": "How many digits is the OTP, and how long is it valid for?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer accurately and concisely provides the exact OTP digit length and validity duration, but lacks inline chunk citations.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer accurately and concisely provides the exact OTP digit length and validity duration, but lacks inline chunk citations."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "The OTP consists of six digits and it remains valid for 10 minutes after it is issued."
+    },
+    {
+      "id": "AQ-08",
+      "question": "How many failed attempts trigger a lockout, how long does it last, and what resets the counter?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer accurately and concisely addresses all parts of the question based on the context, but fails to include any chunk citations.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer accurately and concisely addresses all parts of the question based on the context, but fails to include any chunk citations."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "A lockout occurs after **five consecutive failed login attempts**. The lockout lasts **15 minutes** from the fifth failed attempt, and a **successful login** resets the failed‑attempt counter to zero."
+    },
+    {
+      "id": "AQ-09",
+      "question": "What are the password character requirements, and is there an upper limit on length?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 1.0,
+        "conciseness": 1.0,
+        "composite": 1.0,
+        "status": "PASS"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 2,
+        "precision": 2,
+        "overall": 10,
+        "composite": 1.0,
+        "reason": "The answer accurately and concisely addresses all parts of the question with correct citations and no unnecessary detail.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 2,
+            "precision": 2,
+            "overall": 10,
+            "reason": "The answer accurately and concisely addresses all parts of the question with correct citations and no unnecessary detail."
+          }
+        ]
+      },
+      "delta": 0.0,
+      "disagreement": false,
+      "answer": "The password must be **at least 8 characters long**, and it must include **at least one numeric digit and one symbol**. The field has **no maximum length**—there is no upper limit on how long the password can be. \n\n[Chunk #1]"
+    },
+    {
+      "id": "AQ-10",
+      "question": "What happens to a session token when a user logs out, and what status is returned if it is replayed?",
+      "deterministic": {
+        "completeness": 1.0,
+        "precision": 1.0,
+        "citation_discipline": 0.0,
+        "conciseness": 1.0,
+        "composite": 0.75,
+        "status": "WARN"
+      },
+      "judge": {
+        "samples": 1,
+        "completeness": 2,
+        "factual_grounding": 2,
+        "citation_discipline": 0,
+        "precision": 2,
+        "overall": 8,
+        "composite": 0.8,
+        "reason": "The answer accurately and concisely addresses both parts of the question using the context, but fails to include chunk citations.",
+        "all_verdicts": [
+          {
+            "completeness": 2,
+            "factual_grounding": 2,
+            "citation_discipline": 0,
+            "precision": 2,
+            "overall": 8,
+            "reason": "The answer accurately and concisely addresses both parts of the question using the context, but fails to include chunk citations."
+          }
+        ]
+      },
+      "delta": 0.05,
+      "disagreement": false,
+      "answer": "When a user logs out, the session token is invalidated right away. If that same token is presented again after logout, the request is rejected with a **401 Unauthorized** response."
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "run_at_utc": "2026-09-12T01:20:28.038875+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "visitor_id": "eval-harness-milestone-1",
+  "suites": {
+    "citation_accuracy": {
+      "summary": {
+        "PASS": 4,
+        "FAIL": 0,
+        "WARN": 6,
+        "ERROR": 0,
+        "total": 10
+      },
+      "results": [
+        {
+          "id": "CIT-01",
+          "question": "How many digits must the mobile number field accept?",
+          "status": "WARN",
+          "reason": "answer has no citation — claim is untraceable",
+          "cited_chunks": [],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "The mobile number field must accept exactly 10 digits."
+        },
+        {
+          "id": "CIT-02",
+          "question": "What exact error message is shown when fewer than 10 digits are submitted?",
+          "status": "WARN",
+          "reason": "answer has no citation — claim is untraceable",
+          "cited_chunks": [],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "The error message displayed is **“Enter valid 10-digit mobile number”**."
+        },
+        {
+          "id": "CIT-03",
+          "question": "What happens when letters are typed into the mobile number field?",
+          "status": "WARN",
+          "reason": "answer has no citation — claim is untraceable",
+          "cited_chunks": [],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "When letters are typed into the mobile number field, they are rejected — the letters do not appear in the field."
+        },
+        {
+          "id": "CIT-04",
+          "question": "What is shown after submitting a valid 10-digit mobile number?",
+          "status": "WARN",
+          "reason": "answer has no citation — claim is untraceable",
+          "cited_chunks": [],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "Submitting a valid 10‑digit mobile number displays a toast message that contains the text **“OTP sent.”**"
+        },
+        {
+          "id": "CIT-05",
+          "question": "What happens after five consecutive failed login attempts?",
+          "status": "PASS",
+          "reason": "cited [1, 2], all retrieved",
+          "cited_chunks": [
+            1,
+            2
+          ],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "After five consecutive failed login attempts the account is locked and a message is shown saying “Too many attempts, try again in 15 minutes.” [Chunk #1, #2]"
+        },
+        {
+          "id": "CIT-06",
+          "question": "Where does the Create New Account button take the user?",
+          "status": "PASS",
+          "reason": "cited [1], all retrieved",
+          "cited_chunks": [
+            1
+          ],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "The specification states that the “Create New Account” button navigates the user away from the login page. [Chunk #1]"
+        },
+        {
+          "id": "CIT-07",
+          "question": "How does the password field handle the typed value?",
+          "status": "PASS",
+          "reason": "cited [1], all retrieved",
+          "cited_chunks": [
+            1
+          ],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "The password field masks what the user types, so the entered characters are not shown in plain text—the typed value is never visible. [Chunk #1]"
+        },
+        {
+          "id": "CIT-08",
+          "question": "What is the minimum password length?",
+          "status": "WARN",
+          "reason": "answer has no citation — claim is untraceable",
+          "cited_chunks": [],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "The specification states that a password must be at least 8 characters long."
+        },
+        {
+          "id": "CIT-09",
+          "question": "List every acceptance criterion about the mobile number field.",
+          "status": "PASS",
+          "reason": "cited [1], all retrieved",
+          "cited_chunks": [
+            1
+          ],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "**Acceptance criteria about the mobile number field**\n\n- **AC‑1:** The mobile number field accepts exactly 10 digits. \n- **AC‑2:** Submitting fewer than 10 digits shows the error message “Enter valid 10‑digit mobile number”. \n- **AC‑3:** The mobile number field rejects non‑numeric characters; letters typed into the field do not appear in it. \n- **AC‑4:** Submitting a valid 10‑digit mobile number shows a toast containing “OTP sent”. \n\nThese criteria are all defined in the specification document [Chunk #1]."
+        },
+        {
+          "id": "CIT-10",
+          "question": "Which areas are explicitly out of scope in this specification?",
+          "status": "WARN",
+          "reason": "answer has no citation — claim is untraceable",
+          "cited_chunks": [],
+          "retrieved_chunks": [
+            1,
+            2
+          ],
+          "phantom_citations": [],
+          "answer": "The specification states that the following areas are explicitly out of scope: **performance, accessibility, internationalisation, audit logging, and server‑side authorization**."
+        }
+      ]
+    },
+    "refusal": {
+      "summary": {
+        "PASS": 10,
+        "FAIL": 0,
+        "WARN": 0,
+        "ERROR": 0,
+        "total": 10
+      },
+      "results": [
+        {
+          "id": "REF-01",
+          "kind": "general",
+          "question": "What is the capital of France?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not contain any information about the capital of France. [Chunk #1, Chunk #2]"
+        },
+        {
+          "id": "REF-02",
+          "kind": "general",
+          "question": "Who wrote the novel Pride and Prejudice?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not contain any information about who wrote the novel *Pride and Prejudice*."
+        },
+        {
+          "id": "REF-03",
+          "kind": "general",
+          "question": "What is the chemical symbol for gold?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided context does not contain any information about the chemical symbol for gold. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-04",
+          "kind": "plausible",
+          "question": "What is the session timeout duration for a logged-in user?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not mention a session timeout duration for a logged‑in user. No such information appears in either of the given chunks. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-05",
+          "kind": "plausible",
+          "question": "Which OTP provider or SMS gateway is used to send the code?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not mention which OTP provider or SMS gateway is used to send the code. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-06",
+          "kind": "plausible",
+          "question": "How long is the OTP valid before it expires?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not state how long the OTP remains valid before it expires. It only mentions that a toast saying “OTP sent” is shown after submitting a valid mobile number, but no expiration time is given. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-07",
+          "kind": "plausible",
+          "question": "What is the maximum number of accounts allowed per mobile number?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not state a limit on the number of accounts that can be associated with a single mobile number. Therefore, the maximum number of accounts per mobile number is not mentioned in the given context."
+        },
+        {
+          "id": "REF-08",
+          "kind": "plausible",
+          "question": "Which API endpoint does the login form submit to?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not mention any API endpoint that the login form submits to. Neither [Chunk #1] nor [Chunk #2] contains information about a URL or endpoint for the login request."
+        },
+        {
+          "id": "REF-09",
+          "kind": "plausible",
+          "question": "What password reset flow is available if the user forgets their password?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not describe any password‑reset flow for users who forget their password. No such process is mentioned in the available context. [Chunk #1, #2]"
+        },
+        {
+          "id": "REF-10",
+          "kind": "plausible",
+          "question": "What is the required page load time for the login screen?",
+          "status": "PASS",
+          "reason": "correctly declined — said the context does not cover it",
+          "answer": "The provided specification does not include any requirement for the page‑load time of the login screen. In fact, performance is listed as out of scope, so no load‑time target is defined in the document. [Chunk #1, #2]"
+        }
+      ]
+    }
+  }
+}

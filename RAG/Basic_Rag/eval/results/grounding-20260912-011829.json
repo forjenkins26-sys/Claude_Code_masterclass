@@ -1,0 +1,328 @@
+{
+  "run_at_utc": "2026-09-12T01:18:29.086494+00:00",
+  "base_url": "https://rag-explorer-api.onrender.com",
+  "visitor_id": "eval-harness-milestone-3",
+  "top_k": 4,
+  "summary": {
+    "cases": 12,
+    "scored": 12,
+    "overall_grounding_score": 1.0,
+    "labels": {
+      "FULLY_GROUNDED": 10,
+      "CORRECT_REFUSAL": 2
+    },
+    "hallucinations": 0
+  },
+  "results": [
+    {
+      "id": "GND-01",
+      "question": "How many digits is the OTP and how long is it valid?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 2 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "six",
+        "10 minutes"
+      ],
+      "supported_facts": [
+        "six",
+        "10 minutes"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "02-otp-delivery.md",
+        "01-mobile-validation.md",
+        "04-password-rules.md",
+        "06-session-handling.md"
+      ],
+      "answer": "The OTP consists of six digits and remains valid for 10 minutes after it is issued."
+    },
+    {
+      "id": "GND-02",
+      "question": "After how many failed login attempts does the account lock, and for how long?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 2 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "five",
+        "15 minutes"
+      ],
+      "supported_facts": [
+        "five",
+        "15 minutes"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "03-account-lockout.md",
+        "08-audit-logging.md",
+        "06-session-handling.md",
+        "05-navigation.md"
+      ],
+      "answer": "The account locks after **five consecutive failed login attempts**, and the lockout lasts for **15 minutes** from the fifth failed attempt. [Chunk #1]"
+    },
+    {
+      "id": "GND-03",
+      "question": "What is the exact error message shown for a mobile number that is too short?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 1 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "Enter valid 10-digit mobile number"
+      ],
+      "supported_facts": [
+        "Enter valid 10-digit mobile number"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "01-mobile-validation.md",
+        "07-error-messages.md",
+        "02-otp-delivery.md",
+        "03-account-lockout.md"
+      ],
+      "answer": "The error message displayed when a mobile number is shorter than 10 digits is:\n\n**“Enter valid 10‑digit mobile number”**"
+    },
+    {
+      "id": "GND-04",
+      "question": "What are the password requirements?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 3 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "8",
+        "number",
+        "symbol"
+      ],
+      "supported_facts": [
+        "8",
+        "number",
+        "symbol"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "04-password-rules.md",
+        "05-navigation.md",
+        "03-account-lockout.md",
+        "08-audit-logging.md"
+      ],
+      "answer": "The password must be at least 8 characters long, contain at least one number and one symbol, and the field masks the input so the typed value is never shown in plain text. There is no maximum length for the password."
+    },
+    {
+      "id": "GND-05",
+      "question": "How long are audit entries kept and who can read them?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 2 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "90 days",
+        "auditor"
+      ],
+      "supported_facts": [
+        "90 days",
+        "auditor"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "08-audit-logging.md",
+        "03-account-lockout.md",
+        "06-session-handling.md",
+        "02-otp-delivery.md"
+      ],
+      "answer": "Audit entries are retained for 90 days, and only users who have the **auditor** role are allowed to read the audit log."
+    },
+    {
+      "id": "GND-06",
+      "question": "How long can a session stay idle before it expires?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 1 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "30 minutes"
+      ],
+      "supported_facts": [
+        "30 minutes"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "06-session-handling.md",
+        "02-otp-delivery.md",
+        "03-account-lockout.md",
+        "08-audit-logging.md"
+      ],
+      "answer": "A logged‑in session will expire after **30 minutes of inactivity**."
+    },
+    {
+      "id": "GND-07",
+      "question": "How soon can a user request a new OTP?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 1 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "60 seconds"
+      ],
+      "supported_facts": [
+        "60 seconds"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "02-otp-delivery.md",
+        "03-account-lockout.md",
+        "06-session-handling.md",
+        "05-navigation.md"
+      ],
+      "answer": "A user can request a new OTP after 60 seconds."
+    },
+    {
+      "id": "GND-08",
+      "question": "What happens to a session token after logout if someone replays it?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 1 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "401"
+      ],
+      "supported_facts": [
+        "401"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "06-session-handling.md",
+        "03-account-lockout.md",
+        "08-audit-logging.md",
+        "05-navigation.md"
+      ],
+      "answer": "After a user logs out, the session token is immediately invalidated. If that token is replayed afterward, the system refuses it and returns a 401 Unauthorized response. [Chunk #1]"
+    },
+    {
+      "id": "GND-09",
+      "question": "What is the minimum contrast ratio required for error text?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "all 1 fact(s) supported by context",
+      "grounding_score": 1.0,
+      "expected_facts": [
+        "4.5"
+      ],
+      "supported_facts": [
+        "4.5"
+      ],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "07-error-messages.md",
+        "04-password-rules.md",
+        "01-mobile-validation.md",
+        "03-account-lockout.md"
+      ],
+      "answer": "The error text must have a contrast ratio of **at least 4.5 : 1**."
+    },
+    {
+      "id": "GND-10",
+      "question": "What is the maximum password length allowed?",
+      "label": "FULLY_GROUNDED",
+      "status": "PASS",
+      "reason": "nothing invented; no specific fact required",
+      "grounding_score": 1.0,
+      "expected_facts": [],
+      "supported_facts": [],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": false,
+      "should_refuse": false,
+      "retrieved_sources": [
+        "04-password-rules.md",
+        "03-account-lockout.md",
+        "06-session-handling.md",
+        "02-otp-delivery.md"
+      ],
+      "answer": "The password field has no maximum length; it can accept passwords of any length. [Chunk #1]"
+    },
+    {
+      "id": "GND-11",
+      "question": "Which encryption algorithm protects stored passwords?",
+      "label": "CORRECT_REFUSAL",
+      "status": "PASS",
+      "reason": "correctly declined — corpus cannot answer this",
+      "grounding_score": 1.0,
+      "expected_facts": [],
+      "supported_facts": [],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": true,
+      "should_refuse": true,
+      "retrieved_sources": [
+        "03-account-lockout.md",
+        "04-password-rules.md",
+        "05-navigation.md",
+        "08-audit-logging.md"
+      ],
+      "answer": "The provided context does not specify any encryption algorithm used to protect stored passwords."
+    },
+    {
+      "id": "GND-12",
+      "question": "How many login attempts per minute are allowed before rate limiting kicks in?",
+      "label": "CORRECT_REFUSAL",
+      "status": "PASS",
+      "reason": "correctly declined — corpus cannot answer this",
+      "grounding_score": 1.0,
+      "expected_facts": [],
+      "supported_facts": [],
+      "missing_facts": [],
+      "unsupported_facts": [],
+      "invented_facts": [],
+      "refused": true,
+      "should_refuse": true,
+      "retrieved_sources": [
+        "03-account-lockout.md",
+        "06-session-handling.md",
+        "08-audit-logging.md",
+        "05-navigation.md"
+      ],
+      "answer": "The provided documents do not specify a per‑minute login‑attempt limit or any rate‑limiting rule based on attempts per minute. They only describe a lockout after five consecutive failed attempts with a 15‑minute lockout period, but no per‑minute threshold is mentioned. [Chunk #1]"
+    }
+  ]
+}

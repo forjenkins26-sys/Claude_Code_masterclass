@@ -1,0 +1,64 @@
+{
+  "_comment": [
+    "Questions whose answers ARE in eval/corpus/login-spec.md.",
+    "These test CITATION ACCURACY, not correctness of the answer.",
+    "We are asking: when the model answers, does it cite a chunk that",
+    "actually came back from retrieval?",
+    "",
+    "'expect_citation' is true when the question asks for a specific fact",
+    "that should be attributed. Set it false for questions where a bare",
+    "answer is reasonable."
+  ],
+  "questions": [
+    {
+      "id": "CIT-01",
+      "question": "How many digits must the mobile number field accept?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-02",
+      "question": "What exact error message is shown when fewer than 10 digits are submitted?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-03",
+      "question": "What happens when letters are typed into the mobile number field?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-04",
+      "question": "What is shown after submitting a valid 10-digit mobile number?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-05",
+      "question": "What happens after five consecutive failed login attempts?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-06",
+      "question": "Where does the Create New Account button take the user?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-07",
+      "question": "How does the password field handle the typed value?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-08",
+      "question": "What is the minimum password length?",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-09",
+      "question": "List every acceptance criterion about the mobile number field.",
+      "expect_citation": true
+    },
+    {
+      "id": "CIT-10",
+      "question": "Which areas are explicitly out of scope in this specification?",
+      "expect_citation": true
+    }
+  ]
+}

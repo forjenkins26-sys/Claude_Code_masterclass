@@ -1,0 +1,96 @@
+{
+  "_comment": [
+    "Ground truth for retrieval quality. Milestone 2.",
+    "",
+    "HOW THIS WAS LABELLED — this is the part that makes the metrics mean",
+    "something. Each `relevant_sources` list was written BY HAND by reading",
+    "eval/corpus_retrieval/*.md and deciding which document answers the",
+    "question. Nothing here was copied from what the RAG returned. Labelling",
+    "from RAG output would measure the retriever against itself and always",
+    "score perfectly.",
+    "",
+    "WHY FILENAMES, NOT CHUNK NUMBERS — `chunk_number` in the API response is",
+    "just the rank position (1..4) of that result, so it changes every query.",
+    "The stable identifier is `source`, the filename. Each corpus file is",
+    "under CHUNK_SIZE (800) and is one section, so one file == one chunk, and",
+    "naming the file names the chunk.",
+    "",
+    "MULTI-ANSWER QUESTIONS are included on purpose (RET-09, RET-10). A",
+    "question whose answer spans two documents is where Precision@4 and Hit",
+    "Rate@4 stop agreeing, which is the point of measuring both."
+  ],
+  "questions": [
+    {
+      "id": "RET-01",
+      "question": "How many digits must the mobile number field accept?",
+      "relevant_sources": ["01-mobile-validation.md"],
+      "note": "single document; the only file discussing digit count"
+    },
+    {
+      "id": "RET-02",
+      "question": "How long is the OTP valid before it expires?",
+      "relevant_sources": ["02-otp-delivery.md"],
+      "note": "expiry stated only in the OTP document"
+    },
+    {
+      "id": "RET-03",
+      "question": "After how many failed attempts does the account lock?",
+      "relevant_sources": ["03-account-lockout.md"],
+      "note": "single document"
+    },
+    {
+      "id": "RET-04",
+      "question": "What is the minimum password length?",
+      "relevant_sources": ["04-password-rules.md"],
+      "note": "single document"
+    },
+    {
+      "id": "RET-05",
+      "question": "Where does the Forgot Password link take the user?",
+      "relevant_sources": ["05-navigation.md"],
+      "note": "single document"
+    },
+    {
+      "id": "RET-06",
+      "question": "How long until an idle session expires?",
+      "relevant_sources": ["06-session-handling.md"],
+      "note": "session timeout stated only here; deliberately similar wording to RET-02 (expiry) to test discrimination"
+    },
+    {
+      "id": "RET-07",
+      "question": "Where on the page are field errors displayed?",
+      "relevant_sources": ["07-error-messages.md"],
+      "note": "single document"
+    },
+    {
+      "id": "RET-08",
+      "question": "How long are audit log entries retained?",
+      "relevant_sources": ["08-audit-logging.md"],
+      "note": "single document; 'retained' echoes 'retention' wording nowhere else"
+    },
+    {
+      "id": "RET-09",
+      "question": "What happens to the session token after a user logs out, and is that event recorded anywhere?",
+      "relevant_sources": ["06-session-handling.md", "08-audit-logging.md"],
+      "note": "two documents: token invalidation is in session handling, the recording question points at audit logging"
+    },
+    {
+      "id": "RET-10",
+      "question": "Which rules govern what a user types into the password and mobile fields?",
+      "relevant_sources": ["04-password-rules.md", "01-mobile-validation.md"],
+      "note": "two documents: one per field"
+    },
+    {
+      "id": "RET-11",
+      "question": "What error message is shown for an invalid mobile number?",
+      "relevant_sources": ["01-mobile-validation.md"],
+      "note": "the exact string lives in mobile validation, NOT in the error-messages document, which only describes placement and styling. A retriever that returns 07-error-messages.md has matched on the word 'error' rather than on meaning"
+    },
+    {
+      "id": "RET-12",
+      "question": "Who is allowed to read the audit log?",
+      "relevant_sources": ["08-audit-logging.md"],
+      "note": "single document; tests role wording"
+    }
+  ]
+}
