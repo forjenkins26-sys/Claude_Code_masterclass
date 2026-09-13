@@ -1,1 +1,0 @@
-Auth setup skipped - requires valid credentials

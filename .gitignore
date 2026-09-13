@@ -65,3 +65,19 @@ RAG/**/dist/
 /n8n-local/
 # Playwright DOM snapshot that captured a Pinecone credential modal with the key visible
 /before-save.yml
+
+# --- Test reporter output (added 2026-09-14) ---
+# Regenerated on every run (allure-playwright reporter, playwright.config.ts).
+# 698 untracked + 260 already-tracked files / 64MB before this rule existed.
+**/allure-results/
+**/allure-report/
+**/test-results/
+**/playwright-report/
+**/.allure/
+
+# Root-level scratch from the 2026-08-31 langflow session: screenshots + DOM
+# snapshots. Same batch as /before-save.yml above, which captured a live API key
+# - treat these as credential-risk and keep them out of git.
+/*.png
+/*.yml
+!/.github/**/*.yml
