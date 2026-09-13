@@ -21,7 +21,15 @@ Git remote: `https://github.com/forjenkins26-sys/Claude_Code_masterclass.git`
 | `AI Agents_N8n/` | n8n workflow JSON exports — 5 AI agent workflows (ChitChat, Jira Bug, PRD→Excel x2, E2E) | n8n import |
 | `QA Portfolio/` | Portfolio site — Vercel deploy, own `CLAUDE.md`, live at `anand-soni-qa-portfolio.vercel.app` | static + Vercel |
 | `RAG/Basic_Rag/app/` | RAG Explorer — visual RAG pipeline demo (PDF→chunk→Nomic embed→ChromaDB→retrieve top-4→Groq answer), FastAPI + React/Vite/Tailwind | pip + npm |
-| `scripts/` | Workspace-level scripts — `fetch-local-page.js`, `generate_portfolio.py`, `testplan/` | node / python |
+| `scripts/` | Workspace-level scripts — `fetch-local-page.js`, `generate_portfolio.py`, `new-demo-project.sh` | node / python / bash |
+| `interview-prep/` | QA Interview Prep static site — topic data files (playwright, selenium, cucumber, restapi, javapython) | static |
+| `rag-analytics/` | RAG Explorer Usage — single-page usage/analytics view for the RAG demo | static |
+| `langflow-ui/` | Langflow UI — local web front-end (`index.html` + deps) | npm |
+| `E2E QA Pipeline/` | AI E2E QA pipeline design docs — flow markdown + `.excalidraw` diagram | docs |
+| `AI-Learning/` | `AI-Testing-Learning-Sequence.md` — the 9-step AI-testing learning order | docs |
+| `Playwright docs/` | Playwright interview Q&A reference (`.docx` + `.txt`) | docs |
+| `bug-report-create-skill/` | Repo-local copy of the `/create-bug` skill (`SKILL.md` + `assets/`) | skill |
+| `test-plan-create-skill/` | Repo-local copy of the `/test-plan` skill (`SKILL.md` + `assets/`) | skill |
 | `blinkit-login.html` + `blinkit-products.html` + `blinkit-checkout.html` | Local demo app — served at `localhost:7000` | Python `http.server` |
 | `registration-demo.html` | Registration demo for SCRUM-142 | Python `http.server` |
 | `myTest.java` | Hello World Java sandbox | `javac` / `java` |
@@ -286,8 +294,9 @@ Deploy: `cd "QA Portfolio" && vercel deploy --prod --yes --scope anandsoni2641-1
 scripts/
   fetch-local-page.js     ← DOM fetcher for localhost pages (replaces WebFetch for local URLs)
   generate_portfolio.py   ← Generates QA Portfolio HTML
-  testplan/               ← Test plan generation scripts
+  new-demo-project.sh     ← Scaffolds a new local-only demo/client E2E project
 ```
+(`testplan/` lives at `output/testplan/` + `src/testplan/`, NOT under `scripts/`)
 
 ## Active Jira Epics
 
