@@ -65,7 +65,23 @@ def _autoseed() -> None:
             AUTOSEED.update(state="skipped", message="no bundled corpus")
             return
 
-        AUTOSEED.update(state="running", message="starting")
+        # Embedded Qdrant keeps the whole collection resident, so memory scales
+        # with the number of points, not with the batch size: measured 598 MB at
+        # the first upsert and 844 MB by 2,000 points, against 303 MB before any
+        # indexing. A small instance therefore has to seed a subset or be
+        # OOM-killed mid-boot. Writing the subset to its own file keeps
+        # ingest.run() unchanged — it still just reads a CSV.
+        limit = int(os.getenv("AUTO_SEED_LIMIT", "0"))
+        if limit > 0:
+            import pandas as pd
+
+            subset = config.UPLOAD_DIR / f"_seed_{limit}.csv"
+            pd.read_csv(
+                corpus, dtype=str, encoding="utf-8-sig", keep_default_na=False
+            ).head(limit).to_csv(subset, index=False)
+            corpus = subset
+
+        AUTOSEED.update(state="running", message="starting", limit=limit)
         for ev in ingest.run(
             corpus,
             ["Summary", "Description", "Test Steps", "Expected Result"],
@@ -82,8 +98,22 @@ def _autoseed() -> None:
         AUTOSEED.update(state="failed", message=f"{type(exc).__name__}: {exc}")
 
 
+def _start_autoseed_later(delay: float = 8.0) -> None:
+    """Begin seeding only after the server has had time to bind its port.
+
+    gunicorn imports this module before it listens, so work started at import
+    time competes with startup. On a 0.1-CPU instance that delay was enough for
+    the platform to report "No open ports detected" while the seed thread was
+    still pulling model files. Waiting a few seconds costs nothing and lets the
+    health check pass first — the app is then reachable, and reports seeding
+    progress through /api/config, instead of looking dead.
+    """
+    time.sleep(delay)
+    _autoseed()
+
+
 if os.getenv("AUTO_SEED", "0") not in ("0", "false", "False"):
-    threading.Thread(target=_autoseed, daemon=True).start()
+    threading.Thread(target=_start_autoseed_later, daemon=True).start()
 
 
 # ------------------------------------------------------------------ pages

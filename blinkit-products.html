@@ -503,25 +503,12 @@
 </div>
 
 <script>
-  const PRODUCTS = [
-    { id:1, name:'Fresh Tomatoes', weight:'500g', price:25,  emoji:'🍅', category:'fruits',    time:'8 min' },
-    { id:2, name:'Amul Full Cream Milk', weight:'1L', price:68, emoji:'🥛', category:'dairy', time:'10 min' },
-    { id:3, name:'Lay\'s Classic Salted', weight:'100g', price:20, emoji:'🍿', category:'snacks', time:'12 min' },
-    { id:4, name:'Tropicana Orange Juice', weight:'1L', price:110, emoji:'🧃', category:'beverages', time:'10 min' },
-    { id:5, name:'Brown Bread', weight:'400g', price:45, emoji:'🍞', category:'bakery', time:'9 min' },
-    { id:6, name:'Bananas', weight:'1 dozen', price:48, emoji:'🍌', category:'fruits', time:'8 min' },
-    { id:7, name:'Amul Butter', weight:'500g', price:260, emoji:'🧈', category:'dairy', time:'10 min' },
-    { id:8, name:'Kurkure Masala Munch', weight:'90g', price:20, emoji:'🌽', category:'snacks', time:'12 min' },
-    { id:9, name:'Coca-Cola', weight:'2L', price:95, emoji:'🥤', category:'beverages', time:'10 min' },
-    { id:10, name:'Whole Wheat Atta', weight:'5kg', price:260, emoji:'🌾', category:'bakery', time:'15 min' },
-    { id:11, name:'Onions', weight:'1kg', price:30, emoji:'🧅', category:'fruits', time:'8 min' },
-    { id:12, name:'Paneer', weight:'200g', price:80, emoji:'🧀', category:'dairy', time:'10 min' },
-    { id:13, name:'Bingo Mad Angles', weight:'130g', price:30, emoji:'🔺', category:'snacks', time:'12 min' },
-    { id:14, name:'Red Bull Energy Drink', weight:'250ml', price:125, emoji:'🐂', category:'beverages', time:'10 min' },
-    { id:15, name:'Pav Buns', weight:'6 pcs', price:30, emoji:'🫓', category:'bakery', time:'9 min' },
-    { id:16, name:'Apples', weight:'4 pcs', price:120, emoji:'🍎', category:'fruits', time:'8 min' },
-  ];
+  // Products are fetched from the API rather than hardcoded, so the loading,
+  // error and empty states are real states the page can actually be in.
+  const PRODUCTS_API = 'api/products.json';
+  let PRODUCTS = [];
 
+  let productsLoaded = false;
   let cart = [];
   let currentCategory = 'all';
   let searchQuery = '';
@@ -537,7 +524,37 @@
     setTimeout(() => t.classList.remove('show'), duration);
   }
 
+  async function loadProducts() {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '<p id="productsLoading" style="color:#888;font-size:14px;grid-column:1/-1">Loading products…</p>';
+
+    try {
+      const res = await fetch(PRODUCTS_API);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('Malformed response');
+
+      PRODUCTS = data;
+      productsLoaded = true;
+      renderProducts();
+    } catch (err) {
+      productsLoaded = false;
+      grid.innerHTML = `
+        <div id="productsError" style="grid-column:1/-1;text-align:center;padding:32px 16px">
+          <div style="font-size:32px">⚠️</div>
+          <div style="color:#c62828;font-size:15px;font-weight:600;margin-top:8px">Couldn't load products</div>
+          <div style="color:#888;font-size:13px;margin-top:4px">${err.message}</div>
+          <button id="retryProducts" onclick="loadProducts()"
+            style="margin-top:12px;padding:8px 20px;border:0;border-radius:6px;background:#0c831f;color:#fff;font-size:14px;cursor:pointer">
+            Retry
+          </button>
+        </div>`;
+    }
+  }
+
   function renderProducts() {
+    if (!productsLoaded) return;   // don't clobber the loading/error state
     const grid = document.getElementById('productGrid');
     let filtered = PRODUCTS;
 
@@ -660,7 +677,7 @@
   }
 
   // Init
-  renderProducts();
+  loadProducts();
 </script>
 
 </body>

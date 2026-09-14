@@ -1,0 +1,146 @@
+[
+  {
+    "id": 1,
+    "name": "Fresh Tomatoes",
+    "weight": "500g",
+    "price": 25,
+    "emoji": "🍅",
+    "category": "fruits",
+    "time": "8 min"
+  },
+  {
+    "id": 2,
+    "name": "Amul Full Cream Milk",
+    "weight": "1L",
+    "price": 68,
+    "emoji": "🥛",
+    "category": "dairy",
+    "time": "10 min"
+  },
+  {
+    "id": 3,
+    "name": "Lay's Classic Salted",
+    "weight": "100g",
+    "price": 20,
+    "emoji": "🍿",
+    "category": "snacks",
+    "time": "12 min"
+  },
+  {
+    "id": 4,
+    "name": "Tropicana Orange Juice",
+    "weight": "1L",
+    "price": 110,
+    "emoji": "🧃",
+    "category": "beverages",
+    "time": "10 min"
+  },
+  {
+    "id": 5,
+    "name": "Brown Bread",
+    "weight": "400g",
+    "price": 45,
+    "emoji": "🍞",
+    "category": "bakery",
+    "time": "9 min"
+  },
+  {
+    "id": 6,
+    "name": "Bananas",
+    "weight": "1 dozen",
+    "price": 48,
+    "emoji": "🍌",
+    "category": "fruits",
+    "time": "8 min"
+  },
+  {
+    "id": 7,
+    "name": "Amul Butter",
+    "weight": "500g",
+    "price": 260,
+    "emoji": "🧈",
+    "category": "dairy",
+    "time": "10 min"
+  },
+  {
+    "id": 8,
+    "name": "Kurkure Masala Munch",
+    "weight": "90g",
+    "price": 20,
+    "emoji": "🌽",
+    "category": "snacks",
+    "time": "12 min"
+  },
+  {
+    "id": 9,
+    "name": "Coca-Cola",
+    "weight": "2L",
+    "price": 95,
+    "emoji": "🥤",
+    "category": "beverages",
+    "time": "10 min"
+  },
+  {
+    "id": 10,
+    "name": "Whole Wheat Atta",
+    "weight": "5kg",
+    "price": 260,
+    "emoji": "🌾",
+    "category": "bakery",
+    "time": "15 min"
+  },
+  {
+    "id": 11,
+    "name": "Onions",
+    "weight": "1kg",
+    "price": 30,
+    "emoji": "🧅",
+    "category": "fruits",
+    "time": "8 min"
+  },
+  {
+    "id": 12,
+    "name": "Paneer",
+    "weight": "200g",
+    "price": 80,
+    "emoji": "🧀",
+    "category": "dairy",
+    "time": "10 min"
+  },
+  {
+    "id": 13,
+    "name": "Bingo Mad Angles",
+    "weight": "130g",
+    "price": 30,
+    "emoji": "🔺",
+    "category": "snacks",
+    "time": "12 min"
+  },
+  {
+    "id": 14,
+    "name": "Red Bull Energy Drink",
+    "weight": "250ml",
+    "price": 125,
+    "emoji": "🐂",
+    "category": "beverages",
+    "time": "10 min"
+  },
+  {
+    "id": 15,
+    "name": "Pav Buns",
+    "weight": "6 pcs",
+    "price": 30,
+    "emoji": "🫓",
+    "category": "bakery",
+    "time": "9 min"
+  },
+  {
+    "id": 16,
+    "name": "Apples",
+    "weight": "4 pcs",
+    "price": 120,
+    "emoji": "🍎",
+    "category": "fruits",
+    "time": "8 min"
+  }
+]

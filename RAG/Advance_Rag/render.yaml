@@ -19,11 +19,28 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
-      # Seed the bundled corpus on boot. The free tier's filesystem is
-      # ephemeral, so the Qdrant folder does not survive a restart and the
-      # collection has to be rebuilt each time the instance wakes.
+      # The first deploy OOM-crash-looped on this instance. The cause was not
+      # the corpus size but the embedding batch: one ONNX inference of 32
+      # documents allocates a working arena that took RSS from 295 MB to
+      # 587 MB in a single step, before a single point was indexed.
+      #
+      # Measured over 150 rows on this app:
+      #   INGEST_BATCH=32  ->  588 MB   OOM on a 512 MB instance
+      #   INGEST_BATCH=8   ->  418 MB
+      #   INGEST_BATCH=4   ->  363 MB
+      #
+      # 4 is slower per row but is the difference between a running service and
+      # a crash loop. Raise it on an instance with more headroom.
+      - key: INGEST_BATCH
+        value: "4"
+      # Embedded Qdrant also keeps the collection resident, so points cost
+      # memory on top of the batch arena. 1,200 rows leaves room under the cap
+      # while keeping hybrid search, reranking and citations meaningful.
+      # AUTO_SEED_LIMIT=0 seeds the full 5,000-row corpus.
       - key: AUTO_SEED
         value: "1"
+      - key: AUTO_SEED_LIMIT
+        value: "1200"
       # Keep the ONNX path: the bge models need ~2.9 GB of weights and 504 MB
       # resident, neither of which fits the free instance.
       - key: EMBED_BACKEND

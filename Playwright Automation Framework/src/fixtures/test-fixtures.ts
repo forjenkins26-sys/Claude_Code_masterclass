@@ -5,12 +5,14 @@ import { LoginPage } from '../pages/LoginPage';
 import { RegistrationPage } from '../pages/RegistrationPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { BlinkitLoginPage } from '../pages/BlinkitLoginPage';
+import { BlinkitProductsPage } from '../pages/BlinkitProductsPage';
 
 type PageFixtures = {
   loginPage: LoginPage;
   registrationPage: RegistrationPage;
   forgotPasswordPage: ForgotPasswordPage;
   blinkitLoginPage: BlinkitLoginPage;
+  blinkitProductsPage: BlinkitProductsPage;
 };
 
 /**
@@ -37,6 +39,11 @@ export const test = base.extend<PageFixtures>({
   blinkitLoginPage: async ({ page }, use) => {
     const blinkitLoginPage = new BlinkitLoginPage(page);
     await use(blinkitLoginPage);
+  },
+
+  blinkitProductsPage: async ({ page }, use) => {
+    const blinkitProductsPage = new BlinkitProductsPage(page);
+    await use(blinkitProductsPage);
   },
 });
 
