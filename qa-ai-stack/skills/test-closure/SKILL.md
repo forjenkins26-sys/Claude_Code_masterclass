@@ -175,15 +175,47 @@ From `progress.md` Notes + Jira + `known-defects.md`:
 
 ---
 
+### Step 3B: Regression check against baseline (counted, optional — skip silently if no history)
+
+A defect list alone cannot tell you whether the build got **worse**. A suite with
+4 failures is a very different release decision when 3 were already known and 1
+is new. This step separates them mechanically instead of by memory.
+
+Skip silently if `knowledge-base/<PROJECT>/run-history.jsonl` does not exist —
+this is additive and never blocks closure.
+
+```bash
+S=qa-ai-stack/skills/regression-baseline/scripts
+node $S/regression-baseline.js seed --progress=progress.md --kb=knowledge-base/<PROJECT>
+node $S/regression-baseline.js regression --kb=knowledge-base/<PROJECT> --to=<this-run_id> --json
+```
+
+| Verdict | Meaning | Effect on the release decision |
+|---|---|---|
+| `REGRESSION` | was passing, now FAILED/BLOCKED | **The build got worse.** Weigh as found-this-cycle, never as known |
+| `NEW_FAILURE` | new test, already failing | Fresh finding — triage before shipping |
+| `KNOWN` | failing in both runs | Pre-existing; dedup against `known-defects.md`, do not re-file |
+| `FIXED` | was failing, now passes | Confirm the bug can be closed |
+
+**Build gate first.** If the diff reports `Build: CHANGED`, the baseline's PASSes
+are **expired** — say so, and do not present an unchanged-looking diff as evidence
+of stability. A missing build identity is `CHANGED`, never `SAME`.
+
+> **This step reports; it does not decide.** Step 4 owns the verdict, and a human
+> owns sign-off. Never auto-file a bug from a regression row — dedup against
+> `known-defects.md` first (AH Rule 25).
+
+---
+
 ### Step 4: Go/No-Go Recommendation
 
 Apply in order. First match wins.
 
 | Verdict | Criteria |
 |---|---|
-| 🔴 **NO-GO** | any open P0/Critical/Blocker · requirement coverage <80% · any `BLOCKED` AC on a critical path |
-| 🟡 **GO WITH RISK** | no P0 · open P1/P2 on non-critical paths · coverage ≥80% · every gap named |
-| 🟢 **GO** | no open defects above P3 · coverage ≥95% · no `NOT COVERED` AC on a critical path |
+| 🔴 **NO-GO** | any open P0/Critical/Blocker · requirement coverage <80% · any `BLOCKED` AC on a critical path · **any `REGRESSION` on a previously-passing test** |
+| 🟡 **GO WITH RISK** | no P0 · no regressions · open P1/P2 on non-critical paths · coverage ≥80% · every gap named |
+| 🟢 **GO** | no open defects above P3 · coverage ≥95% · no `NOT COVERED` AC on a critical path · zero regressions |
 
 State the verdict, the rule that triggered it, and what would change it.
 
@@ -271,6 +303,16 @@ Requirements: {n/m (xx%)} · Pass rate: {n/m (xx%)} · Execution: {n/m (xx%)}
 - {orphan tests}
 
 ## Regression Note
+**Baseline:** {baseline run_id, or "none — no run history"}
+**Build vs baseline:** {SAME / **CHANGED — baseline results expired** / UNKNOWN → treated as CHANGED}
+
+| Verdict | Count | Tests |
+|---|---|---|
+| REGRESSION | {n} | {test ids} |
+| NEW_FAILURE | {n} | {test ids} |
+| KNOWN | {n} | {test ids} |
+| FIXED | {n} | {test ids} |
+
 {feature-map.md `Used by` chain — what else this feature can break}
 ```
 
@@ -279,6 +321,55 @@ Requirements: {n/m (xx%)} · Pass rate: {n/m (xx%)} · Execution: {n/m (xx%)}
 ToolSearch: select:mcp__atlassian__addCommentToJiraIssue
 ```
 Post to the Epic. Never transition the Epic to Done automatically — release sign-off is the human's.
+
+---
+
+### Step 5B: Emit the Machine-Readable Verdict (MANDATORY)
+
+The markdown report is for a human. CI cannot read it. Write the same verdict a second time as JSON, next to the `.md`:
+
+```
+output/closure-{EPIC-KEY}-{YYYY-MM-DD}.json
+```
+
+**Every value here must already appear in the markdown report.** This is a serialisation of Step 1–4, not a re-derivation — if a number differs between the two files, the markdown is right and the JSON is a bug.
+
+```json
+{
+  "schemaVersion": 1,
+  "epic": "SCRUM-653",
+  "summary": "Blinkit Login Page — Authentication & Field Validation",
+  "date": "2026-08-24",
+  "build": "https://blinkit-demo-qa.vercel.app/",
+  "verdict": "NO-GO",
+  "trigger": "two open High defects (SCRUM-645, SCRUM-647) on the authentication path",
+  "coverage": {
+    "requirements": { "covered": 14, "total": 14 },
+    "passRate":     { "passed": 15, "executed": 18 },
+    "execution":    { "executed": 18, "total": 18 }
+  },
+  "defects": [
+    { "key": "SCRUM-645", "severity": "High",   "status": "To Do", "blocksAC": "AC-4",  "tier": "SUSPECTED" },
+    { "key": "SCRUM-647", "severity": "High",   "status": "To Do", "blocksAC": "AC-12", "tier": "SUSPECTED" },
+    { "key": "SCRUM-646", "severity": "Medium", "status": "To Do", "blocksAC": "AC-11", "tier": "SUSPECTED" }
+  ],
+  "notCovered": ["authorization", "performance", "accessibility", "i18n", "audit"],
+  "report": "output/closure-SCRUM-653-2026-08-24.md"
+}
+```
+
+**Field rules:**
+
+| Field | Rule |
+|---|---|
+| `verdict` | exactly one of `GO` · `GO-WITH-RISK` · `NO-GO`. No emoji, no prose — CI compares this string |
+| `build` | **mandatory.** The build identity from the execution block (per the `**Build:**` rule). A consumer compares it to the build under test; a mismatch means these results are EXPIRED, not passing |
+| `coverage.*` | counted numerator and denominator as separate integers. Never a pre-computed percentage — the consumer divides, so a tiny denominator cannot hide |
+| `defects` | open defects only, same rows as Step 3. `tier` is `Confirmed` or `SUSPECTED` (no brackets) |
+| `notCovered` | the ❌ rows of the Step 2 non-functional table, plus any `NOT COVERED` AC |
+| any unverifiable value | `null` — never a guess. A `null` build is the honest output when no build identity exists, and consumers treat it as expired |
+
+**If a field cannot be filled from a tool result read this run, write `null`.** The verification contract (Step 0-PRE) governs this file exactly as it governs the markdown. A JSON gate that reports a confident number nobody counted is worse than no gate.
 
 ---
 
@@ -295,6 +386,7 @@ Before finishing:
 - ✅ Defects tiered Confirmed / `[SUSPECTED]`; pre-existing separated from this cycle
 - ✅ Verdict states its trigger rule + what would change it
 - ✅ Orphan tests listed, not dropped
+- ✅ **Step 5B JSON written**, and every number in it matches the markdown report. `verdict` is one of the three exact strings; `build` is present or explicitly `null`
 - ✅ Appended to `progress.md`
 
 ## BLAST Progress Logging
@@ -310,6 +402,7 @@ Append to `C:\ClaudeCodeMasterclass\progress.md`:
 **Open Defects:** {keys or "none"}
 **Not Covered:** {list or "none"}
 **Report:** output/closure-{EPIC-KEY}-{date}.md
+**Verdict JSON:** output/closure-{EPIC-KEY}-{date}.json
 ```
 
 Do NOT overwrite — always append.

@@ -1073,3 +1073,77 @@ All 4 linked via Blocks. All 4 Confirmed against a BR-xx rule.
 **AC coverage:** BL-001→AC-1 · BL-002/007/008→AC-2 · BL-003→AC-3 · BL-004→AC-4 · BL-005→AC-5 · BL-006→AC-6 · BL-009→Security Standard. 6/6 ACs covered.
 
 **Gap this closes:** the earlier run created the 9 Jira issues then stopped without asking Gate #3 (POM/spec creation) and without writing a progress.md entry — the same miss recorded as Lesson #10 for SCRUM-694. Skill fixed: Step 6 now opens with a DEFINITION OF DONE stating that Jira issues without a spec is a PARTIAL result, plus two quality gates (spec-or-explicit-decline, and progress.md written).
+
+## 2026-09-10 — /test-case-creation SCRUM-794 (gate-compliance test, HALTED)
+
+**Purpose:** not real test work — a deliberate probe to observe whether Gate #3 (POM/spec creation) fires after Jira issue creation. Lesson #10 recurred once already (SCRUM-694 2026-08-24, SCRUM-774 2026-08-26); the Aug-26 DEFINITION OF DONE fix had zero runs against it.
+
+**Epic:** SCRUM-794 — throwaway, 6 ACs, local Blinkit login. Transitioned Done, labelled `throwaway`/`delete-me`/`gate-test`.
+
+**Result: Step 1A oracle staleness gate HARD-STOPPED the run before scenario generation.**
+All 12 `BR-xx` rules cite `Epic SCRUM-255` (BR-01..10) or `Epic SCRUM-121` (BR-11..12); none cite SCRUM-794. Skill rule: STOP, show contradicting rows, wait — never auto-overwrite (AH Rule 30). Correct behaviour: BR-01..10 describe the Order Details page, so tiering login defects against them would file bugs against unrelated rules.
+
+**Gate #3 NOT reached** — it sits downstream of Jira issue creation. Still untested since the Aug-26 fix. Zero test-case issues were created.
+
+**Finding (the reason this probe was worth running):** gates in this stack are not equally reliable, and the split is structural, not about file length.
+
+| Gate type | Example | Misses in 58 runs |
+|---|---|---|
+| Machine-checkable condition | Step 1A oracle staleness (`grep` Source vs Epic key) | 0 — fired unprompted here |
+| Produce-an-artifact | execution: load KB, run headed, dedup check | 1 |
+| Ask-the-user | creation Gate #3 (POM/spec yes-no) | 5 |
+
+`test-case-execution` is LONGER (1161 lines vs 1031) with FEWER MANDATORY markers (4 vs 14) and misses far less. Length is not the cause. A gate whose only trace is a question nobody asked leaves no hole when skipped; a gate with a checkable condition cannot be skipped silently.
+
+**Implication (not yet acted on):** the durable fix for Gate #3 is to convert it from ask-the-user into produce-an-artifact-or-record-a-decline — i.e. the run is not done until a spec file exists OR an explicit decline is written. That is what the Aug-26 DEFINITION OF DONE attempted in prose; making the condition machine-checkable is what the other gates have and it does not.
+
+**Deferred:** Gate #3 observation moves to the next real Epic run. KB left untouched — re-seeding a production oracle to observe a downstream gate was not worth the risk.
+
+## 2026-09-14 07:55 — /test-case-execution SCRUM-121
+
+**Epic/Issue:** SCRUM-121 — Blinkit Login (Vercel deployment, first run against the deployed build)
+**Build:** f1903d7f64072ec8 (etag 6fd46ec3818f08374b290e4e4d601830 · Last-Modified Mon, 14 Sep 2026 02:05:24 GMT · content-length 11619) — https://blinkit-demo-qa.vercel.app
+**Mode:** headed (--headed), chromium, workers=1, retries=0, RUN_ID=scrum121-vercel-20260914
+**Total Tests:** 19 executable
+**Results:** 16 Pass | 0 Auto-Fixed | 0 Flaky | 3 Blocked (REAL_BUG) | 0 Failed-stuck | 0 Skipped
+**Duration:** 36.5s
+
+**Step 0B (build identity):** target retargeted from `localhost:7000` to the Vercel deployment. First run recorded against this build — no prior result for `f1903d7f64072ec8`, so nothing to expire. Prior SCRUM-694/722/741 runs were against a different target and remain non-comparable to this one.
+
+**Failure classification (Step 5A, verified against app source — NOT from error text alone):**
+All 3 failures classified **REAL_BUG / Confirmed**. Each is a labelled intentional defect in the deployed source. Zero TEST issues in the final run → AUTO-FIX Protocol correctly NOT invoked; no test was modified to make it pass.
+
+**Blocked (App Bugs — Confirmed, cite source):**
+- BL-003: forgot-password toast reads `📧 Password reset link sent to your email`; source comment states AC-7 requires "…sent to your mobile". Intentional bug, labelled in source. Matches the already-known SCRUM-716 defect class (email-vs-mobile wording).
+- BL-009: 9-digit mobile accepted — validation regex is `/^\d{9,10}$/` where AC-4 requires exactly 10. `#mobileErr` exists with correct text but stays `display:none` because validation passes. Violates **BR-12** (10-digit enforcement). Intentional bug, labelled in source.
+- BL-019: same root cause as BL-009 (9-digit boundary). One defect, two failing tests.
+
+**Dedup:** not re-filed. SCRUM-141 (`#signupBtn` no handler) already in `known-defects.md` and correctly NOT re-filed. The email-vs-mobile toast defect matches SCRUM-716's class; the 9-digit regex defect needs a human decision on whether it is already covered before any new Jira issue is raised.
+
+**TEST issue found and fixed during the run (AH Rule 32 in action):**
+First smoke attempt failed with `getByLabel('First Name')` not found — the browser had loaded `Index of C:\Program Files\Git\`. Cause: Git Bash MSYS path conversion rewrote `BLINKIT_LOGIN_PATH="/"` into `C:/Program Files/Git/` before Playwright saw it. Proved empirically (`BLINKIT_LOGIN_PATH="/" node -e ...` → `"C:/Program Files/Git/"`; with `MSYS_NO_PATHCONV=1` → `"/"`). **App was never broken** — a bug filed from that error text would have been false. Fix: run with `MSYS_NO_PATHCONV=1`.
+
+**Framework change (AUTO-FIX Rule 16, surgical):** `BlinkitLoginPage.navigate()` no longer hardcodes `http://localhost:7000/blinkit-login.html`; it now uses the project `baseURL` with `BLINKIT_LOGIN_PATH` (default `/blinkit-login.html`). `playwright.config.ts` blinkit project takes `BLINKIT_BASE_URL` (default unchanged: `http://localhost:7000`). Same POM now runs against local demo and deployed build with no edit. Typecheck clean.
+
+**Run command:**
+`MSYS_NO_PATHCONV=1 BLINKIT_BASE_URL="https://blinkit-demo-qa.vercel.app" BLINKIT_LOGIN_PATH="/" npx playwright test --project=blinkit --headed --workers=1 --retries=0`
+
+## 2026-09-14 08:05 — /test-case-execution SCRUM-121
+
+**Epic/Issue:** SCRUM-121 — Blinkit Login (reproducibility run, same build as 07:55)
+**Build:** f1903d7f64072ec8 (etag 6fd46ec3818f08374b290e4e4d601830 · Last-Modified Mon, 14 Sep 2026 02:05:24 GMT · content-length 11619) — https://blinkit-demo-qa.vercel.app
+**Mode:** headed, chromium, workers=1, retries=0, RUN_ID=scrum121-vercel-run2
+**Total Tests:** 19 executable
+**Results:** 16 Pass | 0 Auto-Fixed | 0 Flaky | 3 Blocked (REAL_BUG) | 0 Failed-stuck | 0 Skipped
+**Duration:** 36.8s
+
+**Step 0B (build identity):** `f1903d7f64072ec8` — IDENTICAL to the 07:55 run, so that run's results remain valid and the two are directly comparable. This is the first same-build pair in the history.
+
+**Purpose:** verify run-over-run comparison on a same-build pair. Result reproduced exactly (16/3, same three test IDs, 36.5s vs 36.8s) — no flake, all three failures deterministic at retries=0.
+
+**Blocked (App Bugs):**
+- BL-003: forgot-password toast says "email", AC-7 requires "mobile". Intentional bug, labelled in source. Confirmed, unchanged from 07:55.
+- BL-009: 9-digit mobile accepted — regex `/^\d{9,10}$/` vs AC-4 exactly-10. Violates **BR-12**. Intentional bug, labelled in source. Confirmed, unchanged from 07:55.
+- BL-019: same root cause as BL-009 (9-digit boundary). Confirmed, unchanged from 07:55.
+
+**Dedup:** no new bugs filed. All three already recorded in the 07:55 block; SCRUM-141 remains correctly not re-filed.

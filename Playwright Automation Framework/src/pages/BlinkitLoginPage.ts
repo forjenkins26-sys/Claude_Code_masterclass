@@ -41,7 +41,12 @@ export class BlinkitLoginPage {
   }
 
   async navigate(): Promise<void> {
-    await this.page.goto('http://localhost:7000/blinkit-login.html');
+    // Path comes from the project's baseURL so the same POM runs against the
+    // local demo server and the deployed Vercel build. Override per run with
+    // BLINKIT_LOGIN_PATH (local server serves /blinkit-login.html; the Vercel
+    // deployment serves the same page at /).
+    const loginPath = process.env.BLINKIT_LOGIN_PATH ?? '/blinkit-login.html';
+    await this.page.goto(loginPath);
     await this.page.waitForLoadState('domcontentloaded');
   }
 

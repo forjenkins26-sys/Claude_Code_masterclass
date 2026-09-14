@@ -1,0 +1,14 @@
+{
+  "run_id": "2026-09-14T0755-SCRUM-121",
+  "epic": "SCRUM-121",
+  "build": {
+    "raw": "f1903d7f64072ec8 (etag 6fd46ec3818f08374b290e4e4d601830 · Last-Modified Mon, 14 Sep 2026 02:05:24 GMT · content-length 11619) — https://blinkit-demo-qa.vercel.app",
+    "etag": "6fd46ec3818f08374b290e4e4d601830",
+    "last_modified": "Mon, 14 Sep 2026 02:05:24 GMT"
+  },
+  "set_at": "2026-09-14T02:30:03.363Z",
+  "previous": {
+    "run_id": "2026-08-25T2107-SCRUM-741",
+    "set_at": "2026-09-14T02:28:27.580Z"
+  }
+}

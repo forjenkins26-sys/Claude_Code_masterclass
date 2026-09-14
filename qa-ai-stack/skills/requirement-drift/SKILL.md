@@ -126,9 +126,22 @@ For every `BR-xx`, compare the stored rule text against the current AC line it c
 Capture the current build identity, in this order of preference:
 
 1. An explicit version the user supplies (`/requirement-drift SCRUM-255 build 4.2.1`)
-2. A version string exposed by the app (meta tag, `/version` endpoint, footer build number)
-3. `git rev-parse --short HEAD` in the app repo, if the app is local to the workspace
-4. For a local static demo app — the AUT file's modified timestamp
+2. **For any hosted URL — the composite resolver (preferred, machine-checkable):**
+   ```bash
+   node qa-ai-stack/skills/regression-baseline/scripts/build-identity.js <target-url> --json
+   ```
+   Returns `build_id = sha256(etag | last-modified | content-length)` plus a
+   `state` of `RESOLVED` or `UNKNOWN`. Use `build_id` as the `Build:` value.
+3. A version string exposed by the app (meta tag, `/version` endpoint, footer build number)
+4. `git rev-parse --short HEAD` in the app repo, if the app is local to the workspace
+5. For a local static demo app — the AUT file's modified timestamp
+
+> **Never compare a bare ETag.** Verified 2026-09-14 against
+> `blinkit-demo-qa.vercel.app`: ETag `6fd46ec3818f08374b290e4e4d601830` was
+> **identical** on 2026-08-23, 08-24 and 09-14 while `Last-Modified` advanced to
+> Sep 14 — the app redeployed and the ETag never moved. An ETag-only comparison
+> reports "same build" indefinitely and keeps stale PASSes as valid evidence.
+> The composite hash catches this; a single field does not.
 
 Compare against the `Build:` line of the most recent execution block in `progress.md`.
 

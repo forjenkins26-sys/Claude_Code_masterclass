@@ -57,6 +57,47 @@ Show the per-file score, grade, and findings table. Then:
 - **All ≥ min (exit 0):** report PASS. If invoked as a pre-run gate, hand back to the flow (e.g. proceed to `/test-case-execution`).
 - **Any < min (exit 1):** report FAIL with the specific findings. Recommend fixes BUT do not apply them here — surface to the user (or, if they ask, the fix belongs to `/test-case-creation` regeneration or a manual edit, following AUTO-FIX Rule 16 surgical + Rule 17 verify). This skill only scores.
 
+## Companion: TypeScript critic gate (`ts-critic.js`)
+
+`spec-quality.js` scores spec **text** with regex. It cannot tell you whether a
+generated spec **compiles**. A spec that does not typecheck fails at run time as
+a confusing runtime error, which then gets misread as an application bug — the
+AH Rule 32 trap (test failing ≠ app broken). `ts-critic.js` closes that hole by
+running the `tsc --noEmit` these frameworks already define and mapping errors
+back to spec files.
+
+> Not a new compiler: 2 of 3 frameworks here already have `"typecheck": "tsc --noEmit"`.
+> This wires an existing command into a gate.
+
+```bash
+node ~/.claude/skills/spec-quality/scripts/ts-critic.js <projectDir> [--json]
+node .../ts-critic.js "Playwright Automation Framework"          # auto-ramp
+node .../ts-critic.js <dir> --enforce                            # force blocking
+node .../ts-critic.js <dir> --advisory                           # force non-blocking
+node .../ts-critic.js <dir> --reset                              # clear run counter
+```
+
+**Self-promoting ramp (machine-checkable, never ask-the-user).** Per the
+2026-09-10 SCRUM-794 finding — machine-checkable gates missed 0/58 runs while
+ask-the-user gates missed 5/58 — this gate never asks permission:
+
+| Run | Mode | Behaviour |
+|---|---|---|
+| 1–3 | `ADVISORY` | reports type errors, exit 0, does not block |
+| 4+ | `ENFORCING` | reports and exits 1 on any type error |
+
+State lives in `.ts-critic-state.json` in the project root (gitignored).
+
+**Exit codes:** `0` clean or advisory · `1` type errors while enforcing ·
+`2` tsc failed to run at all (config/invocation problem — never a silent pass).
+
+Verified 2026-09-14 on `Playwright Automation Framework`: clean run passes;
+an injected `const n: number = "string"` was caught as TS2322 + TS2345 and
+correctly attributed to the spec file; ramp confirmed advisory×3 → enforcing
+at run 4 (exit 0,0,0,1,1). One real defect found and fixed during verification:
+Windows CRLF broke the diagnostic regex, making genuine type errors report as
+"tsc did not run".
+
 ### Optional: pre-run gate placement
 This skill is designed to slot in AFTER `/test-case-creation` produces a spec and BEFORE `/test-case-execution` runs it — as an advisory gate. It is NOT wired into those skills automatically (their logic is unchanged); invoke it explicitly or via `/qa-run` if you want the check. A failing score is a warning, not a hard block, unless you run it in CI with the non-zero exit.
 

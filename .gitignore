@@ -43,6 +43,7 @@ MediCare-QA-Demo/
 # Python virtualenv + local vector store: huge, machine-specific, never in git
 RAG/**/.venv/
 RAG/**/chroma_db/
+RAG/**/chroma_store/
 RAG/**/__pycache__/
 RAG/**/node_modules/
 RAG/**/dist/
@@ -81,3 +82,10 @@ RAG/**/dist/
 /*.png
 /*.yml
 !/.github/**/*.yml
+output/**/__pycache__/
+
+# ts-critic gate run counter (local state, per project)
+.ts-critic-state.json
+
+# AH Rule 31 evidence harvests (throwaway run artifacts)
+output/harvest-*/

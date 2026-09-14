@@ -27,13 +27,15 @@ export default defineConfig({
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
     },
-    // Blinkit (localhost) — no auth setup required
+    // Blinkit — no auth setup required.
+    // Target is switchable: BLINKIT_BASE_URL picks local demo vs deployed build,
+    // so the same suite can be run against either without editing the POM.
     {
       name: 'blinkit',
       testMatch: /blinkit.*\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: 'http://localhost:7000',
+        baseURL: process.env.BLINKIT_BASE_URL ?? 'http://localhost:7000',
         viewport: { width: 1536, height: 864 },
       },
     },

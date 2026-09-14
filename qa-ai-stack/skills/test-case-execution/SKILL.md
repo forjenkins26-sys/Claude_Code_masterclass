@@ -99,6 +99,49 @@ One line of output that is not the Epic under test = stale.
 
 **Most common cause:** a project folder reused across Epics, where `CLAUDE.md` was retargeted but the KB was not. Scaffolding a fresh project per Epic avoids it entirely.
 
+#### Step 0B: Resolve build identity + expire stale results (advisory — never blocks)
+
+**A test result belongs to the build it ran against.** A PASS recorded against an
+older build is not evidence about the current one. This step records which build
+this run is measuring, and marks prior results expired when the build moved.
+
+This step **never halts the run.** It reports and records. (Step 0A is the only
+hard stop in this skill.)
+
+1. **Resolve the current build identity** for the target URL:
+   ```bash
+   node qa-ai-stack/skills/regression-baseline/scripts/build-identity.js <target-url> --json
+   ```
+   Gives `build_id = sha256(etag | last-modified | content-length)` and a
+   `state` of `RESOLVED` or `UNKNOWN`.
+
+2. **Never compare a bare ETag.** Verified 2026-09-14 on `blinkit-demo-qa.vercel.app`:
+   the ETag was byte-identical across 2026-08-23, 08-24 and 09-14 while
+   `Last-Modified` advanced to Sep 14 — a redeploy the ETag never reflected.
+   Comparing ETag alone reports "same build" forever and silently keeps stale
+   PASSes valid. Always use the composite `build_id`.
+
+3. **Compare against the last execution block's `Build:` line in `progress.md`:**
+
+   | Condition | Verdict | Effect on prior results |
+   |---|---|---|
+   | `build_id` identical | `SAME` | Prior results remain valid |
+   | `build_id` differs | **`CHANGED`** | **All prior results EXPIRED** — re-run required |
+   | `state: UNKNOWN`, or no `Build:` recorded last run | **`CHANGED`** | Treat as expired. **Never** read a missing build as "same" |
+
+4. **Record it.** `**Build:**` is mandatory in this run's `progress.md` block —
+   write the `build_id` plus the raw fields, e.g.
+   `**Build:** f1903d7f64072ec8 (etag 6fd46ec…830 · Last-Modified Mon, 14 Sep 2026 02:05:24 GMT · content-length 11619)`.
+   A run without a `Build:` line cannot be compared later and expires by default.
+
+5. **If the build CHANGED**, say so plainly in the run report: prior PASSes are
+   not evidence for this build. Do not reuse them to justify skipping a test.
+
+> **Absence of evidence is not evidence of no deployment.** A missing or
+> unresolvable build identity is always `CHANGED`, never `SAME` (AH Rule 30).
+
+---
+
 ### Step 1: Parse Input
 
 **Two modes:**
@@ -494,6 +537,27 @@ From test failure + investigation:
   - Browser: Chromium 131.0.6778.85
   - Viewport: 1536x864
   - Date: 2026-06-10
+- **Browser Evidence:** paste from the `browser-evidence.txt` attachment on the
+  failed test (auto-captured by `src/fixtures/browser-evidence.ts`). Include the
+  request count and any page/console errors verbatim:
+  ```
+  Total network requests during test: 1
+  UNCAUGHT PAGE ERRORS (0) — none —
+  CONSOLE ERRORS / WARNINGS (0) — none —
+  FAILED NETWORK REQUESTS (0) — none —
+  ```
+
+**Why this section is mandatory for inert-control bugs.** A screenshot of a
+button that does nothing is identical to a screenshot of a button that works.
+The proof is what the browser did NOT do. `Total network requests: 0` across a
+submit turns "the button seems dead" into evidence a developer can act on
+without reproducing it first. This is the same fact that was previously derived
+by hand — "clicked live, URL unchanged, form === null" (MC-022, BL-015, BL-017,
+SCRUM-624, SCRUM-647).
+
+**Read it with AH Rule 32 in mind.** Zero requests is evidence, not a verdict.
+A test that failed before reaching the submit step also fires nothing. Confirm
+the step was actually reached before classifying REAL_BUG.
 
 **3. Duplicate Bug Check (MANDATORY before creating)**
 
