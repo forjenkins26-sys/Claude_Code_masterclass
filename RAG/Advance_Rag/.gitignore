@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets — never commit.
+.env
+
+# Embedded Qdrant store: rebuilt by running ingestion, and large.
+qdrant_data/
+
+# Uploaded files land here at runtime. The generated corpus lives in
+# testcase/ and IS committed.
+data/*
+!data/.gitkeep

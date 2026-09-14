@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: advanced-rag-explorer
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: RAG/Advance_Rag
+    buildCommand: pip install -r requirements.txt
+    # One worker: each worker loads its own copy of the embedder and reranker
+    # (~400 MB resident), and the free instance has 512 MB.
+    #
+    # Two threads, not more: the work is ONNX inference, which already uses the
+    # cores internally, and every extra thread holds its own request buffers.
+    #
+    # timeout 0 disables gunicorn's worker kill. The default 30 s would shoot
+    # the worker during the /api/ingest/sse stream, which runs for minutes.
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 0
+    healthCheckPath: /api/config
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      # Seed the bundled corpus on boot. The free tier's filesystem is
+      # ephemeral, so the Qdrant folder does not survive a restart and the
+      # collection has to be rebuilt each time the instance wakes.
+      - key: AUTO_SEED
+        value: "1"
+      # Keep the ONNX path: the bge models need ~2.9 GB of weights and 504 MB
+      # resident, neither of which fits the free instance.
+      - key: EMBED_BACKEND
+        value: fast
+      - key: RERANK_BACKEND
+        value: fast
+      # HF_HOME must point somewhere writable; the default (~/.cache) is not
+      # guaranteed to be on a hosted container.
+      - key: HF_HOME
+        value: /tmp/hf
+      - key: GROQ_API_KEY
+        sync: false   # set in the Render dashboard, never committed

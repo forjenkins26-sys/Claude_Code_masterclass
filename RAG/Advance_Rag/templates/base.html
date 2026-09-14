@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Advanced RAG Explorer{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot">R</span> Advanced RAG Explorer</div>
+  <nav class="tabs">
+    <a href="/"        class="{{ 'active' if active == 'upload' }}">Upload</a>
+    <a href="/ingest"  class="{{ 'active' if active == 'ingest' }}">Ingest</a>
+    <a href="/chunks"  class="{{ 'active' if active == 'chunks' }}">Chunks</a>
+    <a href="/chat"    class="{{ 'active' if active == 'chat' }}">Chat</a>
+  </nav>
+  <div class="spacer"></div>
+  {% if collection.points %}
+    <span class="pill live">{{ "{:,}".format(collection.points) }} points indexed</span>
+  {% else %}
+    <span class="pill warn">collection empty</span>
+  {% endif %}
+  <span class="pill">{{ cfg.embed_model }}</span>
+  <span class="pill">{{ cfg.vector_db }}</span>
+</header>
+
+<div class="shell">
+  <aside class="rail">{% block rail %}{% endblock %}</aside>
+  <main class="content">{% block main %}{% endblock %}</main>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

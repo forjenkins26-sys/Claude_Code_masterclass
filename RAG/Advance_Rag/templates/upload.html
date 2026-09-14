@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Upload — Advanced RAG Explorer{% endblock %}
+
+{% block rail %}
+<div class="card">
+  <h3>Pipeline</h3>
+  <ol class="stages" id="stages"></ol>
+</div>
+
+<div class="card">
+  <h3>Configuration</h3>
+  <dl class="kv">
+    <dt>Chunk size</dt><dd>{{ cfg.chunk_size }}</dd>
+    <dt>Overlap</dt><dd>{{ cfg.chunk_overlap }}</dd>
+    <dt>Embedder</dt><dd>bge-m3</dd>
+    <dt>Dense dim</dt><dd>{{ cfg.dense_dim }}</dd>
+    <dt>Reranker</dt><dd>bge-reranker-v2-m3</dd>
+    <dt>Top-N hybrid</dt><dd>{{ cfg.top_n_hybrid }}</dd>
+    <dt>Top-K rerank</dt><dd>{{ cfg.top_k_rerank }}</dd>
+    <dt>RRF k</dt><dd>{{ cfg.rrf_k }}</dd>
+    <dt>LLM</dt><dd>{{ cfg.llm_model }}</dd>
+  </dl>
+</div>
+{% endblock %}
+
+{% block main %}
+<div>
+  <h1 class="page-title">Upload a test-case file</h1>
+  <p class="page-lede">
+    CSV or Excel. Pick the columns whose text gets embedded and the columns kept
+    as Qdrant payload for filtering. Nothing is indexed on this page — the next
+    step does that, so you can see the chunking before committing to it.
+  </p>
+</div>
+
+{% if not cfg.llm_configured %}
+<div class="alert warn">
+  <strong>GROQ_API_KEY is not set.</strong> Upload and ingestion still work;
+  query rewriting and answering will fail until a key is present in <code>.env</code>.
+</div>
+{% endif %}
+
+<section class="panel">
+  <header><h2>1 · Choose a file</h2><span class="sub">.csv · .xlsx · .xls</span></header>
+  <div class="body">
+    <div class="row">
+      <label class="field" style="flex:1">
+        File
+        <input type="file" id="file" accept=".csv,.xlsx,.xls">
+      </label>
+      <button id="btn-upload">Upload &amp; preview</button>
+    </div>
+    <p class="hint" style="margin:9px 0 0">
+      The bundled corpus lives at
+      <code>testcase/vwo_test_cases_5000.csv</code> — 5,000 VWO test cases, 19 columns.
+    </p>
+    <div id="upload-msg"></div>
+  </div>
+</section>
+
+<section class="panel" id="preview-panel" hidden>
+  <header>
+    <h2>2 · Preview</h2>
+    <span class="sub" id="preview-sub"></span>
+  </header>
+  <div class="body">
+    <div class="stat-row" id="preview-stats" style="margin-bottom:15px"></div>
+    <div class="table-wrap" style="max-height:290px;overflow-y:auto">
+      <table id="preview-table"></table>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="cols-panel" hidden>
+  <header>
+    <h2>3 · Choose columns</h2>
+    <span class="sub">text = embedded · metadata = filterable payload</span>
+  </header>
+  <div class="body">
+    <div class="row" style="align-items:stretch">
+      <div class="field" style="flex:1">
+        <span>Text columns <span class="hint">(concatenated into the embedded document)</span></span>
+        <div class="colpick" id="text-cols"></div>
+      </div>
+      <div class="field" style="flex:1">
+        <span>Metadata columns <span class="hint">(kept in the payload, used by filters)</span></span>
+        <div class="colpick" id="meta-cols"></div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:15px">
+      <button id="btn-continue">Continue to ingest →</button>
+      <button class="ghost" id="btn-guess">Suggest for a Jira test-case file</button>
+      <span class="hint" id="cols-note"></span>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const stages = new Stages($('#stages'), [
+  ['upload', 'Upload file'],
+  ['preview', 'Inspect columns'],
+  ['select', 'Select columns'],
+  ['ingest', 'Ingest (next page)'],
+]);
+stages.set('upload', 'active', 'waiting for a file');
+
+// Columns that read as prose belong in the embedding; short codes and
+// enumerations belong in the payload, where an exact-match filter can use them.
+const TEXT_HINTS = ['summary', 'description', 'test steps', 'expected result', 'title', 'steps', 'expected'];
+const META_HINTS = ['issue key', 'issue type', 'priority', 'component', 'module', 'feature',
+                    'test type', 'labels', 'browser', 'device', 'environment',
+                    'automation status', 'epic link', 'status', 'reporter'];
+
+let state = { filename: null, columns: [] };
+
+$('#btn-upload').onclick = async () => {
+  const input = $('#file');
+  if (!input.files?.length) { $('#upload-msg').innerHTML = alertBox('warn', 'Pick a file first.'); return; }
+
+  const btn = $('#btn-upload');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Reading…';
+  $('#upload-msg').innerHTML = '';
+  stages.set('upload', 'active', input.files[0].name);
+
+  try {
+    const fd = new FormData();
+    fd.append('file', input.files[0]);
+    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    state = { filename: data.filename, columns: data.columns };
+    stages.set('upload', 'done', `${fmt(data.rows)} rows`);
+    renderPreview(data);
+    renderColumnPickers(data);
+    stages.set('preview', 'done', `${data.columns.length} columns`);
+    stages.set('select', 'active', 'choose text + metadata');
+    $('#upload-msg').innerHTML = alertBox('ok', `${data.filename} read: ${fmt(data.rows)} rows.`);
+  } catch (err) {
+    stages.set('upload', 'failed', 'failed');
+    $('#upload-msg').innerHTML = alertBox('err', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload & preview';
+  }
+};
+
+function renderPreview(data) {
+  $('#preview-panel').hidden = false;
+  $('#preview-sub').textContent = `${data.filename} · ${fmt(data.rows)} rows`;
+
+  $('#preview-stats').innerHTML = `
+    <div class="stat"><b>${fmt(data.rows)}</b><span>rows</span></div>
+    <div class="stat"><b>${data.columns.length}</b><span>columns</span></div>
+    <div class="stat"><b>${data.head.length}</b><span>previewed</span></div>`;
+
+  const cols = data.columns;
+  $('#preview-table').innerHTML = `
+    <thead><tr>${cols.map(c => `<th title="${esc(data.dtypes[c] || '')}">${esc(c)}</th>`).join('')}</tr></thead>
+    <tbody>${data.head.map(r => `<tr>${cols.map(c => {
+      const v = String(r[c] ?? '');
+      // Preview cells are truncated: a Description cell runs to ~400 characters
+      // and five untruncated rows would make the table unreadable.
+      return `<td title="${esc(v)}">${esc(v.length > 90 ? v.slice(0, 90) + '…' : v)}</td>`;
+    }).join('')}</tr>`).join('')}</tbody>`;
+}
+
+function renderColumnPickers(data) {
+  $('#cols-panel').hidden = false;
+  const build = (el, checkedFor) => {
+    el.innerHTML = data.columns.map((c, i) => `
+      <label>
+        <input type="checkbox" value="${esc(c)}" ${checkedFor(c) ? 'checked' : ''}>
+        <span>${esc(c)}</span>
+        <span class="dt">${esc(data.dtypes[c] || '')}</span>
+      </label>`).join('');
+    el.onchange = updateNote;
+  };
+  build($('#text-cols'), c => TEXT_HINTS.includes(c.toLowerCase()));
+  build($('#meta-cols'), c => META_HINTS.includes(c.toLowerCase()));
+  updateNote();
+}
+
+const picked = el => $$('input:checked', $(el)).map(i => i.value);
+
+function updateNote() {
+  const t = picked('#text-cols').length, m = picked('#meta-cols').length;
+  $('#cols-note').textContent = `${t} text · ${m} metadata`;
+  $('#btn-continue').disabled = t === 0;
+}
+
+$('#btn-guess').onclick = () => {
+  $$('#text-cols input').forEach(i => i.checked = TEXT_HINTS.includes(i.value.toLowerCase()));
+  $$('#meta-cols input').forEach(i => i.checked = META_HINTS.includes(i.value.toLowerCase()));
+  updateNote();
+};
+
+$('#btn-continue').onclick = () => {
+  Session.save({
+    filename: state.filename,
+    text_cols: picked('#text-cols'),
+    meta_cols: picked('#meta-cols'),
+  });
+  location.href = '/ingest';
+};
+</script>
+{% endblock %}

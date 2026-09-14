@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}Ingest — Advanced RAG Explorer{% endblock %}
+
+{% block rail %}
+<div class="card">
+  <h3>Ingestion pipeline</h3>
+  <ol class="stages" id="stages"></ol>
+</div>
+
+<div class="card">
+  <h3>Run</h3>
+  <dl class="kv">
+    <dt>File</dt><dd id="rail-file">—</dd>
+    <dt>Text cols</dt><dd id="rail-text">—</dd>
+    <dt>Meta cols</dt><dd id="rail-meta">—</dd>
+    <dt>Chunk size</dt><dd>{{ cfg.chunk_size }}</dd>
+    <dt>Overlap</dt><dd>{{ cfg.chunk_overlap }}</dd>
+    <dt>Elapsed</dt><dd id="rail-elapsed">0.0s</dd>
+  </dl>
+</div>
+{% endblock %}
+
+{% block main %}
+<div>
+  <h1 class="page-title">Ingest</h1>
+  <p class="page-lede">
+    Read → build documents → chunk → embed with bge-m3 → index into Qdrant.
+    Progress streams over Server-Sent Events, so each card below fills in as its
+    stage actually finishes rather than all at once at the end.
+  </p>
+</div>
+
+<section class="panel">
+  <header>
+    <h2>Controls</h2>
+    <div class="spacer"></div>
+    <label class="hint" style="display:flex;gap:6px;align-items:center">
+      <input type="checkbox" id="recreate" checked style="width:auto">
+      Recreate collection (drop existing points)
+    </label>
+  </header>
+  <div class="body">
+    <div id="setup-msg"></div>
+    <div class="row">
+      <button id="btn-run">Run ingestion</button>
+      <button class="ghost" id="btn-stop" disabled>Stop</button>
+      <a class="hint" href="/">← change file or columns</a>
+    </div>
+    <p class="hint" style="margin:10px 0 0">
+      Embedding runs locally on the CPU — no API, no cost. Backend:
+      <code>{{ cfg.embed_backend }}</code> · <code>{{ cfg.embed_model }}</code>.
+      The first run downloads the model once into the Hugging Face cache.
+    </p>
+  </div>
+</section>
+
+<section class="panel" id="card-chunk" hidden>
+  <header><h2>Chunk</h2><span class="sub" id="chunk-sub"></span></header>
+  <div class="body">
+    <div class="stat-row" id="chunk-stats" style="margin-bottom:16px"></div>
+    <div id="chunk-hist" style="margin-bottom:16px"></div>
+    <h3 style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 9px">
+      Sample chunks <span class="hint" style="text-transform:none;letter-spacing:0">— repeated overlap highlighted</span>
+    </h3>
+    <div id="chunk-samples"></div>
+  </div>
+</section>
+
+<section class="panel" id="card-embed" hidden>
+  <header><h2>Embed</h2><span class="sub" id="embed-sub"></span></header>
+  <div class="body">
+    <div class="bar" style="margin-bottom:8px"><span id="embed-bar" style="width:0%"></span></div>
+    <p class="hint" id="embed-count" style="margin:0 0 16px">—</p>
+    <div class="row" style="align-items:flex-start;gap:18px">
+      <div style="flex:1;min-width:260px">
+        <h3 style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 7px">Dense vector</h3>
+        <pre id="dense-preview">waiting…</pre>
+      </div>
+      <div style="flex:1;min-width:260px">
+        <h3 style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 7px">Sparse vector — top terms</h3>
+        <div class="table-wrap"><table id="sparse-preview"></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="card-index" hidden>
+  <header><h2>Index</h2><span class="sub" id="index-sub"></span></header>
+  <div class="body">
+    <dl class="kv" id="index-info" style="grid-template-columns:auto 1fr;max-width:420px"></dl>
+    <div class="row" style="margin-top:15px">
+      <a class="btn" href="/chunks" style="text-decoration:none">Browse chunks →</a>
+      <a class="btn" href="/chat" style="text-decoration:none">Open chat →</a>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="card-log">
+  <header><h2>Event log</h2><span class="sub">raw SSE events</span></header>
+  <div class="body"><pre id="log" style="max-height:240px;overflow-y:auto">idle</pre></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const stages = new Stages($('#stages'), [
+  ['read',  'Read file'],
+  ['docs',  'Build documents'],
+  ['chunk', 'Chunk'],
+  ['embed', 'Embed (bge-m3)'],
+  ['index', 'Index into Qdrant'],
+]);
+
+const saved = Session.load();
+let source = null;
+
+if (!saved?.filename) {
+  $('#setup-msg').innerHTML = alertBox('warn', 'No file selected yet. Upload one first.');
+  $('#btn-run').disabled = true;
+} else {
+  $('#rail-file').textContent = saved.filename;
+  $('#rail-text').textContent = saved.text_cols.length;
+  $('#rail-meta').textContent = saved.meta_cols.length;
+}
+
+/** Seconds as m:ss — an ETA of "743" means nothing at a glance. */
+function mmss(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
+}
+
+function log(line) {
+  const el = $('#log');
+  if (el.textContent === 'idle') el.textContent = '';
+  el.textContent += line + '\n';
+  el.scrollTop = el.scrollHeight;
+}
+
+$('#btn-run').onclick = () => {
+  if (!saved?.filename) return;
+
+  stages.reset();
+  $('#log').textContent = 'idle';
+  ['#card-chunk', '#card-embed', '#card-index'].forEach(s => $(s).hidden = true);
+  $('#btn-run').disabled = true;
+  $('#btn-stop').disabled = false;
+
+  const qs = new URLSearchParams({
+    file: saved.filename,
+    text_cols: saved.text_cols.join(','),
+    meta_cols: saved.meta_cols.join(','),
+    recreate: $('#recreate').checked ? '1' : '0',
+  });
+
+  source = new EventSource('/api/ingest/sse?' + qs);
+
+  source.onmessage = e => {
+    const ev = JSON.parse(e.data);
+    log(`[${ev.elapsed ?? 0}s] ${ev.stage}${ev.status ? '/' + ev.status : ''} — ${ev.message || ''}`);
+    if (ev.elapsed != null) $('#rail-elapsed').textContent = ev.elapsed + 's';
+    handle(ev);
+  };
+
+  // EventSource reconnects on its own after a network blip, which for a
+  // one-shot ingest would silently re-run the whole job. Closing on the
+  // terminal event, and on error, is what keeps it a single run.
+  source.onerror = () => {
+    if (source) { source.close(); source = null; }
+    if (!$('#card-index').hidden) return;   // already finished cleanly
+    stages.failAll('stream lost');
+    $('#setup-msg').innerHTML = alertBox('err', 'The ingest stream ended unexpectedly. Check the server console.');
+    finish();
+  };
+};
+
+$('#btn-stop').onclick = () => {
+  if (source) { source.close(); source = null; }
+  stages.failAll('stopped');
+  log('-- stopped by user (server-side work already dispatched may still complete) --');
+  finish();
+};
+
+function finish() {
+  $('#btn-run').disabled = !saved?.filename;
+  $('#btn-stop').disabled = true;
+}
+
+function handle(ev) {
+  if (ev.stage === 'error') {
+    stages.failAll('error');
+    $('#setup-msg').innerHTML = alertBox('err', ev.message);
+    if (source) { source.close(); source = null; }
+    finish();
+    return;
+  }
+
+  if (ev.stage === 'done') {
+    stages.set('index', 'done', `${fmt(ev.points)} points`);
+    if (source) { source.close(); source = null; }
+    finish();
+    return;
+  }
+
+  if (ev.status === 'start') { stages.advance(ev.stage, ev.message); return; }
+
+  switch (ev.stage) {
+    case 'read':
+      stages.set('read', 'done', `${fmt(ev.rows)} rows`);
+      break;
+
+    case 'docs':
+      stages.set('docs', 'done', `${ev.text_cols.length} text cols`);
+      break;
+
+    case 'chunk':
+      stages.set('chunk', 'done', `${fmt(ev.stats.total)} chunks`);
+      renderChunkCard(ev);
+      break;
+
+    case 'embed':
+      if (ev.status === 'preview') { renderEmbedPreview(ev); break; }
+
+      // The model load is its own event so the card appears, and says what it
+      // is waiting on, before the first batch finishes. A cold load runs tens
+      // of seconds; without this the panel stayed hidden and the run looked dead.
+      if (ev.status === 'loaded') {
+        $('#card-embed').hidden = false;
+        $('#embed-count').textContent =
+          `Model ready in ${ev.seconds}s — embedding ${fmt(ev.total)} chunks…`;
+        stages.set('embed', 'active', 'model ready');
+        break;
+      }
+
+      if (ev.status === 'progress') {
+        $('#card-embed').hidden = false;
+        const pct = Math.round((ev.done / ev.total) * 100);
+        $('#embed-bar').style.width = pct + '%';
+        const eta = ev.eta != null ? ` — ${mmss(ev.eta)} left` : '';
+        const rate = ev.rate ? ` — ${ev.rate}/s` : '';
+        $('#embed-count').textContent =
+          `${fmt(ev.done)} / ${fmt(ev.total)} chunks — ${pct}%${rate}${eta}`;
+        stages.set('embed', 'active', `${pct}%${eta}`);
+        break;
+      }
+      if (ev.status === 'done') stages.set('embed', 'done', 'complete');
+      break;
+
+    case 'index':
+      renderIndexCard(ev);
+      stages.set('index', 'done', `${fmt(ev.collection.points)} points`);
+      break;
+  }
+}
+
+function renderChunkCard(ev) {
+  $('#card-chunk').hidden = false;
+  const s = ev.stats;
+  $('#chunk-sub').textContent = `${fmt(s.total)} chunks`;
+  $('#chunk-stats').innerHTML = `
+    <div class="stat"><b>${fmt(s.total)}</b><span>chunks</span></div>
+    <div class="stat"><b>${s.avg}</b><span>avg chars</span></div>
+    <div class="stat"><b>${fmt(s.min)}</b><span>min</span></div>
+    <div class="stat"><b>${fmt(s.max)}</b><span>max</span></div>`;
+  histogram($('#chunk-hist'), s.histogram);
+
+  const overlap = {{ cfg.chunk_overlap }};
+  $('#chunk-samples').innerHTML = ev.samples.map((c, i) => {
+    // Only chunk 2+ of the same row carries a repeated head. Highlighting the
+    // first N chars of every chunk would claim an overlap that is not there.
+    const head = (i > 0 && c.char_len > overlap)
+      ? `<mark class="overlap">${esc(c.text.slice(0, overlap))}</mark>${esc(c.text.slice(overlap))}`
+      : esc(c.text);
+    return `<div class="chunk">
+      <div class="head">
+        <span class="tag coral">chunk ${i + 1}</span>
+        <span class="tag">row ${c.row_index}</span>
+        <span class="tag">${c.char_len} chars</span>
+      </div>
+      <div class="text">${head}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderEmbedPreview(ev) {
+  $('#card-embed').hidden = false;
+  $('#embed-sub').textContent = `${ev.dense_dim}-dim dense + ${fmt(ev.sparse_nnz)} sparse terms`;
+  $('#dense-preview').textContent =
+    `dim   : ${ev.dense_dim}\nfirst8: [${ev.dense_head.join(', ')}]\n…`;
+  $('#sparse-preview').innerHTML = `
+    <thead><tr><th>token id</th><th class="num">weight</th></tr></thead>
+    <tbody>${ev.sparse_terms.map(t =>
+      `<tr><td class="mono">${t.token_id}</td><td class="num">${t.weight}</td></tr>`).join('')}</tbody>`;
+}
+
+function renderIndexCard(ev) {
+  $('#card-index').hidden = false;
+  const c = ev.collection;
+  $('#index-sub').textContent = c.collection;
+  $('#index-info').innerHTML = Object.entries({
+    Collection: c.collection,
+    Points: fmt(c.points),
+    Status: c.status,
+    Mode: c.mode,
+    'Dense dim': c.dense_dim,
+    Vectors: 'dense + sparse (named)',
+  }).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1454 @@
+<title>Two Legs and a Judge</title>
+<meta name="description" content="How the Advanced RAG Explorer retrieves from 5,000 VWO test cases: hybrid dense plus sparse search, RRF fusion, and a cross-encoder rerank.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Public+Sans:ital,wght@0,300..700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+/* ------------------------------------------------------------------ tokens
+   Two accents, and they are not decorative: cyan means DENSE (semantic) and
+   amber means SPARSE (lexical) on every diagram, table and chart in the page.
+   The neutral is blue-biased slate rather than a pure grey, to sit with cyan. */
+:root {
+  --ground:    #f7f8fa;
+  --panel:     #ffffff;
+  --panel-2:   #eef1f5;
+  --rule:      #d9dee6;
+  --rule-soft: #e7ebf1;
+  --text:      #171b22;
+  --text-2:    #4d5665;
+  --text-3:    #7c869a;
+  --dense:     #1d7f95;
+  --dense-bg:  #e2f1f4;
+  --sparse:    #97671a;
+  --sparse-bg: #f8eeda;
+  --fuse:      #5c4f8f;
+  --fuse-bg:   #ece9f5;
+  --grid:      rgba(23, 27, 34, 0.07);
+
+  --step: clamp(1.4rem, 1.1rem + 1.4vw, 2.05rem);
+  --measure: 66ch;
+
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --body: "Public Sans", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+/* Un-stamped document on a dark OS. Guarded with :not([data-theme="light"]) so
+   an explicit light choice still beats a dark system setting. Written as a
+   plain media query rather than CSS nesting, which is not universally safe. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:    #0f1218;
+    --panel:     #171c25;
+    --panel-2:   #1e2430;
+    --rule:      #2b3341;
+    --rule-soft: #232a36;
+    --text:      #e7eaf0;
+    --text-2:    #a8b2c2;
+    --text-3:    #78839a;
+    --dense:     #6fc6d8;
+    --dense-bg:  #16323a;
+    --sparse:    #e0b05a;
+    --sparse-bg: #362a16;
+    --fuse:      #a99ada;
+    --fuse-bg:   #262246;
+    --grid:      rgba(231, 234, 240, 0.07);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:    #0f1218;
+  --panel:     #171c25;
+  --panel-2:   #1e2430;
+  --rule:      #2b3341;
+  --rule-soft: #232a36;
+  --text:      #e7eaf0;
+  --text-2:    #a8b2c2;
+  --text-3:    #78839a;
+  --dense:     #6fc6d8;
+  --dense-bg:  #16323a;
+  --sparse:    #e0b05a;
+  --sparse-bg: #362a16;
+  --fuse:      #a99ada;
+  --fuse-bg:   #262246;
+  --grid:      rgba(231, 234, 240, 0.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 16.5px;
+  line-height: 1.62;
+  font-weight: 350;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 22px;
+}
+
+/* ------------------------------------------------------------------ type */
+
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+
+h1 {
+  font-size: clamp(2.5rem, 1.6rem + 4.2vw, 4.3rem);
+  font-weight: 500;
+  font-variation-settings: "opsz" 120;
+  line-height: 1.02;
+  letter-spacing: -0.022em;
+}
+
+h2 {
+  font-size: var(--step);
+  font-weight: 500;
+  font-variation-settings: "opsz" 60;
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-family: var(--body);
+  font-size: 0.795rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+
+p { margin: 0; max-width: var(--measure); }
+.lede { font-size: 1.12rem; color: var(--text-2); max-width: 60ch; }
+
+em { font-style: italic; }
+strong { font-weight: 600; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--panel-2);
+  border: 1px solid var(--rule-soft);
+  border-radius: 4px;
+  padding: 0.08em 0.36em;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ------------------------------------------------------------------ hero
+   Sized to its content, not the viewport: the first still frame has to show
+   the thesis and the start of the pipeline, not just a headline. */
+
+header.hero {
+  border-bottom: 1px solid var(--rule);
+  background:
+    linear-gradient(var(--panel), var(--panel)) padding-box,
+    var(--ground);
+  position: relative;
+  overflow: hidden;
+}
+
+header.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+
+header.hero .wrap {
+  position: relative;
+  padding-block: 62px 46px;
+  display: grid;
+  gap: 26px;
+}
+
+.hero-title-block { display: grid; gap: 16px; max-width: 24ch; }
+
+h1 .leg-d { color: var(--dense); font-style: italic; font-variation-settings: "opsz" 144; }
+h1 .leg-s { color: var(--sparse); font-style: italic; font-variation-settings: "opsz" 144; }
+
+.corpus-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--panel);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.corpus-strip div {
+  padding: 11px 20px;
+  border-right: 1px solid var(--rule-soft);
+  display: grid;
+  gap: 1px;
+}
+.corpus-strip div:last-child { border-right: 0; }
+
+.corpus-strip b {
+  font-family: var(--mono);
+  font-size: 1.06rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.corpus-strip span {
+  font-size: 0.685rem;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  color: var(--text-3);
+}
+
+/* ------------------------------------------------------------------ layout */
+
+.spine {
+  display: grid;
+  grid-template-columns: 188px minmax(0, 1fr);
+  gap: 52px;
+  align-items: start;
+  padding-block: 54px 20px;
+}
+
+@media (max-width: 940px) {
+  .spine { grid-template-columns: 1fr; gap: 30px; }
+  nav.rail { position: static !important; }
+  nav.rail ol { display: flex; flex-wrap: wrap; gap: 4px; }
+  nav.rail li { padding-left: 0 !important; }
+  nav.rail li::before { display: none !important; }
+  nav.rail a { padding: 5px 10px; border: 1px solid var(--rule); border-radius: 20px; }
+}
+
+nav.rail { position: sticky; top: 26px; }
+nav.rail h3 { margin-bottom: 13px; }
+nav.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+
+nav.rail li { position: relative; padding-left: 25px; }
+nav.rail li::before {
+  content: attr(data-n);
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+nav.rail a {
+  display: block;
+  font-size: 0.855rem;
+  color: var(--text-2);
+  text-decoration: none;
+  padding-block: 4px;
+  border-radius: 3px;
+  transition: color 0.14s;
+}
+nav.rail a:hover, nav.rail a:focus-visible { color: var(--dense); }
+nav.rail a[aria-current="true"] { color: var(--text); font-weight: 600; }
+
+main { display: grid; gap: 62px; min-width: 0; }
+
+section { display: grid; gap: 20px; scroll-margin-top: 24px; }
+
+.sec-head { display: grid; gap: 9px; }
+.sec-head .eyebrow { display: flex; align-items: center; gap: 10px; }
+.sec-head .eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* ------------------------------------------------------------------ panels */
+
+figure {
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+figure > figcaption {
+  padding: 9px 15px;
+  border-top: 1px solid var(--rule-soft);
+  background: var(--panel-2);
+  font-size: 0.8rem;
+  color: var(--text-2);
+}
+figure > figcaption b { color: var(--text); font-weight: 600; }
+
+.pad { padding: 20px; }
+
+/* Marked plainly as a worked example rather than presented as live output. */
+.demo-note {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border: 1px dashed var(--rule);
+  border-radius: 3px;
+  padding: 3px 8px;
+  width: fit-content;
+}
+
+/* ------------------------------------------------------------------ tables */
+
+.tbl-scroll { overflow-x: auto; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.845rem;
+  min-width: 480px;
+}
+
+caption {
+  text-align: left;
+  padding: 13px 15px;
+  font-size: 0.8rem;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 15px;
+  border-bottom: 1px solid var(--rule-soft);
+  vertical-align: top;
+}
+tbody tr:last-child td { border-bottom: 0; }
+
+thead th {
+  font-family: var(--body);
+  font-size: 0.685rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  color: var(--text-3);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--rule);
+}
+
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.m { font-family: var(--mono); font-size: 0.79rem; white-space: nowrap; }
+
+/* ------------------------------------------------------------------ legs */
+
+.legs { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 16px; }
+
+.leg { border: 1px solid var(--rule); border-radius: 4px; background: var(--panel); display: grid; }
+.leg > .hd {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule-soft);
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.leg > .hd b { font-family: var(--display); font-size: 1.06rem; font-weight: 500; }
+.leg > .hd span { font-family: var(--mono); font-size: 0.7rem; color: var(--text-3); }
+.leg > .bd { padding: 15px 16px; display: grid; gap: 11px; font-size: 0.88rem; color: var(--text-2); }
+
+.leg.d > .hd { background: var(--dense-bg); }
+.leg.d > .hd b { color: var(--dense); }
+.leg.s > .hd { background: var(--sparse-bg); }
+.leg.s > .hd b { color: var(--sparse); }
+
+.leg ul { margin: 0; padding-left: 17px; display: grid; gap: 5px; }
+
+.wins {
+  font-size: 0.8rem;
+  padding: 9px 11px;
+  border-radius: 3px;
+  border-left: 2px solid;
+}
+.leg.d .wins { background: var(--dense-bg); border-color: var(--dense); color: var(--text); }
+.leg.s .wins { background: var(--sparse-bg); border-color: var(--sparse); color: var(--text); }
+
+/* ------------------------------------------------------------------ formula */
+
+.formula {
+  font-family: var(--mono);
+  font-size: clamp(0.92rem, 0.82rem + 0.5vw, 1.16rem);
+  text-align: center;
+  padding: 26px 18px;
+  background: var(--fuse-bg);
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--text);
+  overflow-x: auto;
+}
+.formula .k { color: var(--fuse); font-weight: 700; }
+.formula .r { color: var(--dense); font-weight: 700; }
+
+/* fusion ladder — a real ranked list, drawn as bars to the RRF scale */
+.ladder { display: grid; gap: 7px; padding: 18px 20px; }
+
+.rung {
+  display: grid;
+  grid-template-columns: 2.1rem minmax(90px, 1.35fr) minmax(0, 2fr) 4.3rem;
+  gap: 11px;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.rung .pos { font-family: var(--mono); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.rung .who { font-family: var(--mono); font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rung .val { font-family: var(--mono); text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+
+.rung .track { height: 15px; background: var(--panel-2); border-radius: 2px; overflow: hidden; display: flex; }
+.rung .track i { display: block; height: 100%; }
+.rung .track i.d { background: var(--dense); }
+.rung .track i.s { background: var(--sparse); }
+
+.rung.win .who { color: var(--fuse); font-weight: 700; }
+
+.swatches { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.775rem; color: var(--text-2); }
+.swatches span { display: flex; align-items: center; gap: 6px; }
+.swatches i { width: 11px; height: 11px; border-radius: 2px; display: block; }
+
+/* ------------------------------------------------------------------ canvas */
+
+.vecbox { position: relative; background: var(--panel); }
+.vecbox canvas { display: block; width: 100%; height: auto; max-width: 100%; }
+
+.vecbox .ctl {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  gap: 7px;
+}
+
+button.chip {
+  font: inherit;
+  font-size: 0.77rem;
+  font-weight: 550;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.14s;
+}
+button.chip:hover { border-color: var(--dense); color: var(--dense); }
+button.chip[aria-pressed="true"] { background: var(--dense-bg); border-color: var(--dense); color: var(--dense); }
+button.chip:focus-visible { outline: 2px solid var(--dense); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------ rerank */
+
+.moves { display: grid; gap: 0; }
+
+.move {
+  display: grid;
+  grid-template-columns: 4.6rem 1fr 5.2rem;
+  gap: 14px;
+  align-items: center;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: 0.85rem;
+}
+.move:last-child { border-bottom: 0; }
+
+.move .rank { font-family: var(--mono); font-size: 0.77rem; color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.move .rank b { color: var(--text); }
+.move .what { min-width: 0; }
+.move .what .k { font-family: var(--mono); font-size: 0.78rem; color: var(--text-2); }
+.move .score { font-family: var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+
+.arrow { font-family: var(--mono); font-weight: 700; font-size: 0.8rem; }
+.arrow.up { color: var(--dense); }
+.arrow.down { color: var(--sparse); }
+.arrow.flat { color: var(--text-3); }
+
+/* ------------------------------------------------------------------ stack */
+
+.stack { display: grid; gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+
+.layer {
+  background: var(--panel);
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: baseline;
+}
+@media (max-width: 620px) { .layer { grid-template-columns: 1fr; gap: 4px; } }
+
+.layer .what { font-family: var(--mono); font-size: 0.815rem; font-weight: 500; }
+.layer .why { font-size: 0.86rem; color: var(--text-2); }
+
+/* ------------------------------------------------------------------ knobs */
+
+.knobs { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+
+.knob { background: var(--panel); padding: 15px 17px; display: grid; gap: 5px; }
+.knob .nm { font-family: var(--mono); font-size: 0.78rem; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.knob .nm b { color: var(--dense); font-weight: 700; font-variant-numeric: tabular-nums; }
+.knob p { font-size: 0.815rem; color: var(--text-2); max-width: none; }
+
+/* ------------------------------------------------------------------ honest */
+
+.honest {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--sparse);
+  border-radius: 4px;
+  background: var(--panel);
+  padding: 18px 20px;
+  display: grid;
+  gap: 10px;
+}
+.honest h3 { color: var(--sparse); }
+
+/* ------------------------------------------------------------------ footer */
+
+footer {
+  border-top: 1px solid var(--rule);
+  margin-top: 58px;
+  background: var(--panel);
+}
+footer .wrap {
+  padding-block: 26px 42px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 34px;
+  align-items: baseline;
+  font-size: 0.82rem;
+  color: var(--text-3);
+}
+footer .wrap b { color: var(--text-2); font-weight: 600; }
+
+/* ------------------------------------------------------------------ motion
+   Sections animate in FROM a visible resting state: no element is parked at
+   opacity 0 waiting on an observer, so the page reads fully with JS off. */
+@keyframes rise {
+  from { opacity: 0.35; transform: translateY(9px); }
+  to   { opacity: 1; transform: none; }
+}
+.js section { animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.js section:nth-of-type(n+2) { animation-delay: 0.04s; }
+
+@keyframes draw { from { width: 0; } }
+.js .rung .track i { animation: draw 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.js .rung:nth-child(2) .track i { animation-delay: 0.05s; }
+.js .rung:nth-child(3) .track i { animation-delay: 0.1s; }
+.js .rung:nth-child(4) .track i { animation-delay: 0.15s; }
+.js .rung:nth-child(5) .track i { animation-delay: 0.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-title-block">
+      <p class="eyebrow">Advanced RAG Explorer &middot; The Testing Academy</p>
+      <h1>Two <span class="leg-d">legs</span>, one <span class="leg-s">judge</span></h1>
+      <p class="lede">
+        A retrieval pipeline built over 5,000 VWO test cases &mdash; and why a single
+        vector search is not enough once the corpus starts repeating itself.
+      </p>
+    </div>
+
+    <div class="corpus-strip">
+      <div><b>5,000</b><span>test cases</span></div>
+      <div><b>344</b><span>semantic clusters</span></div>
+      <div><b>68</b><span>features</span></div>
+      <div><b>14</b><span>modules</span></div>
+      <div><b>1,024</b><span>dense dims</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap spine">
+
+  <nav class="rail" aria-label="Contents">
+    <h3>Pipeline</h3>
+    <ol>
+      <li data-n="00"><a href="#problem">The problem</a></li>
+      <li data-n="01"><a href="#corpus">The corpus</a></li>
+      <li data-n="02"><a href="#chunk">Chunking</a></li>
+      <li data-n="03"><a href="#embed">One model, two vectors</a></li>
+      <li data-n="04"><a href="#rewrite">Query rewriting</a></li>
+      <li data-n="05"><a href="#legs">Dense vs sparse</a></li>
+      <li data-n="06"><a href="#fuse">RRF fusion</a></li>
+      <li data-n="07"><a href="#rerank">Cross-encoder rerank</a></li>
+      <li data-n="08"><a href="#generate">Grounded generation</a></li>
+      <li data-n="09"><a href="#stack">The stack</a></li>
+      <li data-n="10"><a href="#knobs">Knobs</a></li>
+      <li data-n="11"><a href="#limits">What it does not do</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ============================================================ 00 -->
+    <section id="problem">
+      <div class="sec-head">
+        <p class="eyebrow">00 &middot; The problem</p>
+        <h2>A basic RAG pipeline falls over on a real QA corpus</h2>
+      </div>
+
+      <p>
+        The starter version of this demo did the textbook thing: chunk the documents,
+        embed each chunk with one model, store the vectors, and on a question return
+        the four nearest neighbours. On a handful of PDFs that works well enough to
+        teach the idea.
+      </p>
+
+      <p>
+        A test-case library breaks it in a specific way. Ask <em>&ldquo;which tests
+        expect a 429?&rdquo;</em> and a dense embedding model has no strong signal for
+        the literal token <code>429</code> &mdash; it encodes meaning, and the meaning of
+        &ldquo;rate limit exceeded&rdquo; is spread across many rows that never mention the
+        number. Meanwhile the four nearest neighbours are frequently four executions
+        of the <em>same</em> scenario on four different browsers, because that is what
+        a real suite looks like.
+      </p>
+
+      <p>
+        So this version adds three things a basic pipeline does not have: a second
+        retrieval leg that matches on exact tokens, a fusion step that merges the two
+        ranked lists honestly, and a re-ranking model that reads the question and the
+        candidate <em>together</em> before deciding what the language model sees.
+      </p>
+    </section>
+
+    <!-- ============================================================ 01 -->
+    <section id="corpus">
+      <div class="sec-head">
+        <p class="eyebrow">01 &middot; The corpus</p>
+        <h2>5,000 test cases, and only 344 distinct ideas</h2>
+      </div>
+
+      <p>
+        The corpus is generated by a seeded script, not written by a language model,
+        so it is identical on every run and costs nothing to rebuild. Its shape is the
+        interesting part, and it is deliberate.
+      </p>
+
+      <p>
+        There are <strong>344 hand-written scenarios</strong> &mdash; a feature paired with
+        something a tester actually does to it, each with its own expected result.
+        Each scenario is then executed across <strong>16 contexts</strong>: eight
+        browser/device combinations, three plan tiers, three roles and two
+        environments. 344 &times; 16 gives 5,504 candidate rows, trimmed to 5,000.
+      </p>
+
+      <figure>
+        <div class="tbl-scroll">
+          <table>
+            <caption>Where the rows come from &mdash; counted from the generated file, not estimated.</caption>
+            <thead>
+              <tr><th>Layer</th><th class="n">Count</th><th>What varies</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Modules</td><td class="n">14</td><td>A/B Testing, Heatmaps, Session Recordings, Funnels, Surveys&hellip;</td></tr>
+              <tr><td>Features</td><td class="n">68</td><td>Traffic Allocation, Rage Click Detection, Data Export API&hellip;</td></tr>
+              <tr><td>Scenarios</td><td class="n">344</td><td>One action on one feature, with its own assertion</td></tr>
+              <tr><td>Contexts</td><td class="n">16</td><td>Browser, device, plan tier, role, environment</td></tr>
+              <tr><td>Rows written</td><td class="n">5,000</td><td>Unique summary and issue key on every row</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>
+          <b>This is the retrieval problem, not a flaw in the data.</b> A real suite of
+          this size genuinely has far fewer ideas than rows &mdash; the same scenario runs
+          on Chrome and on Safari iOS, and each run is its own test case with its own
+          result. Dense search alone will happily return four members of one cluster.
+        </figcaption>
+      </figure>
+
+      <p>
+        One rule holds the generator honest: no scenario is ever emitted twice. Ask it
+        for more rows than 344&nbsp;&times;&nbsp;16 and it refuses rather than repeating
+        itself, because a corpus padded with duplicates makes every retrieval number
+        look better than it is.
+      </p>
+    </section>
+
+    <!-- ============================================================ 02 -->
+    <section id="chunk">
+      <div class="sec-head">
+        <p class="eyebrow">02 &middot; Chunking</p>
+        <h2>One test case is one chunk, and that size was measured</h2>
+      </div>
+
+      <p>
+        Chunking a PDF means guessing where a thought ends. A table does not have that
+        problem: the row boundary already <em>is</em> the boundary of a complete idea.
+        Four columns &mdash; Summary, Description, Test Steps, Expected Result &mdash; are
+        concatenated with their column names kept as labels, and that assembled
+        document is the chunk.
+      </p>
+
+      <p>
+        Keeping the label matters more than it looks. Without it, &ldquo;Expected
+        Result: HTTP 403 is returned&rdquo; flattens to bare text, and the word
+        &ldquo;expected&rdquo; in someone&rsquo;s question has nothing to match against
+        on the lexical leg.
+      </p>
+
+      <figure>
+        <div class="pad" style="display:grid;gap:14px">
+          <p class="demo-note">Measured over the 5,000-row corpus</p>
+          <div class="tbl-scroll">
+            <table style="min-width:400px">
+              <thead><tr><th>Document length</th><th class="n">Characters</th></tr></thead>
+              <tbody>
+                <tr><td>Shortest</td><td class="n">874</td></tr>
+                <tr><td>Median</td><td class="n">1,038</td></tr>
+                <tr><td>95th percentile</td><td class="n">1,126</td></tr>
+                <tr><td>Longest</td><td class="n">1,239</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <figcaption>
+          <b><code>CHUNK_SIZE = 1400</code> is derived from that table, not guessed.</b>
+          At 1400 every one of the 5,000 rows stays whole. At the more conventional
+          1000, roughly 77&thinsp;% of rows split in two &mdash; and the second half of a
+          split test case carries its expected result with no idea what was being
+          tested. Drop the knob to 1000 in the running app to watch that happen.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ 03 -->
+    <section id="embed">
+      <div class="sec-head">
+        <p class="eyebrow">03 &middot; Embedding</p>
+        <h2>One model pass produces both vectors</h2>
+      </div>
+
+      <p>
+        The usual way to build hybrid search is a dense encoder plus a separate BM25
+        index: two vocabularies, two tokenisers, two things to keep in sync as the
+        corpus changes. <code>BAAI/bge-m3</code> avoids that entirely &mdash; a single
+        forward pass returns a dense vector <em>and</em> a sparse one, from the same
+        tokenisation of the same text.
+      </p>
+
+      <figure>
+        <div class="vecbox">
+          <canvas id="vec" width="920" height="330" role="img"
+            aria-label="Diagram: one chunk of text entering the bge-m3 model and leaving as a 1024-dimension dense vector and a sparse map of weighted token ids."></canvas>
+          <div class="ctl">
+            <button class="chip" id="btn-dense" aria-pressed="true">Dense</button>
+            <button class="chip" id="btn-sparse" aria-pressed="true">Sparse</button>
+          </div>
+        </div>
+        <figcaption>
+          <b>Two representations of the same sentence.</b> The dense vector is 1,024
+          floats with no individually meaningful positions &mdash; its geometry is the
+          meaning. The sparse vector is a short map of token id to weight, and every
+          entry corresponds to a word that actually appeared.
+        </figcaption>
+      </figure>
+
+      <div class="legs">
+        <div class="leg d">
+          <div class="hd"><b>Dense</b><span>1,024 floats</span></div>
+          <div class="bd">
+            <p>Compared with cosine distance. Position in the space encodes meaning, so
+              paraphrases land near each other even with no shared words.</p>
+            <p class="wins">Finds &ldquo;visitor is not bucketed&rdquo; when you asked about
+              &ldquo;users excluded from the experiment&rdquo;.</p>
+          </div>
+        </div>
+        <div class="leg s">
+          <div class="hd"><b>Sparse</b><span>one weight per distinct token</span></div>
+          <div class="bd">
+            <p>A learned weight per token that occurs in the text; everything else is
+              implicitly zero. Scored by overlap, like a smarter BM25.</p>
+            <p class="wins">Finds the row containing the literal string
+              <code>429</code>, <code>Retry-After</code> or <code>VWO-TC-04271</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 04 -->
+    <section id="rewrite">
+      <div class="sec-head">
+        <p class="eyebrow">04 &middot; Query rewriting</p>
+        <h2>Ask the question several ways before searching</h2>
+      </div>
+
+      <p>
+        A tester and a test case rarely use the same words. Before any vector is
+        computed, the question goes to the language model once and comes back as a
+        small set of alternate phrasings &mdash; one leaning on product vocabulary, one
+        reduced to keywords for the lexical leg to bite on.
+      </p>
+
+      <figure>
+        <div class="pad" style="display:grid;gap:12px">
+          <p class="demo-note">Worked example</p>
+          <div class="stack">
+            <div class="layer">
+              <span class="what" style="color:var(--text-3)">original</span>
+              <span class="why" style="color:var(--text)">how do we test that people get blocked when they call the API too often?</span>
+            </div>
+            <div class="layer">
+              <span class="what">rewrite 1</span>
+              <span class="why">Data Export API rate limit exceeded test case</span>
+            </div>
+            <div class="layer">
+              <span class="what">rewrite 2</span>
+              <span class="why">verify HTTP 429 returned with Retry-After header</span>
+            </div>
+            <div class="layer">
+              <span class="what">rewrite 3</span>
+              <span class="why">API throttling rate limit 429 Retry-After</span>
+            </div>
+          </div>
+        </div>
+        <figcaption>
+          <b>Every variant runs down both legs.</b> Four phrasings &times; two legs gives
+          eight ranked lists feeding the fusion, so a row found by <em>any</em> phrasing
+          enters the candidate pool. Rewrite&nbsp;2 is the one that surfaces the row
+          containing <code>429</code>; the original question never mentions it.
+        </figcaption>
+      </figure>
+
+      <p>
+        If that call fails, the pipeline searches the original question alone rather
+        than erroring. A rewrite is an optimisation, and losing it should cost recall,
+        not the answer.
+      </p>
+    </section>
+
+    <!-- ============================================================ 05 -->
+    <section id="legs">
+      <div class="sec-head">
+        <p class="eyebrow">05 &middot; Retrieval</p>
+        <h2>The two legs disagree, and that is the point</h2>
+      </div>
+
+      <p>
+        Both legs run against one Qdrant collection holding two named vectors per
+        point, so a chunk has one id, one payload and one lifecycle. Hits from either
+        leg can be merged by id with no join, and a metadata filter written once
+        applies to both.
+      </p>
+
+      <p>
+        The app shows the overlap count on every query. A <em>low</em> overlap is the
+        case for hybrid search: each leg is reaching rows the other misses. If the two
+        lists agreed completely, the second leg would be dead weight.
+      </p>
+
+      <figure>
+        <div class="pad" style="display:grid;gap:13px">
+          <p class="demo-note">Measured run &mdash; 400 rows indexed, real models</p>
+          <p style="max-width:none;font-size:0.92rem;color:var(--text-2)">
+            Question: <em>&ldquo;which tests expect a 429 rate limit response?&rdquo;</em>
+          </p>
+          <div class="tbl-scroll">
+            <table style="min-width:420px">
+              <thead><tr><th>Leg</th><th class="n">Hits</th><th class="n">Top score</th><th>Top row</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="color:var(--dense);font-weight:600">Dense</td>
+                  <td class="n">20</td><td class="n">0.4757</td>
+                  <td class="m">VWO-TC-00046</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--sparse);font-weight:600">Sparse</td>
+                  <td class="n">20</td><td class="n">0.1773</td>
+                  <td class="m">VWO-TC-00046</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--fuse);font-weight:600">Fused</td>
+                  <td class="n">30</td><td class="n">&mdash;</td>
+                  <td style="color:var(--text-2)">unique candidates</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <figcaption>
+          <b>Overlap was 10 of 20.</b> Two legs returning 20 rows each produced 30
+          distinct candidates, not 20 &mdash; each leg reached ten rows the other never
+          saw. Those two numbers being different is the entire argument for running
+          both.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ 06 -->
+    <section id="fuse">
+      <div class="sec-head">
+        <p class="eyebrow">06 &middot; Fusion</p>
+        <h2>Fuse the rankings, never the scores</h2>
+      </div>
+
+      <p>
+        Dense cosine similarity comes back around <code>0.82</code>. The sparse leg
+        returns something like <code>14.7</code>. Those numbers are not on a shared
+        scale, and averaging them is meaningless &mdash; whichever leg happens to
+        produce bigger numbers would quietly win every time.
+      </p>
+
+      <p>
+        Reciprocal Rank Fusion discards the magnitudes and keeps only the ordering.
+        Each list contributes <code>1/(k+rank)</code> for the documents it returned, and
+        the contributions are summed per document.
+      </p>
+
+      <figure>
+        <div class="formula">
+          score(<span class="r">d</span>) &nbsp;=&nbsp; &Sigma;<sub>runs</sub> &nbsp; 1 / ( <span class="k">k</span> + rank<sub>run</sub>(<span class="r">d</span>) ) &nbsp;&nbsp;&nbsp; <span style="color:var(--text-3)">where <span class="k">k</span> = 60</span>
+        </div>
+        <div class="ladder">
+          <div class="rung win">
+            <span class="pos">1</span>
+            <span class="who">found by both legs</span>
+            <span class="track"><i class="d" style="width:50%"></i><i class="s" style="width:50%"></i></span>
+            <span class="val">0.032258</span>
+          </div>
+          <div class="rung">
+            <span class="pos">2</span>
+            <span class="who">dense only, rank 1</span>
+            <span class="track"><i class="d" style="width:100%"></i></span>
+            <span class="val">0.016393</span>
+          </div>
+          <div class="rung">
+            <span class="pos">3</span>
+            <span class="who">sparse only, rank 1</span>
+            <span class="track"><i class="s" style="width:100%"></i></span>
+            <span class="val">0.016393</span>
+          </div>
+          <div class="rung">
+            <span class="pos">4</span>
+            <span class="who">dense only, rank 3</span>
+            <span class="track"><i class="d" style="width:97%"></i></span>
+            <span class="val">0.015873</span>
+          </div>
+          <div class="rung">
+            <span class="pos">5</span>
+            <span class="who">sparse only, rank 3</span>
+            <span class="track"><i class="s" style="width:97%"></i></span>
+            <span class="val">0.015873</span>
+          </div>
+        </div>
+        <div class="pad" style="border-top:1px solid var(--rule-soft);display:grid;gap:11px">
+          <div class="swatches">
+            <span><i style="background:var(--dense)"></i> contribution from a dense run</span>
+            <span><i style="background:var(--sparse)"></i> contribution from a sparse run</span>
+          </div>
+        </div>
+        <figcaption>
+          <b>Ranked 2nd by both legs beats ranked 1st by one.</b> A row both legs placed
+          2nd scores 1/62 + 1/62 = 0.032258. A row the dense leg alone placed <em>first</em>
+          scores 1/61 = 0.016393 &mdash; less than half. That is the behaviour you want
+          from a fusion, and it is what <code>k&nbsp;=&nbsp;60</code> buys: a large
+          <code>k</code> flattens the gap between rank 1 and rank 2, so agreement across
+          legs outweighs a single confident leg. These five values are the arithmetic,
+          computed and checked against the implementation.
+        </figcaption>
+      </figure>
+
+      <p>
+        Because RRF never looks at a score, it needs no normalisation step and no tuned
+        per-leg weight &mdash; the two things that make most hybrid setups fragile when
+        the corpus changes.
+      </p>
+    </section>
+
+    <!-- ============================================================ 07 -->
+    <section id="rerank">
+      <div class="sec-head">
+        <p class="eyebrow">07 &middot; Re-ranking</p>
+        <h2>A model that reads the question and the candidate together</h2>
+      </div>
+
+      <p>
+        Everything up to here used a <em>bi-encoder</em>: the question and the chunk are
+        embedded separately, and can only be compared afterwards through a dot product.
+        That is what makes searching 5,000 chunks fast &mdash; the chunk vectors were
+        computed once, at ingest.
+      </p>
+
+      <p>
+        <code>BAAI/bge-reranker-v2-m3</code> is a <em>cross-encoder</em>. It takes the
+        question and one candidate as a single input and reads them jointly, so it can
+        judge relevance the bi-encoder could only approximate. That is also why it
+        cannot run over the whole corpus: it only ever sees the fused top candidates.
+      </p>
+
+      <figure>
+        <p class="demo-note" style="margin:14px 18px 0">Measured run &mdash; same question, real cross-encoder</p>
+        <div class="moves">
+          <div class="move">
+            <span class="rank">1 <span class="arrow flat">&#9644;</span> <b>1</b></span>
+            <span class="what"><span class="k">VWO-TC-00046</span> &mdash; exceed the Data Export API rate limit</span>
+            <span class="score" style="color:var(--dense);font-weight:700">0.7951</span>
+          </div>
+          <div class="move">
+            <span class="rank">2 <span class="arrow flat">&#9644;</span> <b>2</b></span>
+            <span class="what"><span class="k">VWO-TC-00070</span> &mdash; exceed the monthly tracked-user limit</span>
+            <span class="score">0.0029</span>
+          </div>
+          <div class="move">
+            <span class="rank">8 <span class="arrow up">&#9650;</span> <b>3</b></span>
+            <span class="what"><span class="k">VWO-TC-00019</span> &mdash; Survey Builder</span>
+            <span class="score">0.0020</span>
+          </div>
+          <div class="move">
+            <span class="rank">11 <span class="arrow up">&#9650;</span> <b>4</b></span>
+            <span class="what"><span class="k">VWO-TC-00260</span> &mdash; Revenue Report</span>
+            <span class="score">0.0017</span>
+          </div>
+        </div>
+        <figcaption>
+          <b>Look at the gap, not just the order.</b> The genuine rate-limit test scores
+          <code>0.7951</code>; the next candidate scores <code>0.0029</code> &mdash; about
+          274&times; lower. Both retrieval legs had ranked <em>&ldquo;exceed the monthly
+          tracked-user limit&rdquo;</em> second, because <em>limit</em> and
+          <em>exceeded</em> match on both the semantic and the lexical leg. The
+          cross-encoder read the question together with the passage and correctly
+          separated a billing quota from a rate limit. That is the failure a bi-encoder
+          cannot catch on its own.
+        </figcaption>
+      </figure>
+
+      <p>
+        One detail worth stating: the reranker always scores against the
+        <strong>original question</strong>, never a rewrite. The rewrites exist to widen
+        recall; judging relevance against a paraphrase would optimise for the paraphrase
+        instead of for what was asked.
+      </p>
+    </section>
+
+    <!-- ============================================================ 08 -->
+    <section id="generate">
+      <div class="sec-head">
+        <p class="eyebrow">08 &middot; Generation</p>
+        <h2>Grounded, cited, and willing to say no</h2>
+      </div>
+
+      <p>
+        Four chunks reach the language model, numbered, each carrying its issue key and
+        module. The system prompt allows only those chunks as source material, requires
+        <code>[Chunk N]</code> citations inline, and requires the model to say the context
+        does not contain the answer rather than filling the gap from its own knowledge
+        of the product.
+      </p>
+
+      <p>
+        There is a second mode. A request shaped like <em>&ldquo;create a test case for
+        VWO-1234 covering webhook retries&rdquo;</em> is detected by intent and switches
+        the prompt: the retrieved rows become format and style templates rather than
+        facts to quote, and the output is a structured test case in the conventions the
+        corpus already uses.
+      </p>
+
+      <figure>
+        <div class="stack">
+          <div class="layer">
+            <span class="what">Answer mode</span>
+            <span class="why">Grounded Q&amp;A. Cites chunks. Counts only what was retrieved, and says so.</span>
+          </div>
+          <div class="layer">
+            <span class="what">Generate mode</span>
+            <span class="why">Writes a new test case &mdash; Title, Preconditions, Steps, Expected Result, Priority, Labels &mdash; matching the retrieved examples.</span>
+          </div>
+        </div>
+        <figcaption>
+          The app prints the <b>exact prompt</b> it sent, verbatim, under every answer.
+          Nothing about the grounding step is hidden.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ 09 -->
+    <section id="stack">
+      <div class="sec-head">
+        <p class="eyebrow">09 &middot; The stack</p>
+        <h2>What runs, and where</h2>
+      </div>
+
+      <div class="stack">
+        <div class="layer">
+          <span class="what">Flask + SSE</span>
+          <span class="why">Four pages, no build step. Ingestion progress streams as Server-Sent Events &mdash; one-directional traffic, so no websocket earns its keep.</span>
+        </div>
+        <div class="layer">
+          <span class="what">bge-m3</span>
+          <span class="why">Runs locally through FlagEmbedding. Dense plus sparse from one pass. First run downloads about 2.3&nbsp;GB into the Hugging Face cache.</span>
+        </div>
+        <div class="layer">
+          <span class="what">bge-reranker-v2-m3</span>
+          <span class="why">Local cross-encoder, roughly 570&nbsp;MB. Sees only the fused candidates, never the corpus.</span>
+        </div>
+        <div class="layer">
+          <span class="what">Qdrant</span>
+          <span class="why">Embedded by default &mdash; a local folder, no Docker, no server to start. Point <code>QDRANT_URL</code> at a real server and the same code runs against it.</span>
+        </div>
+        <div class="layer">
+          <span class="what">Groq</span>
+          <span class="why">The only network call in the pipeline: query rewriting and the final answer. Everything else is on your machine.</span>
+        </div>
+      </div>
+
+      <p>
+        The embedding and re-ranking models are the reason the first query is slow and
+        every later one is fast. Both loaders are lazy and locked, so the port opens
+        immediately and two simultaneous requests cannot each pull a copy of a
+        multi-gigabyte model into memory.
+      </p>
+    </section>
+
+    <!-- ============================================================ 10 -->
+    <section id="knobs">
+      <div class="sec-head">
+        <p class="eyebrow">10 &middot; Knobs</p>
+        <h2>Six values worth turning during a workshop</h2>
+      </div>
+
+      <div class="knobs">
+        <div class="knob">
+          <span class="nm">CHUNK_SIZE <b>1400</b></span>
+          <p>Measured to keep all 5,000 rows whole. Set it to 1000 to split 77&thinsp;% of them and see what a mid-document boundary costs.</p>
+        </div>
+        <div class="knob">
+          <span class="nm">CHUNK_OVERLAP <b>150</b></span>
+          <p>Characters repeated between adjacent chunks. Only does anything once a document is long enough to split.</p>
+        </div>
+        <div class="knob">
+          <span class="nm">TOP_N_HYBRID <b>20</b></span>
+          <p>Candidates per leg per query variant. Raising it widens recall and gives the reranker more to chew on &mdash; at a cost in latency.</p>
+        </div>
+        <div class="knob">
+          <span class="nm">TOP_K_RERANK <b>4</b></span>
+          <p>Chunks that reach the language model. Small on purpose: more context is not more grounding.</p>
+        </div>
+        <div class="knob">
+          <span class="nm">RRF_K <b>60</b></span>
+          <p>Fusion smoothing. Lower it and a single confident leg starts winning again; raise it and agreement across legs dominates.</p>
+        </div>
+        <div class="knob">
+          <span class="nm">REWRITE_ENABLED <b>on</b></span>
+          <p>Turn it off and ask a question phrased unlike the corpus. The recall drop is the demonstration.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 11 -->
+    <section id="limits">
+      <div class="sec-head">
+        <p class="eyebrow">11 &middot; Limits</p>
+        <h2>What this does not do</h2>
+      </div>
+
+      <div class="honest">
+        <h3>Stated plainly, so nobody is surprised</h3>
+        <p>
+          <strong>The chunk viewer&rsquo;s text search is page-local.</strong> Qdrant has no
+          substring operator, so &ldquo;contains&rdquo; is applied in Python after the
+          scroll. Honest at 5,000 rows; at corpus scale it needs a full-text payload index.
+        </p>
+        <p>
+          <strong>Payload indexes do nothing in embedded mode.</strong> Local Qdrant filters
+          by scanning. The indexes are declared for the day someone sets
+          <code>QDRANT_URL</code>, and the client says so in a warning on startup.
+        </p>
+        <p>
+          <strong>Nothing here is evaluated.</strong> There is no retrieval metric, no
+          golden set, no measurement of whether the reranker helps on <em>this</em> corpus.
+          The page shows you the mechanism so you can judge it yourself; it does not
+          claim a score.
+        </p>
+        <p>
+          <strong>The corpus is synthetic.</strong> The scenarios are written to read like
+          real VWO test cases, and the generator refuses to repeat one &mdash; but no part
+          of it was harvested from a production test suite.
+        </p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span><b>Advanced RAG Explorer</b> &mdash; teaching demo</span>
+    <span>bge-m3 &middot; Qdrant &middot; bge-reranker-v2-m3 &middot; Groq</span>
+    <span>The Testing Academy</span>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+
+/* ---------------------------------------------------------------- rail
+   Marks the section currently in view. rootMargin biases the trigger to the
+   upper third so the highlight tracks what you are reading, not what is
+   scrolling off the bottom. */
+(function () {
+  const links = [...document.querySelectorAll('nav.rail a')];
+  const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const sections = [...document.querySelectorAll('main section')];
+  if (!('IntersectionObserver' in window)) return;
+
+  const seen = new Set();
+  const obs = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (e.isIntersecting) seen.add(e.target.id); else seen.delete(e.target.id);
+    }
+    const first = sections.find(s => seen.has(s.id));
+    links.forEach(a => a.removeAttribute('aria-current'));
+    if (first) byId.get(first.id)?.setAttribute('aria-current', 'true');
+  }, { rootMargin: '-12% 0px -62% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+})();
+
+/* ---------------------------------------------------------------- canvas
+   One chunk of text entering bge-m3 and leaving as two representations.
+   Canvas rather than hand-authored SVG paths because the dense band is 96
+   animated cells and the sparse side draws a live-weighted bar set. */
+(function () {
+  const cv = document.getElementById('vec');
+  if (!cv || !cv.getContext) return;
+  const ctx = cv.getContext('2d');
+
+  const W = cv.width, H = cv.height;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const show = { dense: true, sparse: true };
+
+  // 1024 dims is far too many to draw, so the band shows 96 cells and the label
+  // says so. The sparse rows show the token STRING beside the weight for
+  // readability — bge-m3 actually returns integer token ids, which the app's
+  // own embed panel displays verbatim.
+  const CELLS = 96;
+  const SPARSE = [
+    ['rate',      1.00],
+    ['limit',     0.93],
+    ['429',       0.88],
+    ['Retry',     0.71],
+    ['exceeded',  0.64],
+    ['API',       0.49],
+    ['header',    0.33],
+  ];
+
+  const seed = CELLS;
+  const cells = Array.from({ length: CELLS }, (_, i) => {
+    // Deterministic pseudo-random so the band looks the same on every load.
+    const s = Math.sin(i * 12.9898 + seed) * 43758.5453;
+    return s - Math.floor(s);
+  });
+
+  function tok(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function draw(t) {
+    const C = {
+      text: tok('--text'), t2: tok('--text-2'), t3: tok('--text-3'),
+      rule: tok('--rule'), panel2: tok('--panel-2'), panel: tok('--panel'),
+      dense: tok('--dense'), sparse: tok('--sparse'), fuse: tok('--fuse'),
+    };
+
+    ctx.clearRect(0, 0, W, H);
+
+    const mono = '13px "JetBrains Mono", monospace';
+    const label = '600 11px "Public Sans", sans-serif';
+
+    // ---- input chunk
+    const inX = 26, inY = 112, inW = 214, inH = 106;
+    ctx.fillStyle = C.panel2;
+    roundRect(inX, inY, inW, inH, 4); ctx.fill();
+    ctx.strokeStyle = C.rule; ctx.lineWidth = 1;
+    roundRect(inX + 0.5, inY + 0.5, inW - 1, inH - 1, 4); ctx.stroke();
+
+    ctx.fillStyle = C.t3; ctx.font = label;
+    ctx.fillText('ONE CHUNK', inX + 13, inY - 11);
+
+    ctx.fillStyle = C.t2; ctx.font = '12px "Public Sans", sans-serif';
+    const lines = [
+      'Expected Result: HTTP 429',
+      'is returned together with',
+      'a Retry-After header.',
+    ];
+    lines.forEach((s, i) => ctx.fillText(s, inX + 14, inY + 30 + i * 20));
+
+    // ---- model box
+    const mX = 292, mY = 128, mW = 116, mH = 74;
+    ctx.fillStyle = C.panel;
+    roundRect(mX, mY, mW, mH, 4); ctx.fill();
+    ctx.strokeStyle = C.fuse; ctx.lineWidth = 1.6;
+    roundRect(mX + 0.8, mY + 0.8, mW - 1.6, mH - 1.6, 4); ctx.stroke();
+
+    ctx.fillStyle = C.text; ctx.font = '600 14px "JetBrains Mono", monospace';
+    ctx.fillText('bge-m3', mX + 21, mY + 34);
+    ctx.fillStyle = C.t3; ctx.font = '10px "Public Sans", sans-serif';
+    ctx.fillText('one forward pass', mX + 13, mY + 53);
+
+    // ---- connector: chunk -> model
+    ctx.strokeStyle = C.rule; ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(inX + inW, inY + inH / 2);
+    ctx.lineTo(mX, mY + mH / 2);
+    ctx.stroke();
+
+    // travelling pulse, only when motion is allowed
+    if (!reduced) {
+      const p = (t % 2000) / 2000;
+      const px = inX + inW + (mX - inX - inW) * p;
+      ctx.fillStyle = C.fuse;
+      ctx.beginPath(); ctx.arc(px, inY + inH / 2, 2.6, 0, Math.PI * 2); ctx.fill();
+    }
+
+    const splitX = mX + mW;
+    const outX = 528;
+
+    // ---- dense output
+    if (show.dense) {
+      const dY = 62, bandH = 30, bandW = 352;
+
+      ctx.strokeStyle = C.dense; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(splitX, mY + mH / 2);
+      ctx.bezierCurveTo(splitX + 54, mY + mH / 2, outX - 54, dY + bandH / 2, outX, dY + bandH / 2);
+      ctx.stroke();
+
+      ctx.fillStyle = C.dense; ctx.font = label;
+      ctx.fillText('DENSE VECTOR', outX, dY - 13);
+      ctx.fillStyle = C.t3; ctx.font = '10px "Public Sans", sans-serif';
+      ctx.fillText('1,024 dims  ·  96 shown', outX + 104, dY - 13);
+
+      const cw = bandW / CELLS;
+      for (let i = 0; i < CELLS; i++) {
+        const wob = reduced ? 0 : 0.13 * Math.sin(t / 780 + i * 0.42);
+        const v = Math.min(1, Math.max(0.04, cells[i] + wob));
+        ctx.globalAlpha = 0.2 + v * 0.8;
+        ctx.fillStyle = C.dense;
+        ctx.fillRect(outX + i * cw, dY, Math.max(cw - 0.7, 0.8), bandH);
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = C.rule; ctx.lineWidth = 1;
+      ctx.strokeRect(outX + 0.5, dY + 0.5, bandW - 1, bandH - 1);
+
+      ctx.fillStyle = C.t3; ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillText('compared by cosine distance', outX, dY + bandH + 17);
+    }
+
+    // ---- sparse output
+    if (show.sparse) {
+      const sY = 158, rowH = 21, barMax = 168, labelW = 78;
+
+      ctx.strokeStyle = C.sparse; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(splitX, mY + mH / 2);
+      ctx.bezierCurveTo(splitX + 54, mY + mH / 2, outX - 54, sY + 26, outX, sY + 26);
+      ctx.stroke();
+
+      ctx.fillStyle = C.sparse; ctx.font = label;
+      ctx.fillText('SPARSE VECTOR', outX, sY - 4);
+      ctx.fillStyle = C.t3; ctx.font = '10px "Public Sans", sans-serif';
+      ctx.fillText('weighted tokens, top 7  ·  illustrative', outX + 110, sY - 4);
+
+      SPARSE.forEach(([name, w], i) => {
+        const y = sY + 12 + i * rowH;
+        ctx.fillStyle = C.t2; ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.fillText(name, outX, y + 10);
+
+        ctx.fillStyle = C.panel2;
+        ctx.fillRect(outX + labelW, y, barMax, 12);
+
+        const grow = reduced ? 1 : Math.min(1, (t % 3200) / 900);
+        ctx.fillStyle = C.sparse;
+        ctx.globalAlpha = 0.42 + w * 0.58;
+        ctx.fillRect(outX + labelW, y, barMax * w * grow, 12);
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = C.t3; ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillText(w.toFixed(2), outX + labelW + barMax + 9, y + 10);
+      });
+    }
+
+    if (!show.dense && !show.sparse) {
+      ctx.fillStyle = C.t3; ctx.font = '12px "Public Sans", sans-serif';
+      ctx.fillText('Both representations hidden — turn one back on.', outX, 150);
+    }
+  }
+
+  let raf = null;
+  function loop(t) { draw(t); raf = requestAnimationFrame(loop); }
+
+  function start() {
+    if (reduced) { draw(0); return; }
+    if (raf === null) raf = requestAnimationFrame(loop);
+  }
+  function stop() {
+    if (raf !== null) { cancelAnimationFrame(raf); raf = null; }
+  }
+
+  // Pause when off-screen: an always-on rAF loop burns battery on a page people
+  // scroll past.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => {
+      es[0].isIntersecting ? start() : stop();
+    }, { threshold: 0.05 }).observe(cv);
+  } else {
+    start();
+  }
+
+  function wire(id, key) {
+    const b = document.getElementById(id);
+    b.addEventListener('click', () => {
+      show[key] = !show[key];
+      b.setAttribute('aria-pressed', String(show[key]));
+      if (reduced) draw(0);
+    });
+  }
+  wire('btn-dense', 'dense');
+  wire('btn-sparse', 'sparse');
+
+  // Theme flips change every token the canvas reads, so redraw on both the OS
+  // signal and an explicit data-theme stamp.
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => draw(performance.now()));
+  new MutationObserver(() => draw(performance.now()))
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  draw(0);
+})();
+</script>

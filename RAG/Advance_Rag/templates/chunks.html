@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Chunks — Advanced RAG Explorer{% endblock %}
+
+{% block rail %}
+<div class="card">
+  <h3>Collection</h3>
+  <dl class="kv">
+    <dt>Name</dt><dd>{{ cfg.collection }}</dd>
+    <dt>Points</dt><dd>{{ "{:,}".format(collection.points) }}</dd>
+    <dt>Mode</dt><dd>{{ collection.mode or '—' }}</dd>
+    <dt>Dense dim</dt><dd>{{ cfg.dense_dim }}</dd>
+    <dt>On page</dt><dd id="rail-onpage">0</dd>
+    <dt>Page</dt><dd id="rail-page">1</dd>
+  </dl>
+</div>
+
+<div class="card">
+  <h3>Legend</h3>
+  <p class="hint" style="margin:0">
+    A chunk outlined in <span style="color:var(--coral-deep);font-weight:600">coral</span>
+    was sent to the LLM for the most recent chat answer. Ask something on the
+    Chat tab, then come back here to see exactly which rows it read.
+  </p>
+</div>
+{% endblock %}
+
+{% block main %}
+<div>
+  <h1 class="page-title">Chunks</h1>
+  <p class="page-lede">
+    Every indexed chunk, with the payload Qdrant stores alongside it. Filters use
+    Qdrant's own payload index; the search box is a substring match applied to
+    the current page.
+  </p>
+</div>
+
+<section class="panel">
+  <header><h2>Filters</h2><div class="spacer"></div><span class="sub" id="filter-note"></span></header>
+  <div class="body">
+    <div class="row">
+      <label class="field" style="flex:2;min-width:200px">
+        Text contains
+        <input type="search" id="q" placeholder="e.g. rage click, 403, allocation">
+      </label>
+      <label class="field" style="flex:1;min-width:140px">Module<select id="f-Module"></select></label>
+      <label class="field" style="flex:1;min-width:140px">Feature<select id="f-Feature"></select></label>
+      <label class="field" style="flex:1;min-width:130px">Priority<select id="f-Priority"></select></label>
+      <label class="field" style="flex:1;min-width:130px">Test type<select id="f-TestType"></select></label>
+      <button id="btn-apply">Apply</button>
+      <button class="ghost" id="btn-clear">Clear</button>
+    </div>
+    <div id="msg" style="margin-top:12px"></div>
+  </div>
+</section>
+
+<section class="panel">
+  <header>
+    <h2>Results</h2>
+    <div class="spacer"></div>
+    <button class="ghost" id="btn-prev" disabled>← Prev</button>
+    <button class="ghost" id="btn-next" disabled>Next →</button>
+  </header>
+  <div class="body">
+    <div id="list"><div class="empty">Loading…</div></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const FIELD_IDS = { Module: 'f-Module', Feature: 'f-Feature', Priority: 'f-Priority', 'Test Type': 'f-TestType' };
+
+// Qdrant's scroll API is cursor-based: it hands back the offset of the next page
+// and has no notion of a page number, so going back means remembering the
+// cursors we have already used rather than computing one.
+let cursors = [null];
+let page = 0;
+
+async function loadFacets() {
+  try {
+    const res = await fetch('/api/facets');
+    const data = await res.json();
+    for (const [field, id] of Object.entries(FIELD_IDS)) {
+      const sel = $('#' + id);
+      const values = data[field] || [];
+      sel.innerHTML = `<option value="">All</option>` +
+        values.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+      if (!values.length) sel.disabled = true;
+    }
+  } catch { /* filters simply stay as All */ }
+}
+
+function currentFilters() {
+  const out = {};
+  for (const [field, id] of Object.entries(FIELD_IDS)) {
+    const v = $('#' + id).value;
+    if (v) out[field] = v;
+  }
+  return out;
+}
+
+async function load() {
+  $('#list').innerHTML = '<div class="empty"><span class="spin"></span> Loading…</div>';
+
+  const qs = new URLSearchParams({ limit: '50' });
+  const cursor = cursors[page];
+  if (cursor) qs.set('offset', cursor);
+  const q = $('#q').value.trim();
+  if (q) qs.set('q', q);
+  Object.entries(currentFilters()).forEach(([k, v]) => qs.set(k, v));
+
+  try {
+    const res = await fetch('/api/chunks?' + qs);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    render(data);
+  } catch (err) {
+    $('#list').innerHTML = alertBox('err', err.message);
+  }
+}
+
+function render(data) {
+  const used = new Set(data.highlight || []);
+  $('#rail-onpage').textContent = fmt(data.rows.length);
+  $('#rail-page').textContent = page + 1;
+
+  const active = Object.entries(currentFilters());
+  $('#filter-note').textContent = active.length
+    ? active.map(([k, v]) => `${k}=${v}`).join(' · ')
+    : 'no filters';
+
+  // The cursor for the NEXT page arrives with this response; store it so Next
+  // has somewhere to go and Prev can step back through what we have seen.
+  cursors[page + 1] = data.next_offset;
+  $('#btn-next').disabled = !data.next_offset || data.rows.length === 0;
+  $('#btn-prev').disabled = page === 0;
+
+  if (!data.rows.length) {
+    $('#list').innerHTML = data.notice
+      ? `<div class="empty">${esc(data.notice)} <a href="/">Go to Upload →</a></div>`
+      : `<div class="empty">
+          No chunks matched.${$('#q').value ? ' The text filter only searches the current page — try clearing it, or narrow with a Module filter instead.' : ''}
+        </div>`;
+    return;
+  }
+
+  $('#list').innerHTML = data.rows.map(r => {
+    const p = r.payload || {};
+    const isUsed = used.has(String(r.id));
+    const meta = ['Issue Key', 'Module', 'Feature', 'Priority', 'Test Type', 'Browser', 'Device']
+      .filter(k => p[k])
+      .map(k => `<span class="tag">${esc(k)}: ${esc(p[k])}</span>`).join('');
+
+    return `<div class="chunk ${isUsed ? 'used' : ''}">
+      <div class="head">
+        ${isUsed ? '<span class="tag coral">used in last answer</span>' : ''}
+        <span class="tag blue">${esc(p['Issue Key'] || '—')}</span>
+        <span class="tag">${p.char_len ?? '?'} chars</span>
+        <span class="tag">chunk ${(p.chunk_index ?? 0) + 1}/${p.chunk_count ?? 1}</span>
+        <span class="tag" style="opacity:.7">row ${p.row_index ?? '?'}</span>
+      </div>
+      <div class="text">${esc(p.text || '')}</div>
+      <div class="meta">${meta}</div>
+      <div class="meta" style="opacity:.6">point id ${esc(r.id)}</div>
+    </div>`;
+  }).join('');
+}
+
+$('#btn-apply').onclick = () => { cursors = [null]; page = 0; load(); };
+$('#q').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btn-apply').click(); });
+$('#btn-clear').onclick = () => {
+  $('#q').value = '';
+  Object.values(FIELD_IDS).forEach(id => $('#' + id).value = '');
+  cursors = [null]; page = 0; load();
+};
+$('#btn-next').onclick = () => { page += 1; load(); };
+$('#btn-prev').onclick = () => { page = Math.max(0, page - 1); load(); };
+
+loadFacets().then(load);
+</script>
+{% endblock %}

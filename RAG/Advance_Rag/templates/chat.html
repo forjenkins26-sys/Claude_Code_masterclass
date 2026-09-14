@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% block title %}Chat — Advanced RAG Explorer{% endblock %}
+
+{% block rail %}
+<div class="card">
+  <h3>Query pipeline</h3>
+  <ol class="stages" id="stages"></ol>
+</div>
+
+<div class="card">
+  <h3>Retrieval knobs</h3>
+  <label class="field" style="margin-bottom:10px">
+    Top-N per leg
+    <input type="text" id="top-n" value="{{ cfg.top_n_hybrid }}" inputmode="numeric">
+  </label>
+  <label class="field" style="margin-bottom:10px">
+    Top-K to LLM
+    <input type="text" id="top-k" value="{{ cfg.top_k_rerank }}" inputmode="numeric">
+  </label>
+  <label class="hint" style="display:flex;gap:7px;align-items:center">
+    <input type="checkbox" id="rewrite" {{ 'checked' if cfg.rewrite_enabled }} style="width:auto">
+    Rewrite the query first
+  </label>
+  <p class="hint" style="margin:10px 0 0">
+    Turn rewriting off to see recall drop on a question phrased differently from
+    the corpus.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Last run</h3>
+  <dl class="kv">
+    <dt>Rewrite</dt><dd id="t-rewrite">—</dd>
+    <dt>Retrieve</dt><dd id="t-retrieve">—</dd>
+    <dt>Generate</dt><dd id="t-generate">—</dd>
+    <dt>Fused cands</dt><dd id="t-fused">—</dd>
+    <dt>Mode</dt><dd id="t-mode">—</dd>
+  </dl>
+</div>
+{% endblock %}
+
+{% block main %}
+<div>
+  <h1 class="page-title">Chat</h1>
+  <p class="page-lede">
+    Ask about the indexed test cases, or ask for a new one. Every answer opens up
+    to show the rewrites, both retrieval legs, the RRF fusion and the rerank
+    before/after — the reasoning is the lesson, not just the reply.
+  </p>
+</div>
+
+{% if not collection.points %}
+<div class="alert warn">
+  The collection is empty. <a href="/">Upload a file</a> and run ingestion first.
+</div>
+{% endif %}
+{% if not cfg.llm_configured %}
+<div class="alert err">
+  <strong>GROQ_API_KEY is not set.</strong> Add it to <code>.env</code> and restart —
+  rewriting and answering both call Groq.
+</div>
+{% endif %}
+
+<section class="panel">
+  <header><h2>Conversation</h2><div class="spacer"></div>
+    <button class="ghost" id="btn-clear">Clear</button>
+  </header>
+  <div class="body">
+    <div class="examples">
+      <button>Which test cases cover rage clicks?</button>
+      <button>What do we expect when the Data Export API rate limit is exceeded?</button>
+      <button>List the negative tests for traffic allocation</button>
+      <button>How is GDPR deletion tested?</button>
+      <button>Create a new test case for JIRA VWO-1234 covering webhook retries</button>
+    </div>
+
+    <div class="chat-log" id="log">
+      <div class="empty">Ask something, or pick an example above.</div>
+    </div>
+
+    <div class="composer" style="margin-top:16px">
+      <textarea id="q" rows="2" placeholder="Ask about the test cases — Enter to send, Shift+Enter for a new line"></textarea>
+      <button id="btn-send">Send</button>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const stages = new Stages($('#stages'), [
+  ['rewrite',  'Rewrite query'],
+  ['embed',    'Embed variants'],
+  ['search',   'Dense + sparse search'],
+  ['fuse',     'RRF fusion'],
+  ['rerank',   'Cross-encoder rerank'],
+  ['generate', 'Generate answer'],
+]);
+
+const log = $('#log');
+let busy = false;
+
+$$('.examples button').forEach(b => b.onclick = () => { $('#q').value = b.textContent; send(); });
+$('#btn-send').onclick = send;
+$('#btn-clear').onclick = () => {
+  log.innerHTML = '<div class="empty">Ask something, or pick an example above.</div>';
+  stages.reset();
+};
+$('#q').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+
+function intInput(sel, fallback) {
+  const n = parseInt($(sel).value, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+async function send() {
+  if (busy) return;
+  const question = $('#q').value.trim();
+  if (!question) return;
+
+  busy = true;
+  $('#btn-send').disabled = true;
+  $('#q').value = '';
+  if (log.querySelector('.empty')) log.innerHTML = '';
+
+  addMsg('user', 'You', esc(question));
+  const pending = addMsg('assistant', 'Assistant', '<span class="spin"></span> thinking…');
+
+  stages.reset();
+  // These stages all resolve inside one request, so the tracker shows the shape
+  // of the pipeline rather than live server progress. It is marked done from the
+  // response — never faked forward on a timer.
+  stages.set('rewrite', 'active', 'calling Groq');
+
+  try {
+    const data = await postJSON('/api/chat', {
+      question,
+      top_n: intInput('#top-n', {{ cfg.top_n_hybrid }}),
+      top_k: intInput('#top-k', {{ cfg.top_k_rerank }}),
+      rewrite: $('#rewrite').checked,
+    });
+    ['rewrite', 'embed', 'search', 'fuse', 'rerank', 'generate']
+      .forEach(k => stages.set(k, 'done'));
+    stages.set('rewrite',  'done', `${data.rewrites.length} variants`);
+    stages.set('search',   'done', `${data.counts.dense_runs}+${data.counts.sparse_runs} runs`);
+    stages.set('fuse',     'done', `${fmt(data.counts.fused)} candidates`);
+    stages.set('rerank',   'done', `top ${data.counts.final}`);
+    stages.set('generate', 'done', `${data.timings.generate}s`);
+
+    pending.remove();
+    addAnswer(data);
+    renderTimings(data);
+  } catch (err) {
+    stages.failAll('failed');
+    pending.remove();
+    addMsg('assistant', 'Assistant', alertBox('err', err.message));
+  } finally {
+    busy = false;
+    $('#btn-send').disabled = false;
+    $('#q').focus();
+  }
+}
+
+function addMsg(cls, who, html) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + cls;
+  el.innerHTML = `<div class="who">${esc(who)}</div><div class="bubble">${html}</div>`;
+  log.appendChild(el);
+  el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  return el;
+}
+
+function renderTimings(d) {
+  $('#t-rewrite').textContent  = d.timings.rewrite + 's';
+  $('#t-retrieve').textContent = d.timings.retrieve + 's';
+  $('#t-generate').textContent = d.timings.generate + 's';
+  $('#t-fused').textContent    = fmt(d.counts.fused);
+  $('#t-mode').textContent     = d.mode;
+}
+
+function addAnswer(d) {
+  const el = document.createElement('div');
+  el.className = 'msg assistant';
+  el.innerHTML = `
+    <div class="who">Assistant
+      <span class="tag ${d.mode === 'generate' ? 'coral' : 'green'}" style="margin-left:7px">${esc(d.mode)}</span>
+    </div>
+    <div class="bubble">${renderAnswer(d.answer)}</div>
+    ${detail('Query rewrites', rewritesHtml(d))}
+    ${detail('Dense vs sparse — what each leg found', legsHtml(d))}
+    ${detail('RRF fusion', fusedHtml(d))}
+    ${detail('Cross-encoder rerank — before / after', rerankHtml(d))}
+    ${detail(`Chunks sent to the LLM (${d.final.length})`, finalHtml(d))}
+    ${detail('Exact prompt sent', `<pre>${esc(d.prompt || '(none)')}</pre>`)}
+  `;
+  log.appendChild(el);
+  el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function detail(title, inner) {
+  return `<details class="stage-detail"><summary>${esc(title)}</summary><div>${inner}</div></details>`;
+}
+
+function rewritesHtml(d) {
+  if (d.rewrites.length <= 1) {
+    return `<p class="hint">Rewriting was off — only the original question was searched.</p>`;
+  }
+  return `<ol style="margin:0;padding-left:20px;font-size:12.5px">` +
+    d.rewrites.map((r, i) =>
+      `<li>${esc(r)} ${i === 0 ? '<span class="tag">original</span>' : ''}</li>`).join('') +
+    `</ol>`;
+}
+
+function hitTable(rows, scoreKey, scoreLabel) {
+  if (!rows.length) return '<p class="hint">Nothing returned.</p>';
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Issue</th><th>Module</th><th class="num">${esc(scoreLabel)}</th><th>Snippet</th></tr></thead>
+    <tbody>${rows.map((h, i) => `<tr>
+      <td class="num">${i + 1}</td>
+      <td class="mono">${esc(h.issue_key || '—')}</td>
+      <td>${esc(h.module || '—')}</td>
+      <td class="num">${h[scoreKey] ?? '—'}</td>
+      <td>${esc((h.snippet || '').replace(/\n/g, ' ').slice(0, 110))}…</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+function legsHtml(d) {
+  const denseIds  = new Set(d.dense.map(h => h.id));
+  const sparseIds = new Set(d.sparse.map(h => h.id));
+  const both = [...denseIds].filter(id => sparseIds.has(id)).length;
+
+  return `
+    <p class="hint" style="margin:0 0 10px">
+      ${d.dense.length} dense · ${d.sparse.length} sparse · <strong>${both}</strong> found by both.
+      A low overlap is the case for hybrid search: each leg is reaching rows the
+      other misses.
+    </p>
+    <div class="row" style="align-items:flex-start;gap:16px">
+      <div style="flex:1;min-width:300px">
+        <h4 style="font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 7px">Dense (semantic)</h4>
+        ${hitTable(d.dense, 'score', 'cosine')}
+      </div>
+      <div style="flex:1;min-width:300px">
+        <h4 style="font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 7px">Sparse (lexical)</h4>
+        ${hitTable(d.sparse, 'score', 'score')}
+      </div>
+    </div>`;
+}
+
+function fusedHtml(d) {
+  return `
+    <p class="hint" style="margin:0 0 10px">
+      RRF adds 1/(k+rank) across all ${d.counts.dense_runs + d.counts.sparse_runs}
+      runs with k={{ cfg.rrf_k }}. Rank positions are fused, not scores — the two
+      legs are not on a comparable scale.
+    </p>
+    ${hitTable(d.fused, 'rrf_score', 'rrf')}`;
+}
+
+function rerankHtml(d) {
+  if (!d.rerank_after.length) return '<p class="hint">Nothing to rerank.</p>';
+  return `
+    <p class="hint" style="margin:0 0 10px">
+      The cross-encoder reads the question and the chunk together, so it can
+      judge relevance the bi-encoder could only approximate. Movement below is
+      the reranker disagreeing with the fusion.
+    </p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>After</th><th>Before</th><th>Move</th><th>Issue</th><th class="num">rerank</th><th>Snippet</th></tr></thead>
+      <tbody>${d.rerank_after.map(h => {
+        const move = h.rank_before - h.rank_after;
+        const cls = move > 0 ? 'up' : move < 0 ? 'down' : 'flat';
+        const txt = move > 0 ? `▲ ${move}` : move < 0 ? `▼ ${-move}` : '—';
+        return `<tr>
+          <td class="num">${h.rank_after}</td>
+          <td class="num" style="color:var(--muted)">${h.rank_before}</td>
+          <td class="${'delta ' + cls}">${txt}</td>
+          <td class="mono">${esc(h.issue_key || '—')}</td>
+          <td class="num">${h.rerank_score ?? '—'}</td>
+          <td>${esc((h.snippet || '').replace(/\n/g, ' ').slice(0, 90))}…</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+}
+
+function finalHtml(d) {
+  if (!d.final.length) return '<p class="hint">No chunks reached the LLM.</p>';
+  return d.final.map((h, i) => `
+    <div class="chunk">
+      <div class="head">
+        <span class="tag coral">Chunk ${i + 1}</span>
+        <span class="tag blue">${esc(h.issue_key || '—')}</span>
+        ${h.module ? `<span class="tag">${esc(h.module)}</span>` : ''}
+        ${h.priority ? `<span class="tag">${esc(h.priority)}</span>` : ''}
+        <span class="tag">rerank ${h.rerank_score ?? '—'}</span>
+      </div>
+      <div class="text">${esc(h.text || h.snippet || '')}</div>
+    </div>`).join('');
+}
+</script>
+{% endblock %}

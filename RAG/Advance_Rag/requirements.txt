@@ -1,0 +1,32 @@
+flask==3.0.3
+python-dotenv==1.0.1
+pandas==2.2.2
+openpyxl==3.1.5
+groq>=0.13.0
+
+# Production WSGI server for hosted deployments. Flask's built-in server is a
+# development server and says so on every boot. One worker only: each worker
+# loads its own copy of the models (~400 MB resident), so a second one doubles
+# the memory on a container that is usually memory-bound, not CPU-bound.
+gunicorn>=21.2.0
+
+qdrant-client==1.11.3
+
+# The default backend (EMBED_BACKEND=fast, RERANK_BACKEND=fast). ONNX Runtime
+# rather than PyTorch, which is what makes it usable on a CPU: bge-small +
+# BM25 embed the 5,000-row corpus in ~9 minutes against ~5 hours for bge-m3,
+# and MiniLM re-ranks in ~1.9 s against ~43 s.
+fastembed>=0.8.0
+
+# The bge backend (EMBED_BACKEND=bge-m3 / RERANK_BACKEND=bge). Optional in
+# practice — nothing imports FlagEmbedding unless one of those is selected —
+# but pinned here so the switch works without a second install step.
+#
+# 1.4.x is required, not optional: FlagEmbedding 1.2.x fails at import against
+# transformers 5.x with "NameError: name 'Optional' is not defined" in
+# BGE_M3/trainer.py. Verified on transformers 5.17.0 / torch 2.14.0.
+FlagEmbedding>=1.4.2,<2
+
+# torch is imported directly by models.py to set the CPU thread count, so it is
+# a dependency of the fast path too, not only of FlagEmbedding.
+torch>=2.2.0
