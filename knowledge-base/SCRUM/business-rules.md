@@ -26,8 +26,15 @@
 | BR-11 | Valid 10-digit mobile login triggers OTP toast with exact number | SCRUM-121 | P2 |
 | BR-12 | Mobile number field enforces 10-digit maxlength (browser-level) | SCRUM-121 / AH Rule 18 | P3 |
 
+## Registration (registration-demo.html)
+
+| Rule | Statement | Source | Priority |
+|---|---|---|---|
+| BR-13 | A user is eligible only once their 18th birthday has **passed** — age must be compared to day precision, not year+month | SCRUM-142 AC (age gate) | P1 |
+
 ## Conflict handling
 If session requirements contradict a rule here, flag the contradiction in analysis output — do not silently pick one. Epic AC for the CURRENT feature still wins per-run; these rules are the persistent baseline.
 
 ## Known violations (cross-ref known-defects.md)
 - **BR-08 violated** → SCRUM-269 (Cancel visible in Dispatched). Confirmed defect, caught by OD-008/SCRUM-263.
+- **BR-13 violated** → SCRUM-795 (age gate ignores day-of-month, accepts users days short of 18). Confirmed defect, caught by REG-018b.
