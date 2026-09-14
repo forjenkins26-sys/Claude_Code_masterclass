@@ -8,6 +8,8 @@
 |-----|------|---------|--------|------------|----------------|
 | SCRUM-269 | Order Details / Cancel button | Cancel Order button visible in Dispatched ("Out for Delivery") state | Open | Confirmed | Violates BR-08. `order-details.html` renders `#cancelBtn` unconditionally — no visibility logic tied to status. Caught by OD-008/SCRUM-263. Do NOT re-file. |
 | SCRUM-141 | Blinkit Login / signup | `#signupBtn` has no click handler — button does nothing | Open | Confirmed | Intentional defect in `blinkit-login.html`. Known. Do NOT re-file. |
+| *(existing, key unread)* | Blinkit Login / mobile validation | 9-digit mobile accepted — regex `/^\d{9,10}$/` but AC-4 requires exactly 10. `#mobileErr` exists with correct text but stays `display:none` because validation passes | Open | Confirmed | Violates **BR-12**. Source-labelled INTENTIONAL BUG in the deployed build (`f1903d7f64072ec8`). Caught by BL-009 + BL-019 (one defect, two tests). **Already filed** — JQL `summary ~ "9-digit" AND statusCategory != Done` returns 1 open bug; MCP could not return its key (titles archive). Do NOT re-file without opening the JQL link first. |
+| *(existing, key unread)* | Blinkit Login / forgot password | Forgot-password toast reads "📧 …sent to your email"; AC-7 requires "…sent to your mobile" | Open | Confirmed | Source-labelled INTENTIONAL BUG. Caught by BL-003. Same defect class as SCRUM-716 (email-vs-mobile wording). Do NOT re-file without confirming against SCRUM-716. |
 
 ## Probing guidance
 - Order status–conditional UI (cancel/reorder/invoke buttons) → test every status state, not just default. SCRUM-269 proves status-gating logic is weak.

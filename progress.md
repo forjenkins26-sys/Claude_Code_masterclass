@@ -1147,3 +1147,26 @@ First smoke attempt failed with `getByLabel('First Name')` not found — the bro
 - BL-019: same root cause as BL-009 (9-digit boundary). Confirmed, unchanged from 07:55.
 
 **Dedup:** no new bugs filed. All three already recorded in the 07:55 block; SCRUM-141 remains correctly not re-filed.
+
+## 2026-09-14 08:20 — dedup check for SCRUM-121 defects (NO BUGS FILED)
+
+**Purpose:** decide whether the 3 Confirmed defects from the 07:55 / 08:05 runs need new Jira issues.
+
+**Result: NOT filed. Dedup evidence says both defects are already tracked.**
+
+| Defect | JQL | Open bugs found |
+|---|---|---|
+| 9-digit mobile accepted (BL-009/BL-019, violates BR-12) | `summary ~ "9-digit" AND statusCategory != Done` | **1** |
+| mobile validation | `summary ~ "mobile" AND summary ~ "validation" AND statusCategory != Done` | **1** |
+| broad mobile/digit sweep | `summary ~ "digit" OR summary ~ "mobile"` | 16 (all states) |
+| forgot/email sweep | `summary ~ "forgot" OR summary ~ "email"` | 14 (all states) |
+
+**MCP read limitation (unchanged from 2026-08-24):** `searchResultMode:"count"` returns totals, but issue *titles* still archive — `nodes` came back empty on every query, and a `fields:["summary","status"]` search archived too. So the counts are trustworthy; the identity of the matching issues is not machine-readable from here.
+
+**Decision (human-owned, AH Rule 25 + the SCRUM-694 duplicate lesson):** a count of 1 open bug on the narrowest possible query is strong evidence the 9-digit defect is already filed. Filing a second issue would risk repeating the SCRUM-717/719 duplicate incident, which required manual cleanup. Not filed. BL-003 (forgot-password toast says "email") matches the SCRUM-716 defect class already recorded in the 2026-08-24 block.
+
+**To close this out, a human needs to open the two JQL links and confirm identity:**
+- https://anandsoni2641.atlassian.net/issues?jql=project%20%3D%20SCRUM%20AND%20issuetype%20%3D%20Bug%20AND%20summary%20~%20%229-digit%22%20AND%20statusCategory%20!%3D%20Done
+- https://anandsoni2641.atlassian.net/issues?jql=project%20%3D%20SCRUM%20AND%20issuetype%20%3D%20Bug%20AND%20summary%20~%20%22forgot%22%20OR%20summary%20~%20%22email%22
+
+If the existing issue is a different defect, file then — with the evidence already gathered: regex `/^\d{9,10}$/` vs AC-4 exactly-10, source-labelled INTENTIONAL BUG, `#mobileErr` present with correct text but `display:none` because validation passes.
