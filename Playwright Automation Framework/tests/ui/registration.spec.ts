@@ -1,4 +1,5 @@
 import { test, expect } from '../../src/fixtures/test-fixtures';
+import { RegistrationPage } from '../../src/pages/RegistrationPage';
 
 // Epic: SCRUM-142 — Registration Page Testing — Form Validation & Field Constraints
 // URL:  http://localhost:7000/registration-demo.html
@@ -167,21 +168,37 @@ test.describe('Registration Page Tests (SCRUM-142)', () => {
 
   test('REG-017: Verify DOB making user exactly 18 passes age gate', async ({ registrationPage }) => {
     // Source: SCRUM-142 — exactly 18 years old → PASS
-    // Date: user born 2008-06-12 is exactly 18 on 2026-06-12
+    // Derived from today, not hardcoded: a fixed DOB drifts past the boundary it tests.
     await registrationPage.fillValidForm();
-    await registrationPage.dobInput.fill('2008-06-12');
+    await registrationPage.dobInput.fill(RegistrationPage.dobForAge(18));
     await registrationPage.submit();
     await expect(registrationPage.dobError).not.toBeVisible();
   });
 
   test('REG-018: Verify DOB making user under 18 is rejected', async ({ registrationPage }) => {
-    // Source: SCRUM-142 — 17 yrs 11 months → FAIL: "You must be at least 18 years old to register"
-    // Date: 2008-07-12 = 17 years 11 months on 2026-06-12
+    // Source: SCRUM-142 — under 18 → FAIL: "You must be at least 18 years old to register"
+    // Derived from today. The app's gate is month-granular (age === 18 && m >= 0),
+    // so this uses 17y + 2 months short of the birthday rather than the AC's
+    // "17 yrs 11 months" — see REG-018b, which covers the day-level hole.
     await registrationPage.fillValidForm();
-    await registrationPage.dobInput.fill('2008-07-12');
+    await registrationPage.dobInput.fill(RegistrationPage.dobForAge(18, 2));
     await registrationPage.submit();
     await expect(registrationPage.dobError).toBeVisible();
     await expect(registrationPage.dobError).toHaveText('You must be at least 18 years old to register');
+  });
+
+  test('REG-018b: Verify a user days short of 18 is rejected [WILL FAIL — BUG-C]', async ({ registrationPage }) => {
+    // Source: SCRUM-142 — "at least 18 years old". Someone whose 18th birthday has
+    // not happened yet is under 18, whatever the day.
+    // BUG-C: checkAge() compares years and months only —
+    //   return age > 18 || (age === 18 && m >= 0)
+    // so anyone born earlier in the current month passes the gate before their
+    // birthday. Found 2026-09-15 while fixing REG-018's stale date.
+    await registrationPage.fillValidForm();
+    // 18th birthday is 3 days away → still 17 today
+    await registrationPage.dobInput.fill(RegistrationPage.dobTurning18InDays(3));
+    await registrationPage.submit();
+    await expect(registrationPage.dobError).toBeVisible();
   });
 
   // ── Password Strength Validation ─────────────────────────────────────────────

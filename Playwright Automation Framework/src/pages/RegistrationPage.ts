@@ -71,6 +71,37 @@ export class RegistrationPage {
   }
 
   // Fill all fields with valid data for happy-path tests
+  /**
+   * A date of birth `age` years before today, shifted forward by `monthsShort`
+   * months — so the person's `age`-th birthday is still that many months away.
+   * dobForAge(18) is exactly 18 today; dobForAge(18, 2) is 17 years 10 months.
+   *
+   * Age-gate tests must derive dates from today, never hardcode them: a fixed DOB
+   * silently ages past the boundary it was written to test (REG-018 hardcoded a
+   * 17y11m date in June 2026 that had become 18y2m by September 2026, so the test
+   * failed against an app that was behaving correctly).
+   */
+  static dobForAge(age: number, monthsShort = 0): string {
+    const today = new Date();
+    const d = new Date(today.getFullYear() - age, today.getMonth() + monthsShort, today.getDate());
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  /**
+   * A date of birth whose 18th birthday falls a few days from now — so the person
+   * is still 17 today. Used to probe day-level precision in the age gate.
+   * Derived from today so it never drifts, and it steps into next month rather
+   * than clamping to a day that has already passed.
+   */
+  static dobTurning18InDays(days = 3): string {
+    const today = new Date();
+    const birthday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + days);
+    const d = new Date(birthday.getFullYear() - 18, birthday.getMonth(), birthday.getDate());
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
   async fillValidForm(): Promise<void> {
     await this.firstNameInput.fill('Rahul');
     await this.lastNameInput.fill('Sharma');
