@@ -89,3 +89,6 @@ output/**/__pycache__/
 
 # AH Rule 31 evidence harvests (throwaway run artifacts)
 output/harvest-*/
+
+# generated QA dashboard (rebuild with dashboard.js)
+output/qa-dashboard.html

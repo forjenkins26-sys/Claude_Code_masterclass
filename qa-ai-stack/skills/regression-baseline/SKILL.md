@@ -61,7 +61,37 @@ node $S/regression-baseline.js diff --kb=knowledge-base/SCRUM --from=<id> --to=<
 
 # resolve a live build identity
 node $S/build-identity.js https://your-app.example.com --json
+
+# static HTML dashboard over the run store (read-only, no server, no keys)
+node $S/dashboard.js --kb=knowledge-base/SCRUM --out=output/qa-dashboard.html
 ```
+
+## Dashboard (`dashboard.js`)
+
+A single self-contained HTML file built from `run-history.jsonl`. No server, no
+build step, no API keys, no network calls — open the file directly.
+
+**What it deliberately refuses to draw.** It does NOT plot one pass-rate line
+across every run. Verified on the real store (2026-09-14): 17 runs span **16
+distinct epics** with test counts from 13 to 31, and only SCRUM-121 has more
+than one run. A single series would place SCRUM-299 (10/16) beside SCRUM-545
+(25/31) as though one followed the other and read as a declining quality trend
+that does not exist. So:
+
+| Situation | Rendering |
+|---|---|
+| Epic with 2+ runs | Sparkline — a real trend |
+| Epic with 1 run | Card marked "single run — no trend", never connected |
+| Run with no build identity | `NONE` / `NO BUILD ID` in red, never hidden |
+| Two runs, same build, PASS→FAIL | **REGRESSION** — "code got worse" |
+| Two runs, different build, PASS→FAIL | **DIFFERENCE — NOT proven regressions**, baseline expired |
+
+No composite "quality score" is computed. A blended percentage across
+incomparable suites looks authoritative and means nothing.
+
+The regression panel calls `diffRuns()` from `regression-baseline.js` rather
+than recomputing verdicts in the page, so the HTML and the CLI cannot disagree —
+verified: both report the same 3 KNOWN rows and "no regressions" for SCRUM-121.
 
 **Exit codes:** `0` no regressions · `1` one or more REGRESSION/NEW_FAILURE · `2` bad input.
 
