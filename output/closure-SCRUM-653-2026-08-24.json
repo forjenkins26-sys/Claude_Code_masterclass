@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "epic": "SCRUM-653",
+  "summary": "Blinkit Login Page (Vercel) — Authentication & Field Validation",
+  "date": "2026-08-24",
+  "build": "https://blinkit-demo-qa.vercel.app/",
+  "verdict": "NO-GO",
+  "trigger": "two open High defects (SCRUM-645, SCRUM-647) on the authentication path",
+  "coverage": {
+    "requirements": { "covered": 14, "total": 14 },
+    "passRate": { "passed": 15, "executed": 18 },
+    "execution": { "executed": 18, "total": 18 }
+  },
+  "defects": [
+    { "key": "SCRUM-645", "severity": "High", "status": "To Do", "blocksAC": "AC-4", "tier": "SUSPECTED" },
+    { "key": "SCRUM-647", "severity": "High", "status": "To Do", "blocksAC": "AC-12", "tier": "SUSPECTED" },
+    { "key": "SCRUM-646", "severity": "Medium", "status": "To Do", "blocksAC": "AC-11", "tier": "SUSPECTED" }
+  ],
+  "notCovered": ["authorization", "performance", "accessibility", "i18n", "audit"],
+  "report": "output/closure-SCRUM-653-2026-08-24.md"
+}

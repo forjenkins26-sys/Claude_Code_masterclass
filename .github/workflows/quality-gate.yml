@@ -1,0 +1,64 @@
+# Quality gate — surfaces the release verdict from the newest /test-closure run.
+#
+# WHY THIS DOES NOT COMPUTE THE VERDICT
+#
+# /test-closure is a Claude Code skill. It reads Jira over MCP, reads progress.md
+# execution rows written by a human-run headed test cycle, and consults the
+# knowledge-base bug oracle. None of that exists inside a GitHub runner. So this
+# job cannot produce a verdict; it reads one that was already produced and
+# committed, and puts it in front of whoever is looking at the PR.
+#
+# WHY IT IS WARN-ONLY
+#
+# Same reason playwright-blinkit.yml holds its four @known-defect tests out of the
+# gate: a check that stays red for weeks because of triaged, known defects is one
+# people learn to scroll past, and then it protects nothing. Today's real verdict
+# (SCRUM-653) is NO-GO on two High defects that are already filed and understood.
+# Blocking every push on that would train exactly the habit we are trying to avoid.
+#
+# TO MAKE IT BLOCK: add --strict to the run below, or call the script with --strict
+# from a release workflow where a human is already waiting on the answer.
+
+name: Quality Gate
+
+on:
+  push:
+    paths:
+      - 'output/closure-*.json'
+      - 'scripts/quality-gate.js'
+      - '.github/workflows/quality-gate.yml'
+  pull_request:
+    paths:
+      - 'output/closure-*.json'
+      - 'scripts/quality-gate.js'
+  workflow_dispatch:
+    inputs:
+      build:
+        description: 'Build identity to check the verdict against (blank = skip the expiry check)'
+        required: false
+        type: string
+      strict:
+        description: 'Fail the job on NO-GO or expired results'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  gate:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Read closure verdict
+        # No npm install: the script is dependency-free node, so there is nothing
+        # to restore and no lockfile to key a cache on.
+        run: |
+          node scripts/quality-gate.js \
+            ${{ inputs.build && format('--build "{0}"', inputs.build) || '' }} \
+            ${{ inputs.strict && '--strict' || '' }}
