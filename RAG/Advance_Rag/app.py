@@ -134,6 +134,35 @@ def _seed_on_first_request() -> None:
     _ensure_seed_started()
 
 
+@app.post("/api/seed")
+def api_seed():
+    """Start (or report) the bundled-corpus seed.
+
+    An explicit endpoint because the hosted filesystem is ephemeral: after the
+    instance sleeps the collection is gone, and recovering it should be one call
+    rather than re-uploading the CSV. It is also the only way to re-run seeding
+    without a redeploy when the automatic trigger has already fired.
+    """
+    global _seed_started
+    if AUTOSEED["state"] == "running":
+        return jsonify({"status": "already running", "autoseed": AUTOSEED})
+    if store.info().get("points") and not request.args.get("force"):
+        return jsonify({"status": "already populated", "collection": store.info()})
+    _seed_started = False
+    _ensure_seed_started_forced()
+    return jsonify({"status": "started", "autoseed": AUTOSEED})
+
+
+def _ensure_seed_started_forced() -> None:
+    """Start the seed thread regardless of the AUTO_SEED setting."""
+    global _seed_started
+    with _seed_lock:
+        if _seed_started:
+            return
+        _seed_started = True
+        threading.Thread(target=_autoseed, daemon=True).start()
+
+
 def _seed_enabled() -> tuple[bool, str]:
     """Whether to seed on boot, and the reason either way.
 
