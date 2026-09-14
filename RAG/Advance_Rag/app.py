@@ -101,18 +101,37 @@ def _autoseed() -> None:
         AUTOSEED.update(state="failed", message=f"{type(exc).__name__}: {exc}")
 
 
-def _start_autoseed_later(delay: float = 8.0) -> None:
-    """Begin seeding only after the server has had time to bind its port.
+_seed_lock = threading.Lock()
+_seed_started = False
 
-    gunicorn imports this module before it listens, so work started at import
-    time competes with startup. On a 0.1-CPU instance that delay was enough for
-    the platform to report "No open ports detected" while the seed thread was
-    still pulling model files. Waiting a few seconds costs nothing and lets the
-    health check pass first — the app is then reachable, and reports seeding
-    progress through /api/config, instead of looking dead.
+
+def _ensure_seed_started() -> None:
+    """Kick off seeding from inside a live worker, at most once.
+
+    Seeding at import time did not survive: gunicorn starts more than one worker
+    process, the thread landed in one that then exited ("Worker exiting (pid:
+    73)"), and the worker left serving traffic had its own fresh AUTOSEED dict
+    still reading "idle". The collection stayed empty and nothing in the logs
+    said why.
+
+    Triggering from the first request instead ties the work to a process that is
+    demonstrably alive and handling traffic. The lock keeps concurrent first
+    requests from starting it twice; the thread keeps the triggering request
+    fast.
     """
-    time.sleep(delay)
-    _autoseed()
+    global _seed_started
+    if _seed_started or not _seed_on:
+        return
+    with _seed_lock:
+        if _seed_started:
+            return
+        _seed_started = True
+        threading.Thread(target=_autoseed, daemon=True).start()
+
+
+@app.before_request
+def _seed_on_first_request() -> None:
+    _ensure_seed_started()
 
 
 def _seed_enabled() -> tuple[bool, str]:
@@ -140,10 +159,10 @@ def _seed_enabled() -> tuple[bool, str]:
 
 _seed_on, _seed_why = _seed_enabled()
 AUTOSEED["message"] = _seed_why
-if _seed_on:
-    threading.Thread(target=_start_autoseed_later, daemon=True).start()
-else:
+if not _seed_on:
     AUTOSEED["state"] = "off"
+# When enabled, seeding starts on the first request (see _ensure_seed_started)
+# rather than here, so it runs in a worker that is actually serving traffic.
 
 
 # ------------------------------------------------------------------ pages
