@@ -71,7 +71,10 @@ def _autoseed() -> None:
         # indexing. A small instance therefore has to seed a subset or be
         # OOM-killed mid-boot. Writing the subset to its own file keeps
         # ingest.run() unchanged — it still just reads a CSV.
-        limit = int(os.getenv("AUTO_SEED_LIMIT", "0"))
+        # Default to a capped seed on a hosted instance for the same reason the
+        # batch size is capped there: the whole collection stays resident, so an
+        # uncapped 5,000-row seed is an OOM on a small box. 0 means no cap.
+        limit = int(os.getenv("AUTO_SEED_LIMIT") or (1200 if os.getenv("RENDER") else 0))
         if limit > 0:
             import pandas as pd
 
@@ -112,8 +115,35 @@ def _start_autoseed_later(delay: float = 8.0) -> None:
     _autoseed()
 
 
-if os.getenv("AUTO_SEED", "0") not in ("0", "false", "False"):
+def _seed_enabled() -> tuple[bool, str]:
+    """Whether to seed on boot, and the reason either way.
+
+    AUTO_SEED is honoured when set, but it is not required. A hosted instance is
+    detected by RENDER (set by the platform) and seeds by default, because there
+    the alternative is a permanently empty collection: the disk is ephemeral, so
+    every wake from sleep starts with nothing and there is no operator at the
+    keyboard to re-upload. Relying on the env var alone was a single point of
+    failure — when it did not arrive, the app sat idle with no indication why,
+    which is exactly what happened on the first deploy.
+
+    The reason string is surfaced through /api/config so the next person does
+    not have to guess whether seeding was off, skipped, or broken.
+    """
+    raw = os.getenv("AUTO_SEED")
+    if raw is not None and raw != "":
+        on = raw not in ("0", "false", "False")
+        return on, f"AUTO_SEED={raw!r}"
+    if os.getenv("RENDER"):
+        return True, "hosted instance (RENDER set), AUTO_SEED unset"
+    return False, "local run, AUTO_SEED unset"
+
+
+_seed_on, _seed_why = _seed_enabled()
+AUTOSEED["message"] = _seed_why
+if _seed_on:
     threading.Thread(target=_start_autoseed_later, daemon=True).start()
+else:
+    AUTOSEED["state"] = "off"
 
 
 # ------------------------------------------------------------------ pages
@@ -149,6 +179,15 @@ def api_config():
             "config": config.summary(),
             "collection": store.info(),
             "autoseed": AUTOSEED,
+            # Why seeding is or is not running, and the memory-critical knob.
+            # Both were invisible when the first deploy sat idle with an empty
+            # collection, which made it look like the app, not the config.
+            "runtime": {
+                "seed_enabled": _seed_on,
+                "seed_reason": _seed_why,
+                "ingest_batch": config.INGEST_BATCH,
+                "hosted": bool(os.getenv("RENDER")),
+            },
         }
     )
 

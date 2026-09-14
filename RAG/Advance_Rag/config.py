@@ -74,7 +74,15 @@ RERANK_MODEL = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3")
 # assumed. Left configurable for anyone running this on a GPU.
 BGE_USE_FP16 = os.getenv("BGE_USE_FP16", "0") not in ("0", "false", "False")
 
-INGEST_BATCH = int(os.getenv("INGEST_BATCH", 32))
+# Embedding batch size, and the single most important number for memory: one
+# ONNX inference over 32 documents allocates a working arena that took RSS from
+# 295 MB to 587 MB in a single step (measured), which OOM-kills a 512 MB
+# instance before anything is indexed. Batch 4 peaks at 363 MB.
+#
+# The default is therefore chosen from the environment rather than fixed at 32:
+# a hosted instance gets the safe value even if INGEST_BATCH never arrives,
+# because the failure mode there is a crash loop, not a slow run.
+INGEST_BATCH = int(os.getenv("INGEST_BATCH") or (4 if os.getenv("RENDER") else 32))
 
 # Torch defaults to half the physical cores. Using all of them measured 20%
 # faster on bge-m3 (373 min -> 299 min) and costs nothing on the fast path.
