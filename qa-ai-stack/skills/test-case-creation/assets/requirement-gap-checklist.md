@@ -65,6 +65,31 @@ per AH Rule 4.
 | ⚠️ | Scenario generated + flagged `AMBIGUOUS` + question for ticket author in Step 7 |
 | ❌ | **No invented scenario.** Step 7 gap row + question for ticket author |
 
+## Rate by impact, classify by bucket
+
+Every ⚠️ and ❌ carries an impact rating — what ships broken if it stays unanswered:
+
+| Impact | Meaning |
+|---|---|
+| 🔴 High | Data, money, access or safety at risk, or release-blocking (authz undefined, rollback absent) |
+| 🟡 Medium | A real defect users hit, but recoverable and visible (error copy, boundary values) |
+| 🟢 Low | Cosmetic or easily corrected later (single-reading ambiguity, missing mockup link) |
+
+Rate by blast radius, not by how much text is missing. One absent sentence about
+authorization outranks a whole undefined cosmetic section.
+
+Findings fall into three buckets:
+
+- **Gap** (`❌`) — information simply missing.
+- **Ambiguity** (`⚠️`) — two or more valid readings.
+- **Risk** (no score) — the requirement is present and clear, but something could still
+  ship broken: a stated rule with no stated failure mode, a feature touching a fragile
+  area from `feature-map.md`, an AC that contradicts an existing `BR-xx`. A ticket can
+  score all ✅ and still carry risk, which is why this bucket cannot come from the
+  checklist rows alone.
+
+Sort the Step 7 table highest-impact first — the author reads top-down.
+
 **Cross-check against the Knowledge Base (Step 1A):** a ❌ here that `business-rules.md`
 already answers with a `BR-xx` rule is not a true gap — cite the `BR-xx` as the assertion
 baseline and mark the row ✅ (KB-sourced). Only genuinely unanswered rows are gaps.

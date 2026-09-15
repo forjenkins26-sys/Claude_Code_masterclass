@@ -170,6 +170,24 @@ mcp__atlassian__getJiraIssue({
 })
 ```
 
+**If the fetch fails, STOP — never proceed on an invented ticket.**
+
+A 404, an auth error or an unreachable MCP means there is no requirement source, not that the requirement is empty. Generating scenarios anyway produces test cases asserting behaviour nobody specified, which is exactly what AH Rule 33 forbids.
+
+| Failure | Action |
+|---|---|
+| Key returns 404 / does not exist | Report the key as not found. Do **not** substitute a similar key or assume a rename — verify with JQL first if a rename is suspected |
+| MCP unreachable / auth error | Report it. Do not fall back to guessing from the URL or the spec name |
+| Any failure | **Ask the user to paste the ticket body**, then continue in Mode A using the pasted text as the requirement source. Record in the output that the source was pasted, not fetched (traceability, AH Rule 33) |
+
+```
+Could not fetch {KEY}: {error}.
+Paste the ticket body (summary + description + ACs) and I'll continue from that,
+or confirm the key and I'll retry.
+```
+
+This is not hypothetical: on 2026-09-15 `SCRUM-142` was listed as an Active Epic in `CLAUDE.md` and 404'd — the Epic had never existed. Without this step the run has no requirement source and the gap is invisible until test cases are already written.
+
 **Extract from Epic:**
 - Summary (feature name)
 - Description (acceptance criteria, functional requirements)
@@ -260,6 +278,28 @@ Score against whatever the requirement source is for this mode:
 | ✅ | Normal scenario generation (Step 3), assertion cites the AC / chunk / `BR-xx` |
 | ⚠️ | Generate the scenario, flag it `AMBIGUOUS`, add a question for the ticket author to Step 7 |
 | ❌ | **Generate nothing.** Add a gap row + question for the ticket author to Step 7 |
+
+**Rate every ⚠️ and ❌ by impact — what ships broken if this stays unanswered.**
+
+An unrated gap list reads flat: a missing performance target and a missing button label look identical, so the author fixes whichever is first rather than whichever matters. The rating is the finding's *consequence*, not a guess at the requirement.
+
+| Impact | Meaning | Example |
+|---|---|---|
+| 🔴 High | Could ship a defect that loses data, money, access or safety — or blocks release | authz roles unspecified · payment/rounding rules absent · no rollback behaviour |
+| 🟡 Medium | Could ship a real defect users hit, but recoverable and visible | error-path copy unspecified · boundary values undefined · empty-state undefined |
+| 🟢 Low | Cosmetic or easily corrected after release | wording ambiguity with one sensible reading · mockup not linked |
+
+Rate from the dimension's blast radius, not from how much text is missing — one absent sentence about authorization outranks a whole undefined cosmetic section.
+
+**Classify each finding into one of three buckets** when reporting in Step 7:
+
+| Bucket | What it is | Test-case consequence |
+|---|---|---|
+| **Gap** | Information is simply missing (`❌`) | No scenario generated — the gap is the deliverable |
+| **Ambiguity** | Two or more valid readings exist (`⚠️`) | Scenario generated against the most likely reading, flagged `AMBIGUOUS`, question raised |
+| **Risk** | Requirement is *present and clear*, but testing it reveals something that could ship broken | Scenario generated normally **and** the risk is reported |
+
+The Risk bucket is the one a completeness checklist misses by construction: it catches what a clear requirement does not protect against — a stated rule with no stated failure mode, a new feature touching a fragile area from `feature-map.md`, an AC that contradicts an existing `BR-xx`. A ticket can score all ✅ and still carry risk.
 
 **CRITICAL — a missing AC is a finding, not a blank to fill.** Never invent a requirement to close a ❌, and never write an assertion whose expected value came from your own inference. If the requirement source doesn't state the expected behavior, the gap IS the deliverable. This is AH Rule 4 territory — where a test is still warranted despite the gap, mark it `// VERIFICATION REQUIRED`.
 
@@ -804,11 +844,16 @@ Every ⚠️ and ❌ scored in Step 1C becomes a row here. Same report, second a
 ```markdown
 ### Requirement Completeness Gaps (Step 1C)
 
-| Dimension | Row | Score | Question for ticket author |
-|---|---|---|---|
-| Non-functional | Security / authorization | ❌ | Which roles can cancel an order? AC doesn't say. |
-| Clarity | No ambiguous wording | ⚠️ | AC line 4 says "handle gracefully" — what is the observable pass/fail? |
+| Bucket | Dimension | Row | Score | Impact | Question for ticket author |
+|---|---|---|---|---|---|
+| Gap | Non-functional | Security / authorization | ❌ | 🔴 High | Which roles can cancel an order? AC doesn't say. |
+| Ambiguity | Clarity | No ambiguous wording | ⚠️ | 🟡 Medium | AC line 4 says "handle gracefully" — what is the observable pass/fail? |
+| Risk | Cross-cutting | Regression surface | — | 🔴 High | Cancel touches Order Details, which `feature-map.md` lists as used by Checkout — AC says nothing about in-flight orders. |
 ```
+
+**Sort the table by impact, highest first.** The author reads top-down; a 🔴 buried under cosmetic rows gets the same attention as the cosmetic rows.
+
+Risk rows carry no ✅/⚠️/❌ score (the requirement is present and clear — the risk is in what it does not protect against), so their Score column is `—`. They still need an impact rating and a question.
 
 Report ❌ rows even when no test case was generated for them — an untested dimension nobody flagged is the failure mode this step exists to prevent.
 
