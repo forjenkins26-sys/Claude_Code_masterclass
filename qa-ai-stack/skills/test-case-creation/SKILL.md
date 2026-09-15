@@ -841,6 +841,16 @@ Compare:
 
 Every ⚠️ and ❌ scored in Step 1C becomes a row here. Same report, second axis — Step 1C asks *"is the requirement complete enough to test from"*, the table above asks *"does the requirement match the UI"*.
 
+**Open the section with a readiness verdict — one line, counted, not judged.**
+
+`NOT READY` when one or more 🔴 High rows exist; `READY` otherwise. The blocker count is the number of 🔴 rows, so the verdict is arithmetic rather than an opinion, and two people reading the same report get the same answer.
+
+```
+Readiness: NOT READY (2 blockers)
+```
+
+Per AH Rule 33 the verdict is **advisory**. It summarises the table for someone skimming; it does not gate the run, does not stop scenario generation for ✅/⚠️ rows, and does not override the author's or QA lead's call. Never withhold the test cases because the verdict reads NOT READY — report both.
+
 ```markdown
 ### Requirement Completeness Gaps (Step 1C)
 
@@ -853,6 +863,20 @@ Every ⚠️ and ❌ scored in Step 1C becomes a row here. Same report, second a
 
 **Sort the table by impact, highest first.** The author reads top-down; a 🔴 buried under cosmetic rows gets the same attention as the cosmetic rows.
 
+**Every question in that last column has to be answerable in one reply:**
+
+| Rule | Why |
+|---|---|
+| **One topic per question** | A question bundling three topics gets one answer covering one of them, and the other two are silently lost |
+| **Answerable from knowledge the author already has** | "What should the timeout be?" is answerable; "What did the architect intend?" is not |
+| **Specific enough to have a wrong answer** | "Can you clarify the error handling?" invites prose. "Which HTTP status does a duplicate email return — 409 or 422?" returns a fact |
+| **Cites what it is about** | Name the AC line, field, or the dimension row whose absence prompted it (AH Rule 33 traceability) |
+
+❌ "Can you clarify roles and permissions and what happens on failure?" — three topics, one answer.
+
+✅ "AC line 6 lists who can cancel an order but not who cannot — can an Analyst cancel another user's order?"
+
+
 Risk rows carry no ✅/⚠️/❌ score (the requirement is present and clear — the risk is in what it does not protect against), so their Score column is `—`. They still need an impact rating and a question.
 
 Report ❌ rows even when no test case was generated for them — an untested dimension nobody flagged is the failure mode this step exists to prevent.
@@ -864,12 +888,25 @@ Report ❌ rows even when no test case was generated for them — an untested di
 ```markdown
 ## Notes
 
-**Requirements Source:** Epic [SCRUM-XX] fetched [date] / UI-observed only
+**Requirements Source:** Epic [SCRUM-XX] fetched [date] / pasted by user [date] / UI-observed only
 **Test Environment:** [URL], [browser]
-**Assumptions:** [List if Mode B]
+**Assumptions — what I could not confirm:** [ALL modes — see below]
 **Requirement Gaps:** [List any found]
 **Out of Scope:** [What's NOT covered]
 ```
+
+**Assumptions is required in every mode, not just Mode B.** It was Mode-B-only on the theory that a fetched Epic leaves nothing unconfirmed — untrue in practice. Mode A infers from AC wording, Mode C reads chunks that may not carry the full document, and both resolve ambiguity somewhere. An unconfirmed inference that nobody wrote down is indistinguishable from a verified fact by the time `/test-case-execution` runs against it (AH Rule 30).
+
+List anything that shaped a test case without a requirement stating it:
+
+| Mode | Typical entries |
+|---|---|
+| A (Epic) | Which reading of an ambiguous AC was used · behaviour inferred from a `BR-xx` rather than the Epic · an AC assumed still current but not re-verified |
+| B (UI only) | Everything — no requirement source exists, so every expected value is an assumption |
+| C (Doc/RAG) | Retrieval may have missed a section · a chunk read in isolation from its surrounding context |
+
+Write "None — every assertion traces to an AC or `BR-xx`" when that is genuinely true. An empty field reads as "not considered"; the explicit line reads as "checked".
+
 
 ---
 
