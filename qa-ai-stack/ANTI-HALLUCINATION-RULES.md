@@ -1,7 +1,7 @@
 # Anti-Hallucination Rules
 
 **Author:** Anand Soni  
-**Updated:** 2026-08-18 · 32 rules (numbered by creation order, not sequence)
+**Updated:** 2026-09-15 · 33 rules (numbered by creation order, not sequence)
 
 ---
 
@@ -632,3 +632,24 @@ If the controls show the app behaving consistently, the defect is in the expecta
 - A wrongly-filed bug is more expensive than a wrongly-passing test: it burns dev time and damages trust in the automation.
 
 **Lesson (2026-08-18):** BL-013 (SCRUM-331) was initially triaged toward REAL_BUG. Headed controls proved the app stripped symbols correctly and the 10-char cap was doing its job — the test's expected value had not accounted for symbols consuming maxlength budget. Correct classification: TEST issue, auto-fixed.
+
+---
+
+## Rule 33 — A gap in the requirement is a finding to report, not a blank to fill
+
+**Applies to:** every skill that reads a requirement source — Epic, PRD, spec doc, ticket, AC list. Analysis and authoring alike.
+
+Rules 1–6 above forbid inventing *behaviour*. This rule closes the adjacent hole: what to do when the requirement itself is incomplete. The pressure there is different — the source is silent, a deliverable is expected, and writing a plausible AC feels like helping. It is not. An invented requirement is indistinguishable from a real one once it is written down, and every test derived from it then asserts a fiction.
+
+❌ DON'T: Epic omits the lockout threshold → write "account locks after 5 failed attempts" → build TC-014 around it → the number is now load-bearing and nobody knows it was guessed.
+
+✅ DO: Report "❌ lockout threshold not specified" as a gap. Where a test is still warranted, mark it `// VERIFICATION REQUIRED` and leave the expected value unasserted until the author supplies it.
+
+**Rules:**
+- **Never fabricate** an acceptance criterion, field, error code, threshold, or requirement to close a gap. A missing item is a finding.
+- **Do not rewrite the ticket for the author.** Surface the gap and ask the question; the requirement stays theirs. (Same two-source model as Rule 19 / Rule 32 — flag, never silently edit.)
+- **Every finding stays traceable** to a specific line in the source, or to its explicit absence. "AC line 8 says X" and "no AC covers authz" are both traceable; "the spec implies X" is not.
+- **A readiness verdict is advisory.** A skill may report "READY" / "NOT READY" on a requirement source, but the author and QA lead own that call — the verdict never gates their decision and never licenses filling the gap itself.
+- Where a gap is answered by an existing `BR-xx` business rule in the Knowledge Base, it is **not** a gap — cite the rule instead (per Rule 25 / Rule 30, re-verify the rule still holds before relying on it).
+
+**Why it earns a global rule (2026-09-15):** this guardrail already existed, but only inside `test-case-creation` Step 1C and its `requirement-gap-checklist.md`. Every other skill that touches a requirement — `test-plan-create-skill`, `epic-create`, `bug-triage`, `test-closure` — faced the same pressure with no rule to point at. Promoting it here makes it apply everywhere a requirement is read, which is what a global rules file is for. The "verdict is advisory" clause was new: nothing in the repo stated it, and an advisory label that quietly hardens into a gate is its own failure mode.

@@ -81,7 +81,7 @@ Steps 1–3 are the build-and-run loop. Step 4 answers *"can we ship?"* rather t
 
 ## Reference Files (load on demand)
 
-- `ANTI-HALLUCINATION-RULES.md` — 32 QA verification rules. Rule 32: test failing ≠ app broken — re-derive your own expected value before assigning REAL_BUG (inverse of Rule 19; expected-value errors are TEST issues, not bugs) · Rule 31: harvest evidence BEFORE any second Playwright run — `test-results/` is wiped on every invocation, even one matching zero tests · Rule 30: recalled memory is a claim, not a fact — re-verify before use (closes KB feedback-loop risk) · Rule 29: edge-case coverage matrix (BVA/ECP/etc) · Rule 28: before/after evidence shots · Rule 27: URL scope (nav-test links, don't cover destinations) · Rule 26: stay in command scope · Rule 25: KB bug-oracle + Confirmed/Suspected tiers · Rule 23: 4-category failure taxonomy · Rule 17: headed mode first
+- `ANTI-HALLUCINATION-RULES.md` — 33 QA verification rules. Rule 33: a gap in the requirement is a finding to report, not a blank to fill — never fabricate an AC/field/threshold, never rewrite the ticket for the author, keep every finding traceable to a line or its absence, and treat a readiness verdict as advisory (the author and QA lead own the call) · Rule 32: test failing ≠ app broken — re-derive your own expected value before assigning REAL_BUG (inverse of Rule 19; expected-value errors are TEST issues, not bugs) · Rule 31: harvest evidence BEFORE any second Playwright run — `test-results/` is wiped on every invocation, even one matching zero tests · Rule 30: recalled memory is a claim, not a fact — re-verify before use (closes KB feedback-loop risk) · Rule 29: edge-case coverage matrix (BVA/ECP/etc) · Rule 28: before/after evidence shots · Rule 27: URL scope (nav-test links, don't cover destinations) · Rule 26: stay in command scope · Rule 25: KB bug-oracle + Confirmed/Suspected tiers · Rule 23: 4-category failure taxonomy · Rule 17: headed mode first
 - `AUTO-FIX-PROTOCOL.md` — 17-rule autonomous fix protocol (max 3 attempts; Rule 16 surgical changes; Rule 17 independent verify before DONE — maker≠checker, default-REJECT)
 - `QA-SKILLS-CHEATSHEET.md` — one-page reference for the 3-step flow
 - `knowledge-base/GUIDE.md` — how persistent product memory works + grow workflow
@@ -140,7 +140,7 @@ npm run rules:check                       # enforce POM/spec placement + naming
 ## Provenance
 
 This stack combines:
-- **Our QA engine** — anti-hallucination (32 rules), auto-fix protocol (17 rules), agent-factory (RCA/Heal/Flaky), rule-engine, the 3 core skills
+- **Our QA engine** — anti-hallucination (33 rules), auto-fix protocol (17 rules), agent-factory (RCA/Heal/Flaky), rule-engine, the 3 core skills
 - **imransdet/qa-assistant** — persistent per-product Knowledge Base + bug-vs-intended oracle + Confirmed/Suspected confidence tiers (layered onto our engine, which it lacks)
 - **multica-ai/andrej-karpathy-skills** — `karpathy-guidelines` coding discipline (Surgical / Simplicity / Think-First / Goal-Driven)
 - **cobusgreyling/loop-engineering** — `loop-verifier` maker/checker pattern → AUTO-FIX Rule 17 (independent verify before DONE, default-REJECT, re-run tests, no-cheating audit)
